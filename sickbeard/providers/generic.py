@@ -191,7 +191,7 @@ class GenericProvider:
         quality = Quality.nameQuality(title)
         return quality
 
-    def _doSearch(self):
+    def _doSearch(self, show=None, season=None):
         return []
 
     def _get_season_search_strings(self, show, season, episode=None):
@@ -268,6 +268,8 @@ class GenericProvider:
             logger.log(u"Found result " + title + " at " + url, logger.DEBUG)
 
             result = self.getResult([episode])
+            if item.extraInfo:
+                result.extraInfo = item.extraInfo
             result.url = url
             result.name = title
             result.quality = quality
@@ -284,7 +286,7 @@ class GenericProvider:
         results = {}
 
         for curString in self._get_season_search_strings(show, season):
-            itemList += self._doSearch(curString)
+            itemList += self._doSearch(curString, show=show, season=season)
 
         for item in itemList:
 
@@ -344,6 +346,8 @@ class GenericProvider:
                 epObj.append(show.getEpisode(actual_season, curEp))
 
             result = self.getResult(epObj)
+            if item.extraInfo:
+                result.extraInfo = item.extraInfo
             result.url = url
             result.name = title
             result.quality = quality
@@ -355,7 +359,10 @@ class GenericProvider:
                 logger.log(u"Separating multi-episode result to check for later - result contains episodes: "+str(parse_result.episode_numbers), logger.DEBUG)
             elif len(epObj) == 0:
                 epNum = SEASON_RESULT
-                result.extraInfo = [show]
+                if result.extraInfo:
+                    result.extraInfo.append( show )
+                else:
+                    result.extraInfo = [show]
                 logger.log(u"Separating full season result to check for later", logger.DEBUG)
 
             if epNum in results:

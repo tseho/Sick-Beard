@@ -115,8 +115,8 @@ class ShowQueue(generic_queue.GenericQueue):
 
         return queueItemObj
 
-    def addShow(self, tvdb_id, showDir, default_status=None, quality=None, flatten_folders=None, lang="en"):
-        queueItemObj = QueueItemAdd(tvdb_id, showDir, default_status, quality, flatten_folders, lang)
+    def addShow(self, tvdb_id, showDir, default_status=None, quality=None, flatten_folders=None, lang="en", audio_lang=None):
+        queueItemObj = QueueItemAdd(tvdb_id, showDir, default_status, quality, flatten_folders, lang, audio_lang)
         
         self.add_item(queueItemObj)
 
@@ -165,7 +165,7 @@ class ShowQueueItem(generic_queue.QueueItem):
 
 
 class QueueItemAdd(ShowQueueItem):
-    def __init__(self, tvdb_id, showDir, default_status, quality, flatten_folders, lang):
+    def __init__(self, tvdb_id, showDir, default_status, quality, flatten_folders, lang, audio_lang):
 
         self.tvdb_id = tvdb_id
         self.showDir = showDir
@@ -173,6 +173,7 @@ class QueueItemAdd(ShowQueueItem):
         self.quality = quality
         self.flatten_folders = flatten_folders
         self.lang = lang
+        self.audio_lang = audio_lang
 
         self.show = None
 
@@ -219,10 +220,16 @@ class QueueItemAdd(ShowQueueItem):
                 t = tvdb_api.Tvdb(**ltvdb_api_parms)
                 s = t[self.tvdb_id]
 
-                # this usually only happens if they have an NFO in their show dir which gave us a TVDB ID that has no
-                # proper english version of the show
-                if not s or not s['seriesname']:
-                    ui.notifications.error("Unable to add show", "Show in "+self.showDir+" has no name on TVDB, probably the wrong language. Delete .nfo and add manually in the correct language.")
+                # this usually only happens if they have an NFO in their show dir which gave us a TVDB ID that has no proper english version of the show
+                if not s['seriesname']:
+                    logger.log(u"Show in " + self.showDir + " has no name on TVDB, probably the wrong language used to search with.", logger.ERROR)
+                    ui.notifications.error("Unable to add show", "Show in " + self.showDir + " has no name on TVDB, probably the wrong language. Delete .nfo and add manually in the correct language.")
+                    self._finishEarly()
+                    return
+                # if the show has no episodes/seasons
+                if not s:
+                    logger.log(u"Show " + str(s['seriesname']) + " is on TVDB but contains no season/episode data.", logger.ERROR)
+                    ui.notifications.error("Unable to add show", "Show " + str(s['seriesname']) + " is on TVDB but contains no season/episode data.")
                     self._finishEarly()
                     return
             except tvdb_exceptions.tvdb_exception, e:
@@ -234,7 +241,7 @@ class QueueItemAdd(ShowQueueItem):
             # clear the name cache
             name_cache.clearCache()
 
-            newShow = TVShow(self.tvdb_id, self.lang)
+            newShow = TVShow(self.tvdb_id, self.lang, self.audio_lang)
             newShow.loadFromTVDB()
 
             self.show = newShow

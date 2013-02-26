@@ -23,7 +23,7 @@ import sickbeard
 import urllib
 import datetime
 
-from common import USER_AGENT
+from common import USER_AGENT, Quality
 
 class SickBeardURLopener(urllib.FancyURLopener):
     version = USER_AGENT
@@ -84,7 +84,7 @@ class SearchResult:
         self.episodes = episodes
 
         # quality of the release
-        self.quality = -1
+        self.quality = Quality.UNKNOWN
 
         # release name
         self.name = ""
@@ -114,6 +114,12 @@ class NZBDataSearchResult(SearchResult):
     NZB result where the actual NZB XML data is stored in the extraInfo
     """
     resultType = "nzbdata"
+
+class TorrentDataSearchResult(SearchResult):
+    """
+    Torrent result where the actual torrent data is stored in the extraInfo
+    """
+    resultType = "torrentdata"
 
 class TorrentSearchResult(SearchResult):
     """
@@ -149,7 +155,7 @@ class Proper:
         self.url = url
         self.date = date
         self.provider = None
-        self.quality = -1
+        self.quality = Quality.UNKNOWN
 
         self.tvdbid = -1
         self.season = -1

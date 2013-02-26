@@ -54,7 +54,10 @@ try:
 except ImportError:
     from lib import simplejson as json
 
-import xml.etree.cElementTree as etree
+try:
+    import xml.etree.cElementTree as etree
+except ImportError:
+    import xml.etree.ElementTree as etree
 
 from sickbeard import browser
 
@@ -336,12 +339,12 @@ class Manage:
             epCounts[Overview.GOOD] = 0
             epCounts[Overview.UNAIRED] = 0
 
-            sqlResults = myDB.select("SELECT * FROM tv_episodes WHERE showid = ? ORDER BY season*1000+episode DESC", [curShow.tvdbid])
+            sqlResults = myDB.select("SELECT * FROM tv_episodes WHERE showid = ? ORDER BY season DESC, episode DESC", [curShow.tvdbid])
 
             for curResult in sqlResults:
 
                 curEpCat = curShow.getOverview(int(curResult["status"]))
-                epCats[str(curResult["season"])+"x"+str(curResult["episode"])] = curEpCat
+                epCats[str(curResult["season"]) + "x" + str(curResult["episode"])] = curEpCat
                 epCounts[curEpCat] += 1
 
             showCounts[curShow.tvdbid] = epCounts
@@ -762,34 +765,63 @@ class ConfigSearch:
         return _munge(t)
 
     @cherrypy.expose
-    def saveSearch(self, **postData):
+    def saveSearch(self, use_nzbs=None, use_torrents=None, nzb_dir=None, sab_username=None, sab_password=None,
+                       sab_apikey=None, sab_category=None, sab_host=None, nzbget_password=None, nzbget_category=None, nzbget_host=None,
+                       torrent_dir=None, nzb_method=None, usenet_retention=None, search_frequency=None, download_propers=None):
 
         results = []
 
-        for key, value in postData.items():
-        	value = value.strip()
-        	val = 1 if value == "on" else value
-        	if hasattr(config, 'change_' + key.upper()):
-        	  	ret, msg = getattr(config, 'change_' + key.upper())(val)
-        	  	if ret == False:
-        	  		results.append(msg)
-        	elif hasattr(sickbeard, key.upper()):
-        	  	setattr(sickbeard, key.upper(), val)
-        	elif hasattr(sickbeard, key.lower()):
-        	  	setattr(sickbeard, key.lower(), val)
-        	else:
-        	  	logger.log("Unknown search setting: " + key, logger.ERROR)
+        if not config.change_NZB_DIR(nzb_dir):
+            results += ["Unable to create directory " + os.path.normpath(nzb_dir) + ", dir not changed."]
 
-        # handle some special cases
-        sickbeard.USENET_RETENTION = int(postData.get('usenet_retention', 200))
+        if not config.change_TORRENT_DIR(torrent_dir):
+            results += ["Unable to create directory " + os.path.normpath(torrent_dir) + ", dir not changed."]
 
-        # this regex will match http or https urls or just a domain/address
-        regex = re.compile(r'^(http)?(?P<s>s|)?(://)?(?P<addr>[^/]*)/?')
-        # this substitution combined with above regex will return a '/' terminated url from given url or host
-        regex_sub = r'http\g<s>://\g<addr>/'
+        config.change_SEARCH_FREQUENCY(search_frequency)
 
-        sab_host = re.sub(regex, regex_sub, postData.get('sab_host', ''))
+        if download_propers == "on":
+            download_propers = 1
+        else:
+            download_propers = 0
+
+        if use_nzbs == "on":
+            use_nzbs = 1
+        else:
+            use_nzbs = 0
+
+        if use_torrents == "on":
+            use_torrents = 1
+        else:
+            use_torrents = 0
+
+        if usenet_retention == None:
+            usenet_retention = 200
+
+        sickbeard.USE_NZBS = use_nzbs
+        sickbeard.USE_TORRENTS = use_torrents
+
+        sickbeard.NZB_METHOD = nzb_method
+        sickbeard.USENET_RETENTION = int(usenet_retention)
+
+        sickbeard.DOWNLOAD_PROPERS = download_propers
+
+        sickbeard.SAB_USERNAME = sab_username
+        sickbeard.SAB_PASSWORD = sab_password
+        sickbeard.SAB_APIKEY = sab_apikey.strip()
+        sickbeard.SAB_CATEGORY = sab_category
+
+        if sab_host and not re.match('https?://.*', sab_host):
+            sab_host = 'http://' + sab_host
+
+        if not sab_host.endswith('/'):
+            sab_host = sab_host + '/'
+
         sickbeard.SAB_HOST = sab_host
+
+        sickbeard.NZBGET_PASSWORD = nzbget_password
+        sickbeard.NZBGET_CATEGORY = nzbget_category
+        sickbeard.NZBGET_HOST = nzbget_host
+
 
         sickbeard.save_config()
 
@@ -875,7 +907,7 @@ class ConfigPostProcessing:
 
         if self.isNamingValid(naming_abd_pattern, None, True) != "invalid":
             sickbeard.NAMING_ABD_PATTERN = naming_abd_pattern
-        else:
+        elif naming_custom_abd:
             results.append("You tried saving an invalid air-by-date naming config, not saving your air-by-date settings")
 
         sickbeard.USE_BANNER = use_banner
@@ -1000,8 +1032,8 @@ class ConfigProviders:
     def saveProviders(self, nzbmatrix_username=None, nzbmatrix_apikey=None,
                       nzbs_r_us_uid=None, nzbs_r_us_hash=None, newznab_string=None,
                       tvtorrents_digest=None, tvtorrents_hash=None,
- 					  btn_api_key=None,
-                      newzbin_username=None, newzbin_password=None,
+ 					  btn_api_key=None, binnewz_language=None,
+                      newzbin_username=None, newzbin_password=None,t411_language=None,t411_username=None,t411_password=None,
                       provider_order=None):
 
         results = []
@@ -1065,6 +1097,10 @@ class ConfigProviders:
                 sickbeard.TVTORRENTS = curEnabled
             elif curProvider == 'btn':
                 sickbeard.BTN = curEnabled
+            elif curProvider == 'binnewz':
+                sickbeard.BINNEWZ = curEnabled
+            elif curProvider == 't411':
+                sickbeard.T411 = curEnabled
             elif curProvider in newznabProviderDict:
                 newznabProviderDict[curProvider].enabled = bool(curEnabled)
             else:
@@ -1074,15 +1110,15 @@ class ConfigProviders:
         sickbeard.TVTORRENTS_HASH = tvtorrents_hash.strip()
 
         sickbeard.BTN_API_KEY = btn_api_key.strip()
+        
+        sickbeard.BINNEWZ_LANGUAGE = binnewz_language
+
+        sickbeard.T411_LANGUAGE = t411_language
+        sickbeard.T411_USERNAME = t411_username
+        sickbeard.T411_PASSWORD = t411_password
 
         sickbeard.NZBSRUS_UID = nzbs_r_us_uid.strip()
         sickbeard.NZBSRUS_HASH = nzbs_r_us_hash.strip()
-
-        sickbeard.NZBMATRIX_USERNAME = nzbmatrix_username
-        sickbeard.NZBMATRIX_APIKEY = nzbmatrix_apikey.strip()
-
-        sickbeard.NEWZBIN_USERNAME = newzbin_username
-        sickbeard.NEWZBIN_PASSWORD = newzbin_password
 
         sickbeard.PROVIDER_ORDER = provider_list
 
@@ -1419,10 +1455,10 @@ class Config:
     notifications = ConfigNotifications()
 
 def haveXBMC():
-    return sickbeard.XBMC_HOST
+    return sickbeard.USE_XBMC and sickbeard.XBMC_UPDATE_LIBRARY
 
 def havePLEX():
-    return sickbeard.PLEX_SERVER_HOST
+    return sickbeard.USE_PLEX and sickbeard.PLEX_UPDATE_LIBRARY
 
 def HomeMenu():
     return [
@@ -1470,11 +1506,11 @@ class NewHomeAddShows:
     def getTVDBLanguages(self):
         result = tvdb_api.Tvdb().config['valid_languages']
 
-        # Make sure list is sorted alphabetically but 'en' is in front
-        if 'en' in result:
-            del result[result.index('en')]
+        # Make sure list is sorted alphabetically but 'fr' is in front
+        if 'fr' in result:
+            del result[result.index('fr')]
         result.sort()
-        result.insert(0,'en')
+        result.insert(0, 'fr')
 
         return json.dumps({'results': result})
 
@@ -1483,11 +1519,11 @@ class NewHomeAddShows:
         return helpers.sanitizeFileName(name)
 
     @cherrypy.expose
-    def searchTVDBForShowName(self, name, lang="en"):
+    def searchTVDBForShowName(self, name, lang="fr"):
         if not lang or lang == 'null':
-                lang = "en"
+                lang = "fr"
 
-        baseURL = "http://thetvdb.com/api/GetSeries.php?"
+        baseURL = "http://www.thetvdb.com/api/GetSeries.php?"
         nameUTF8 = name.encode('utf-8')
 
         logger.log(u"Trying to find Show on thetvdb.com with: " + nameUTF8.decode('utf-8'), logger.DEBUG)
@@ -1509,7 +1545,7 @@ class NewHomeAddShows:
 
             finalURL = baseURL + urllib.urlencode(params)
 
-            logger.log(u"Searching for Show with searchterm: \'" + searchTerm.decode('utf-8')+ u"\' on URL " + finalURL, logger.DEBUG)
+            logger.log(u"Searching for Show with searchterm: \'" + searchTerm.decode('utf-8') + u"\' on URL " + finalURL, logger.DEBUG)
             urlData = helpers.getURL(finalURL)
 
             if urlData is None:
@@ -1523,7 +1559,7 @@ class NewHomeAddShows:
 
                 except Exception, e:
                     # use finalURL in log, because urlData can be too much information
-                    logger.log(u"Unable to parse XML for some reason: "+ex(e)+" from XML: "+finalURL, logger.ERROR)
+                    logger.log(u"Unable to parse XML for some reason: " + ex(e) + " from XML: " + finalURL, logger.ERROR)
                     series = ''
 
                 # add each result to our list
@@ -1651,9 +1687,9 @@ class NewHomeAddShows:
         return _munge(t)
 
     @cherrypy.expose
-    def addNewShow(self, whichSeries=None, tvdbLang="en", rootDir=None, defaultStatus=None,
+    def addNewShow(self, whichSeries=None, tvdbLang="fr", rootDir=None, defaultStatus=None,
                    anyQualities=None, bestQualities=None, flatten_folders=None, fullShowPath=None,
-                   other_shows=None, skipShow=None):
+                   other_shows=None, skipShow=None, audio_lang=None):
         """
         Receive tvdb id, dir, and other options and create a show from them. If extra show dirs are
         provided then it forwards back to newShow, if not it goes to /home.
@@ -1733,7 +1769,7 @@ class NewHomeAddShows:
         newQuality = Quality.combineQualities(map(int, anyQualities), map(int, bestQualities))
         
         # add the show
-        sickbeard.showQueueScheduler.action.addShow(tvdb_id, show_dir, int(defaultStatus), newQuality, flatten_folders, tvdbLang) #@UndefinedVariable
+        sickbeard.showQueueScheduler.action.addShow(tvdb_id, show_dir, int(defaultStatus), newQuality, flatten_folders, tvdbLang, audio_lang) #@UndefinedVariable
         ui.notifications.message('Show added', 'Adding the specified show into '+show_dir)
 
         return finishAddShow()
@@ -2027,21 +2063,31 @@ class Home:
     def testXBMC(self, host=None, username=None, password=None):
         cherrypy.response.headers['Cache-Control'] = "max-age=0,no-cache,no-store"
 
-        result = notifiers.xbmc_notifier.test_notify(urllib.unquote_plus(host), username, password)
-        if len(result.split(":")) > 2 and 'OK' in result.split(":")[2]:
-            return "Test notice sent successfully to "+urllib.unquote_plus(host)
-        else:
-            return "Test notice failed to "+urllib.unquote_plus(host)
+        finalResult = ''
+        for curHost in [x.strip() for x in host.split(",")]:
+            curResult = notifiers.xbmc_notifier.test_notify(urllib.unquote_plus(curHost), username, password)
+            if len(curResult.split(":")) > 2 and 'OK' in curResult.split(":")[2]:
+                finalResult += "Test XBMC notice sent successfully to " + urllib.unquote_plus(curHost)
+            else:
+                finalResult += "Test XBMC notice failed to " + urllib.unquote_plus(curHost)
+            finalResult += "<br />\n"
+
+        return finalResult
 
     @cherrypy.expose
     def testPLEX(self, host=None, username=None, password=None):
         cherrypy.response.headers['Cache-Control'] = "max-age=0,no-cache,no-store"
 
-        result = notifiers.plex_notifier.test_notify(urllib.unquote_plus(host), username, password)
-        if result:
-            return "Test notice sent successfully to "+urllib.unquote_plus(host)
-        else:
-            return "Test notice failed to "+urllib.unquote_plus(host)
+        finalResult = ''
+        for curHost in [x.strip() for x in host.split(",")]:
+            curResult = notifiers.plex_notifier.test_notify(urllib.unquote_plus(curHost), username, password)
+            if len(curResult.split(":")) > 2 and 'OK' in curResult.split(":")[2]:
+                finalResult += "Test Plex notice sent successfully to " + urllib.unquote_plus(curHost)
+            else:
+                finalResult += "Test Plex notice failed to " + urllib.unquote_plus(curHost)
+            finalResult += "<br />\n"
+
+        return finalResult
 
     @cherrypy.expose
     def testLibnotify(self):
@@ -2231,7 +2277,7 @@ class Home:
         return result['description'] if result else 'Episode not found.'
 
     @cherrypy.expose
-    def editShow(self, show=None, location=None, anyQualities=[], bestQualities=[], flatten_folders=None, paused=None, directCall=False, air_by_date=None, tvdbLang=None):
+    def editShow(self, show=None, location=None, anyQualities=[], bestQualities=[], flatten_folders=None, paused=None, directCall=False, air_by_date=None, tvdbLang=None, audio_lang=None, custom_search_names=None):
 
         if show == None:
             errString = "Invalid show ID: "+str(show)
@@ -2308,6 +2354,8 @@ class Home:
             showObj.paused = paused
             showObj.air_by_date = air_by_date
             showObj.lang = tvdb_lang
+            showObj.audio_lang = audio_lang
+            showObj.custom_search_names = custom_search_names
 
             # if we change location clear the db of episodes, change it, write to db, and rescan
             if os.path.normpath(showObj._location) != os.path.normpath(location):
@@ -2414,27 +2462,23 @@ class Home:
 
         redirect("/home/displayShow?show="+str(showObj.tvdbid))
 
-
     @cherrypy.expose
     def updateXBMC(self, showName=None):
-
-        for curHost in [x.strip() for x in sickbeard.XBMC_HOST.split(",")]:
-            if notifiers.xbmc_notifier._update_library(curHost, showName=showName):
-                ui.notifications.message("Command sent to XBMC host " + curHost + " to update library")
-            else:
-                ui.notifications.error("Unable to contact XBMC host " + curHost)
+        # TODO: configure that each host can have different options / username / pw
+        # only send update to first host in the list -- workaround for xbmc sql backend users
+        firstHost = sickbeard.XBMC_HOST.split(",")[0].strip()
+        if notifiers.xbmc_notifier.update_library(showName=showName):
+            ui.notifications.message("Library update command sent to XBMC host: " + firstHost)
+        else:
+            ui.notifications.error("Unable to contact XBMC host: " + firstHost)
         redirect('/home')
-
 
     @cherrypy.expose
     def updatePLEX(self):
-
-        if notifiers.plex_notifier._update_library():
-            ui.notifications.message("Command sent to Plex Media Server host " + sickbeard.PLEX_HOST + " to update library")
-            logger.log(u"Plex library update initiated for host " + sickbeard.PLEX_HOST, logger.DEBUG)
+        if notifiers.plex_notifier.update_library():
+            ui.notifications.message("Library update command sent to Plex Media Server host: " + sickbeard.PLEX_SERVER_HOST)
         else:
-            ui.notifications.error("Unable to contact Plex Media Server host " + sickbeard.PLEX_HOST)
-            logger.log(u"Plex library update failed for host " + sickbeard.PLEX_HOST, logger.ERROR)
+            ui.notifications.error("Unable to contact Plex Media Server host: " + sickbeard.PLEX_SERVER_HOST)
         redirect('/home')
 
     @cherrypy.expose
@@ -2515,6 +2559,45 @@ class Home:
         if segment_list:
             ui.notifications.message("Backlog started", msg)
 
+        if direct:
+            return json.dumps({'result': 'success'})
+        else:
+            redirect("/home/displayShow?show=" + show)
+
+    @cherrypy.expose
+    def setAudio(self, show=None, eps=None, audio_langs=None, direct=False):
+    
+        if show == None or eps == None or audio_langs == None:
+            errMsg = "You must specify a show and at least one episode"
+            if direct:
+                ui.notifications.error('Error', errMsg)
+                return json.dumps({'result': 'error'})
+            else:
+                return _genericMessage("Error", errMsg)
+
+        showObj = sickbeard.helpers.findCertainShow(sickbeard.showList, int(show))
+
+        if showObj == None:
+            return _genericMessage("Error", "Show not in show list")
+
+        try:
+            show_loc = showObj.location #@UnusedVariable
+        except exceptions.ShowDirNotFoundException:
+            return _genericMessage("Error", "Can't rename episodes when the show dir is missing.")
+
+        ep_obj_rename_list = []
+
+        for curEp in eps.split('|'):
+
+                logger.log(u"Attempting to set audio on episode "+curEp+" to "+audio_langs, logger.DEBUG)
+
+                epInfo = curEp.split('x')
+
+                epObj = showObj.getEpisode(int(epInfo[0]), int(epInfo[1]))
+
+                epObj.audio_langs = [audio_langs]
+                epObj.saveToDB()
+        
         if direct:
             return json.dumps({'result': 'success'})
         else:
@@ -2655,7 +2738,7 @@ class UI:
 
         return json.dumps(messages)
 
-   
+
 class WebInterface:
 
     @cherrypy.expose
@@ -2681,7 +2764,7 @@ class WebInterface:
             return cherrypy.lib.static.serve_file(default_image_path, content_type="image/png")
 
         cache_obj = image_cache.ImageCache()
-        
+
         if which == 'poster':
             image_file_name = cache_obj.poster_path(showObj.tvdbid)
         # this is for 'banner' but also the default case
@@ -2689,6 +2772,9 @@ class WebInterface:
             image_file_name = cache_obj.banner_path(showObj.tvdbid)
 
         if ek.ek(os.path.isfile, image_file_name):
+            # use startup argument to prevent using PIL even if installed
+            if sickbeard.NO_RESIZE:
+                return cherrypy.lib.static.serve_file(image_file_name, content_type="image/jpeg")
             try:
                 from PIL import Image
                 from cStringIO import StringIO
@@ -2705,10 +2791,10 @@ class WebInterface:
                 else:
                     return cherrypy.lib.static.serve_file(image_file_name, content_type="image/jpeg")
                 im = im.resize(size, Image.ANTIALIAS)
-                buffer = StringIO()
-                im.save(buffer, 'JPEG', quality=85)
+                imgbuffer = StringIO()
+                im.save(imgbuffer, 'JPEG', quality=85)
                 cherrypy.response.headers['Content-Type'] = 'image/jpeg'
-                return buffer.getvalue()
+                return imgbuffer.getvalue()
         else:
             return cherrypy.lib.static.serve_file(default_image_path, content_type="image/png")
 

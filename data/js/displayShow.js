@@ -1,7 +1,9 @@
 $(document).ready(function(){
 
     $('#sbRoot').ajaxEpSearch({'colorRow': true});
-
+    
+    $("td.status_column:contains('Snatched')").parent().css("background-color", "#EBC1EA");
+    
     $('#seasonJump').change(function() {
         var id = $(this).val();
         if (id && id != 'jump') {
@@ -12,12 +14,22 @@ $(document).ready(function(){
     });
 
     $("#prevShow").click(function(){
-        $('#pickShow option:selected').prev('option').attr('selected', 'selected');
+        var show = $('#pickShow option:selected');
+        if (show.prev('option').length < 1){
+            show.parent().children('option:last').attr('selected', 'selected');
+        } else{
+            show.prev('option').attr('selected', 'selected');
+        };
         $("#pickShow").change();
     });
 
     $("#nextShow").click(function(){
-        $('#pickShow option:selected').next('option').attr('selected', 'selected');
+        var show = $('#pickShow option:selected');
+        if (show.next('option').length < 1){
+            show.parent().children('option:first').attr('selected', 'selected');
+        } else{
+            show.next('option').attr('selected', 'selected');
+        };
         $("#pickShow").change();
     });
 
@@ -37,6 +49,26 @@ $(document).ready(function(){
             return false
 
         url = sbRoot+'/home/setStatus?show='+$('#showID').attr('value')+'&eps='+epArr.join('|')+'&status='+$('#statusSelect').attr('value')
+        window.location.href = url
+
+    });
+    
+    $('#changeAudio').click(function(){
+        var sbRoot = $('#sbRoot').val()
+        var epArr = new Array()
+
+        $('.epCheck').each(function() {
+      
+            if (this.checked == true) {
+                epArr.push($(this).attr('id'))
+            }
+
+        });  
+
+        if (epArr.length == 0)
+            return false
+
+        url = sbRoot+'/home/setAudio?show='+$('#showID').attr('value')+'&eps='+epArr.join('|')+'&audio_langs='+$('#audioSelect').attr('value')
         window.location.href = url
 
     });
