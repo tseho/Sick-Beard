@@ -137,6 +137,20 @@ def change_TV_DOWNLOAD_DIR(tv_download_dir):
 
     return True
 
+def change_TORRENT_DOWNLOAD_DIR(torrent_download_dir):
+
+    if torrent_download_dir == '':
+        sickbeard.TORRENT_DOWNLOAD_DIR = ''
+        return True
+
+    if os.path.normpath(sickbeard.TORRENT_DOWNLOAD_DIR) != os.path.normpath(torrent_download_dir):
+        if helpers.makeDir(torrent_download_dir):
+            sickbeard.TORRENT_DOWNLOAD_DIR = os.path.normpath(torrent_download_dir)
+            logger.log(u"Changed Torrent download folder to " + torrent_download_dir)
+        else:
+            return False
+
+    return True
 
 def change_SEARCH_FREQUENCY(freq):
 
@@ -152,7 +166,15 @@ def change_SEARCH_FREQUENCY(freq):
 
     sickbeard.currentSearchScheduler.cycleTime = datetime.timedelta(minutes=sickbeard.SEARCH_FREQUENCY)
     sickbeard.backlogSearchScheduler.cycleTime = datetime.timedelta(minutes=sickbeard.get_backlog_cycle_time())
+def change_IGNORE_WORDS(words):
 
+    if words == None:
+        words = sickbeard.IGNORE_WORDS
+    else:
+        words = words
+
+    sickbeard.IGNORE_WORDS = words
+   
 def change_VERSION_NOTIFY(version_notify):
    
     oldSetting = sickbeard.VERSION_NOTIFY

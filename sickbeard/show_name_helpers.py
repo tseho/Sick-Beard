@@ -18,7 +18,7 @@
 
 import sickbeard
 
-from sickbeard.common import countryList
+from sickbeard.common import countryList, showLanguages
 from sickbeard.helpers import sanitizeSceneName
 from sickbeard.scene_exceptions import get_scene_exceptions
 from sickbeard import logger
@@ -26,14 +26,14 @@ from sickbeard import db
 
 import re
 import datetime
+import string
 
 from name_parser.parser import NameParser, InvalidNameException
 
 resultFilters = ["sub(pack|s|bed)", "nlsub(bed|s)?", "swesub(bed)?",
-                 "(dir|sample|nfo)fix", "sample", "(dvd)?extras", 
-                 "dub(bed)?"]
+                 "(dir|sample|nfo)fix", "sample", "(dvd)?extras"]
 
-def filterBadReleases(name):
+def filterBadReleases(name,showLang=u"en"):
     """
     Filters out non-english and just all-around stupid releases by comparing them
     to the resultFilters contents.
@@ -42,6 +42,10 @@ def filterBadReleases(name):
     
     Returns: True if the release name is OK, False if it's bad.
     """
+    
+    additionalFilters = []
+    if showLang == u"en":
+        additionalFilters.append("dub(bed)?")
 
     try:
         fp = NameParser()
@@ -65,7 +69,9 @@ def filterBadReleases(name):
         return True
 
     # if any of the bad strings are in the name then say no
-    for x in resultFilters + sickbeard.IGNORE_WORDS.split(','):
+    for x in resultFilters + sickbeard.IGNORE_WORDS.split(',') + additionalFilters:
+        if x == showLanguages.get(showLang):
+            continue
         if re.search('(^|[\W_])'+x+'($|[\W_])', check_string, re.I):
             logger.log(u"Invalid scene release: "+name+" contains "+x+", ignoring it", logger.DEBUG)
             return False
@@ -174,6 +180,8 @@ def makeSceneSearchString (episode):
     myDB = db.DBConnection()
     numseasonsSQlResult = myDB.select("SELECT COUNT(DISTINCT season) as numseasons FROM tv_episodes WHERE showid = ? and season != 0", [episode.show.tvdbid])
     numseasons = int(numseasonsSQlResult[0][0])
+    numepisodesSQlResult = myDB.select("SELECT COUNT(episode) as numepisodes FROM tv_episodes WHERE showid = ? and season != 0", [episode.show.tvdbid])
+    numepisodes = int(numepisodesSQlResult[0][0])
 
     # see if we should use dates instead of episodes
     if episode.show.air_by_date and episode.airdate != datetime.date.fromordinal(1):
@@ -182,8 +190,9 @@ def makeSceneSearchString (episode):
         epStrings = ["S%02iE%02i" % (int(episode.season), int(episode.episode)),
                     "%ix%02i" % (int(episode.season), int(episode.episode))]
 
-    # for single-season shows just search for the show name
-    if numseasons == 1:
+    # for single-season shows just search for the show name -- if total ep count (exclude s0) is less than 11
+    # due to the amount of qualities and releases, it is easy to go over the 50 result limit on rss feeds otherwise
+    if numseasons == 1 and numepisodes < 11:
         epStrings = ['']
 
     showNames = set(makeSceneShowSearchStrings(episode.show))
@@ -233,13 +242,15 @@ def allPossibleShowNames(show):
     """
 
     showNames = [show.name]
-    showNames += [name for name in get_scene_exceptions(show.tvdbid)]
+    for name in get_scene_exceptions(show.tvdbid):
+        if not name in showNames:
+            showNames.append( name )
 
     # if we have a tvrage name then use it
     if show.tvrname != "" and show.tvrname != None:
         showNames.append(show.tvrname)
 
-    if show.custom_search_names != '':
+    if show.custom_search_names != "" and show.custom_search_names != None :
         for custom_name in show.custom_search_names.split(','):
             showNames.append(custom_name)
 

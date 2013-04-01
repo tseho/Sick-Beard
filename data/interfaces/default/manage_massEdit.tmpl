@@ -60,7 +60,7 @@
         </div>
         <div style="width: 50%; text-align: center;" class="float-left">
         <h4>Archive</h4>
-            #set $bestQualityList = filter(lambda x: x > $common.Quality.SDTV, $common.Quality.qualityStrings)
+            #set $bestQualityList = filter(lambda x: x > $common.Quality.SDTV and x < $common.Quality.UNKNOWN, $common.Quality.qualityStrings)
             <select id="bestQualities" name="bestQualities" multiple="multiple" size="len($bestQualityList)">
             #for $curQuality in sorted($bestQualityList):
             <option value="$curQuality" #if $curQuality in $bestQualities then "selected=\"selected\"" else ""#>$common.Quality.qualityStrings[$curQuality]</option>
@@ -91,7 +91,16 @@
         </select>
     </div><br />
 </div>
-
+<div class="optionWrapper clearfix">
+	<span class="selectTitle">Subtitles</span>
+    <div class="selectChoices">
+        <select id="edit_subtitles" name="subtitles">
+            <option value="keep">&lt; keep &gt;</option>
+            <option value="enable" #if $subtitles_value then "selected=\"selected\"" else ""#>enable</option>
+            <option value="disable" #if $subtitles_value == False then "selected=\"selected\"" else ""#>disable</option>
+        </select>
+    </div><br />
+</div>
 <div class="optionWrapper clearfix">
     <br /><span class="separator" style="font-size: 1.2em; font-weight: 700;">*</span>
     Changing these settings will cause the selected shows to be refreshed.

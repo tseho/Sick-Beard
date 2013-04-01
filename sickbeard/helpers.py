@@ -32,15 +32,19 @@ from xml.dom.minidom import Node
 import sickbeard
 
 from sickbeard.exceptions import MultipleShowObjectsException, ex
-from sickbeard import logger, classes
-from sickbeard.common import USER_AGENT, mediaExtensions, XML_NSMAP
+from sickbeard import logger, classes, common
+from sickbeard.common import USER_AGENT, mediaExtensions, XML_NSMAP, subtitleExtensions
 
 from sickbeard import db
 from sickbeard import encodingKludge as ek
+from sickbeard import notifiers
 
 from lib.tvdb_api import tvdb_api, tvdb_exceptions
 
 import xml.etree.cElementTree as etree
+
+from lib import subliminal
+#from sickbeard.subtitles import EXTENSIONS
 
 urllib._urlopener = classes.SickBeardURLopener()
 
@@ -198,6 +202,8 @@ def makeDir (dir):
     if not ek.ek(os.path.isdir, dir):
         try:
             ek.ek(os.makedirs, dir)
+            # do the library update for synoindex
+            notifiers.synoindex_notifier.addFolder(dir)
         except OSError:
             return False
     return True
@@ -463,6 +469,8 @@ def make_dirs(path):
                     ek.ek(os.mkdir, sofar)
                     # use normpath to remove end separator, otherwise checks permissions against itself
                     chmodAsParent(ek.ek(os.path.normpath, sofar))
+                    # do the library update for synoindex
+                    notifiers.synoindex_notifier.addFolder(sofar)
                 except (OSError, IOError), e:
                     logger.log(u"Failed creating " + sofar + " : " + ex(e), logger.ERROR)
                     return False
@@ -482,6 +490,17 @@ def rename_ep_file(cur_path, new_path):
     new_dest_dir, new_dest_name = os.path.split(new_path) #@UnusedVariable
     cur_file_name, cur_file_ext = os.path.splitext(cur_path) #@UnusedVariable
 
+    if cur_file_ext[1:] in subtitleExtensions:
+        #Extract subtitle language from filename
+        sublang = os.path.splitext(cur_file_name)[1][1:]
+        
+        #Check if the language extracted from filename is a valid language
+        try:
+            language = subliminal.language.Language(sublang, strict=True)
+            cur_file_ext = '.'+sublang+cur_file_ext 
+        except ValueError:
+            pass
+        
     # put the extension on the incoming file
     new_path += cur_file_ext
 
@@ -525,6 +544,8 @@ def delete_empty_folders(check_empty_dir, keep_dir=None):
                 logger.log(u"Deleting empty folder: " + check_empty_dir)
                 # need shutil.rmtree when ignore_items is really implemented
                 ek.ek(os.rmdir, check_empty_dir)
+                # do the library update for synoindex
+                notifiers.synoindex_notifier.deleteFolder(check_empty_dir)
             except (WindowsError, OSError), e:
                 logger.log(u"Unable to delete " + check_empty_dir + ": " + repr(e) + " / " + str(e), logger.WARNING)
                 break
@@ -667,6 +688,21 @@ def create_https_certificates(ssl_cert, ssl_key):
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
+    
+def getAllLanguages ():
+    """
+    Returns all show languages where an episode is wanted or unaired
+    
+    Returns: A list of all language codes
+    """
+    myDB = db.DBConnection()
+    
+    sqlLanguages = myDB.select("SELECT DISTINCT(t.audio_lang) FROM tv_shows t, tv_episodes e WHERE t.tvdb_id = e.showid AND (e.status = ? OR e.status = ?)", [common.UNAIRED,common.WANTED])
+    
+    languages = map(lambda x: str(x["audio_lang"]), sqlLanguages)
+    
+    return languages
+
 
 def get_xml_text(node):
     text = ""

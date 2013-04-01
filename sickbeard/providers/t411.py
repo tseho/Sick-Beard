@@ -60,8 +60,10 @@ class T411Provider(generic.TorrentProvider):
         for showName in showNames:
             results.append( self.getSearchParams(showName + " S%02d" % season, show.audio_lang, 433 ))
             results.append( self.getSearchParams(showName + " S%02d" % season, show.audio_lang, 637 ))
+            results.append( self.getSearchParams(showName + " S%02d" % season, show.audio_lang, 634 ))
             results.append( self.getSearchParams(showName + " saison %02d" % season, show.audio_lang, 433 ))
             results.append( self.getSearchParams(showName + " saison %02d" % season, show.audio_lang, 637 ))
+            results.append( self.getSearchParams(showName + " saison %02d" % season, show.audio_lang, 634 ))
         return results
 
     def _get_episode_search_strings(self, ep_obj):
@@ -71,8 +73,13 @@ class T411Provider(generic.TorrentProvider):
         for showName in showNames:
             results.append( self.getSearchParams( "%s S%02dE%02d" % ( showName, ep_obj.season, ep_obj.episode), ep_obj.show.audio_lang, 433 ))
             results.append( self.getSearchParams( "%s %dx%d" % ( showName, ep_obj.season, ep_obj.episode ), ep_obj.show.audio_lang , 433 ))
+            results.append( self.getSearchParams( "%s %dx%02d" % ( showName, ep_obj.season, ep_obj.episode ), ep_obj.show.audio_lang, 433 ))
             results.append( self.getSearchParams( "%s S%02dE%02d" % ( showName, ep_obj.season, ep_obj.episode), ep_obj.show.audio_lang, 637 ))
             results.append( self.getSearchParams( "%s %dx%d" % ( showName, ep_obj.season, ep_obj.episode ), ep_obj.show.audio_lang, 637 ))
+            results.append( self.getSearchParams( "%s %dx%02d" % ( showName, ep_obj.season, ep_obj.episode ), ep_obj.show.audio_lang, 637 ))
+            results.append( self.getSearchParams( "%s S%02dE%02d" % ( showName, ep_obj.season, ep_obj.episode), ep_obj.show.audio_lang, 634))
+            results.append( self.getSearchParams( "%s %dx%d" % ( showName, ep_obj.season, ep_obj.episode ), ep_obj.show.audio_lang, 634 ))
+            results.append( self.getSearchParams( "%s %dx%02d" % ( showName, ep_obj.season, ep_obj.episode ), ep_obj.show.audio_lang, 634 ))
         return results
     
     def _get_title_and_url(self, item):
@@ -104,29 +111,24 @@ class T411Provider(generic.TorrentProvider):
                 link = row.find("a", title=True)
                 title = link['title']
                 
-                torrentPage = self.opener.open( link['href'] )
+                pageURL = link['href']
+                if pageURL.startswith("//"):
+                    pageURL = "http:" + pageURL
+                
+                torrentPage = self.opener.open( pageURL )
                 torrentSoup = BeautifulSoup( torrentPage )
                
                 downloadTorrentLink = torrentSoup.find("a", text=u"Télécharger")
                 if downloadTorrentLink:
                     
                     downloadURL = self.url + downloadTorrentLink['href']
-
-                    torrentdata = self.opener.open( downloadURL , 'wb').read()
                     
-                    if "720p" in title:
-                        if "bluray" in title:
-                            quality = Quality.HDBLURAY
-                        elif "web-dl" in title.lower() or "web.dl" in title.lower():
-                            quality = Quality.HDWEBDL
-                        else:
-                            quality = Quality.HDTV
-                    elif "1080p" in title:
-                        quality = Quality.FULLHDBLURAY
-                    else:
-                        quality = Quality.SDTV
+                    quality = Quality.nameQuality( title )
 
-                    results.append( T411SearchResult( link['title'], torrentdata, downloadURL, quality ) )
+                    if show:
+                        results.append( T411SearchResult( self.opener, link['title'], downloadURL, quality, str(show.audio_lang) ) )
+                    else:
+                        results.append( T411SearchResult( self.opener, link['title'], downloadURL, quality ) )
 
         return results
     
@@ -141,12 +143,16 @@ class T411Provider(generic.TorrentProvider):
     
 class T411SearchResult:
     
-    def __init__(self, title, torrentdata, url, quality):
+    def __init__(self, opener, title, url, quality, audio_langs=None):
+        self.opener = opener
         self.title = title
         self.url = url
-        self.extraInfo = [torrentdata] 
         self.quality = quality
+        self.audio_langs=[audio_langs]
         
+    def getNZB(self):
+        return self.opener.open( self.url , 'wb').read()
+
     def getQuality(self):
         return self.quality
 
