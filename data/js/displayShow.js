@@ -1,7 +1,8 @@
 $(document).ready(function(){
 
     $('#sbRoot').ajaxEpSearch({'colorRow': true});
-    $('#sbRoot').ajaxEpSubtitlesSearch({'colorRow': true});
+    $('#sbRoot').ajaxEpSubtitlesSearch();
+    $('#sbRoot').ajaxHisttrunc();
 
     $('#seasonJump').change(function() {
         var id = $(this).val();
