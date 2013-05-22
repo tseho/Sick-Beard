@@ -395,11 +395,6 @@ class GitUpdateManager(UpdateManager):
                 (files, insertions, deletions) = match.groups()
                 break
 
-        if None in (files, insertions, deletions):
-            logger.log(u"Didn't find indication of success in output, assuming git pull failed", logger.ERROR)
-            logger.log(u"Output: "+str(output))
-            return False
-
         return True
 
 
