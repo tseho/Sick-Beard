@@ -229,90 +229,103 @@ def searchForNeededEpisodes():
     return foundResults.values()
 
 
-def pickBestResult(results, quality_list=None, episode=None):
+def pickBestResult(results, quality_list=None, episode=None, season=None):
 
     logger.log(u"Picking the best result out of "+str([x.name for x in results]), logger.DEBUG)
     links=[]
     myDB = db.DBConnection()
-    for eps in episode.values():
-        if hasattr(eps,'tvdbid'):
-            epidr=myDB.select("SELECT episode_id from tv_episodes where tvdbid=?",[eps.tvdbid])
-            listlink=myDB.select("SELECT link from episode_links where episode_id=?",[epidr[0][0]])
+    if season !=None:
+        epidr=myDB.select("SELECT episode_id from tv_episodes where showid=? and season=?",[episode,season])
+        for epid in epidr:
+            listlink=myDB.select("SELECT link from episode_links where episode_id=?",[epid[0]])
             for dlink in listlink:
                 links.append(dlink[0])
+    else:
+        for eps in episode.values():
+            if hasattr(eps,'tvdbid'):
+                epidr=myDB.select("SELECT episode_id from tv_episodes where tvdbid=?",[eps.tvdbid])
+                listlink=myDB.select("SELECT link from episode_links where episode_id=?",[epidr[0][0]])
+                for dlink in listlink:
+                    links.append(dlink[0])
     # find the best result for the current episode
-        bestResult = None
-        for cur_result in results:
-            curmethod="nzb"
-            bestmethod="nzb"
-            if cur_result.resultType == "torrentdata" or cur_result.resultType == "torrent":
-                curmethod="torrent" 
-            if bestResult:
-                if bestResult.resultType == "torrentdata" or bestResult.resultType == "torrent":
-                    bestmethod="torrent"
-            if hasattr(cur_result,'item'):
-                if hasattr(cur_result.item,'nzburl'):
-                    eplink=cur_result.item.nzburl
-                elif hasattr(cur_result.item,'url'):
-                    eplink=cur_result.item.url
-                elif hasattr(cur_result,'nzburl'):
-                    eplink=cur_result.nzburl
-                elif hasattr(cur_result,'url'):
-                    eplink=cur_result.url
-                else:
-                    eplink=""
-            else:
-                if hasattr(cur_result,'nzburl'):
-                    eplink=cur_result.nzburl
-                elif hasattr(cur_result,'url'):
-                    eplink=cur_result.url
-                else:
-                    eplink=""
-            logger.log("Quality of "+cur_result.name+" is "+Quality.qualityStrings[cur_result.quality])
-        
-            if quality_list and cur_result.quality not in quality_list:
-                logger.log(cur_result.name+" is a quality we know we don't want, rejecting it", logger.DEBUG)
-                continue
-        
-            if eplink in links:
-                logger.log(eplink +" was already downloaded so let's skip it assuming the download failed, you can erase the downloaded links for that episode if you want", logger.DEBUG)
-                continue
-        
-            if ((not bestResult or bestResult.quality < cur_result.quality and cur_result.quality != Quality.UNKNOWN)) or (bestmethod != sickbeard.PREFERED_METHOD and curmethod ==  sickbeard.PREFERED_METHOD and cur_result.quality != Quality.UNKNOWN):
-                bestResult = cur_result
-            
-            elif bestResult.quality == cur_result.quality:
-                if "proper" in cur_result.name.lower() or "repack" in cur_result.name.lower():
-                    bestResult = cur_result
-                elif "internal" in bestResult.name.lower() and "internal" not in cur_result.name.lower():
-                    bestResult = cur_result
-       
+    bestResult = None
+    for cur_result in results:
+        curmethod="nzb"
+        bestmethod="nzb"
+        if cur_result.resultType == "torrentdata" or cur_result.resultType == "torrent":
+            curmethod="torrent" 
         if bestResult:
-            logger.log(u"Picked "+bestResult.name+" as the best", logger.DEBUG)
-        
-            if hasattr(bestResult,'item'):
-                if hasattr(bestResult.item,'nzburl'):
-                    eplink=bestResult.item.nzburl
-                elif hasattr(bestResult.item,'url'):
-                    eplink=bestResult.item.url
-                elif hasattr(bestResult,'nzburl'):
-                    eplink=bestResult.nzburl
-                elif hasattr(bestResult,'url'):
-                    eplink=bestResult.url
-                else:
-                    eplink=""
+            if bestResult.resultType == "torrentdata" or bestResult.resultType == "torrent":
+                bestmethod="torrent"
+        if hasattr(cur_result,'item'):
+            if hasattr(cur_result.item,'nzburl'):
+                eplink=cur_result.item.nzburl
+            elif hasattr(cur_result.item,'url'):
+                eplink=cur_result.item.url
+            elif hasattr(cur_result,'nzburl'):
+                eplink=cur_result.nzburl
+            elif hasattr(cur_result,'url'):
+                eplink=cur_result.url
             else:
-                if hasattr(bestResult,'nzburl'):
-                    eplink=bestResult.nzburl
-                elif hasattr(bestResult,'url'):
-                    eplink=bestResult.url
-                else:
-                    eplink=""
-            #count=myDB.select("SELECT count(*) from episode_links where episode_id=? and link=?",[epidr[0][0],eplink])
-            #if count[0][0]==0:
-                #myDB.action("INSERT INTO episode_links (episode_id, link) VALUES (?,?)",[epidr[0][0],eplink])
+                eplink=""
         else:
-            logger.log(u"No result picked.", logger.DEBUG)
+            if hasattr(cur_result,'nzburl'):
+                eplink=cur_result.nzburl
+            elif hasattr(cur_result,'url'):
+                eplink=cur_result.url
+            else:
+                eplink=""
+        logger.log("Quality of "+cur_result.name+" is "+Quality.qualityStrings[cur_result.quality])
+        
+        if quality_list and cur_result.quality not in quality_list:
+            logger.log(cur_result.name+" is a quality we know we don't want, rejecting it", logger.DEBUG)
+            continue
+        
+        if eplink in links:
+            logger.log(eplink +" was already downloaded so let's skip it assuming the download failed, you can erase the downloaded links for that episode if you want", logger.DEBUG)
+            continue
+        
+        if ((not bestResult or bestResult.quality < cur_result.quality and cur_result.quality != Quality.UNKNOWN)) or (bestmethod != sickbeard.PREFERED_METHOD and curmethod ==  sickbeard.PREFERED_METHOD and cur_result.quality != Quality.UNKNOWN):
+            bestResult = cur_result
+            
+        elif bestResult.quality == cur_result.quality:
+            if "proper" in cur_result.name.lower() or "repack" in cur_result.name.lower():
+                bestResult = cur_result
+            elif "internal" in bestResult.name.lower() and "internal" not in cur_result.name.lower():
+                bestResult = cur_result
+       
+    if bestResult:
+        logger.log(u"Picked "+bestResult.name+" as the best", logger.DEBUG)
+        
+        if hasattr(bestResult,'item'):
+            if hasattr(bestResult.item,'nzburl'):
+                eplink=bestResult.item.nzburl
+            elif hasattr(bestResult.item,'url'):
+                eplink=bestResult.item.url
+            elif hasattr(bestResult,'nzburl'):
+                eplink=bestResult.nzburl
+            elif hasattr(bestResult,'url'):
+                eplink=bestResult.url
+            else:
+                eplink=""
+        else:
+            if hasattr(bestResult,'nzburl'):
+                eplink=bestResult.nzburl
+            elif hasattr(bestResult,'url'):
+                eplink=bestResult.url
+            else:
+                eplink=""
+        if season !=None:
+            for epid in epidr:
+                count=myDB.select("SELECT count(*) from episode_links where episode_id=? and link=?",[epid[0],eplink])
+                if count[0][0]==0:
+                    myDB.action("INSERT INTO episode_links (episode_id, link) VALUES (?,?)",[epid[0],eplink])
+        else:
+            count=myDB.select("SELECT count(*) from episode_links where episode_id=? and link=?",[epidr[0][0],eplink])
+            if count[0][0]==0:
+                myDB.action("INSERT INTO episode_links (episode_id, link) VALUES (?,?)",[epidr[0][0],eplink])
+    else:
+        logger.log(u"No result picked.", logger.DEBUG)
     
     return bestResult
 
@@ -503,7 +516,7 @@ def findSeason(show, season):
         # pick the best season NZB
         bestSeasonNZB = None
         if SEASON_RESULT in foundResults:
-            bestSeasonNZB = pickBestResult(foundResults[SEASON_RESULT], anyQualities+bestQualities,episode=show.episodes[min(show.episodes)])
+            bestSeasonNZB = pickBestResult(foundResults[SEASON_RESULT], anyQualities+bestQualities,show.tvdbid,season)
     
         highest_quality_overall = 0
         for cur_season in foundResults:
