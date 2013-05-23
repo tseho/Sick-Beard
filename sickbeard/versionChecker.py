@@ -374,7 +374,8 @@ class GitUpdateManager(UpdateManager):
         logger.log(u"Writing commit History", logger.DEBUG)
         log, err =self._run_git('log --pretty="%ar %h - %s" --no-merges -200')
         fp = open (os.path.join(sickbeard.DATA_DIR, "hist.log"), 'wb')
-        fp.write (str(log.split('\n')))
+        for line in log.split('\n'):
+            fp.write (line)
         fp.close ()                        
         os.chmod(os.path.join(sickbeard.DATA_DIR, "hist.log"), 0777)
         if not output:
