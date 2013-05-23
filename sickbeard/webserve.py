@@ -1420,7 +1420,10 @@ class ConfigNotifications:
                           use_trakt=None, trakt_username=None, trakt_password=None, trakt_api=None,trakt_remove_watchlist=None,trakt_use_watchlist=None,trakt_start_paused=None,trakt_method_add=None,
                           use_pytivo=None, pytivo_notify_onsnatch=None, pytivo_notify_ondownload=None, pytivo_notify_onsubtitledownload=None, pytivo_update_library=None, 
                           pytivo_host=None, pytivo_share_name=None, pytivo_tivo_name=None,
-                          use_nma=None, nma_notify_onsnatch=None, nma_notify_ondownload=None, nma_notify_onsubtitledownload=None, nma_api=None, nma_priority=0 ):
+                          use_nma=None, nma_notify_onsnatch=None, nma_notify_ondownload=None, nma_notify_onsubtitledownload=None, nma_api=None, nma_priority=0,
+                          use_mail=None, mail_username=None, mail_password=None, mail_server=None, mail_ssl=None, mail_from=None, mail_to=None, mail_notify_onsnatch=None ):
+
+
 
         results = []
 
@@ -1683,6 +1686,22 @@ class ConfigNotifications:
         else:
             nma_notify_onsubtitledownload = 0
 
+        if use_mail == "on":
+            use_mail = 1
+        else:
+            use_mail = 0
+
+        if mail_ssl == "on":
+            mail_ssl = 1
+        else:
+            mail_ssl = 0    
+
+        if mail_notify_onsnatch == "on":
+            mail_notify_onsnatch = 1
+        else:
+            mail_notify_onsnatch = 0
+
+
         sickbeard.USE_XBMC = use_xbmc
         sickbeard.XBMC_NOTIFY_ONSNATCH = xbmc_notify_onsnatch
         sickbeard.XBMC_NOTIFY_ONDOWNLOAD = xbmc_notify_ondownload
@@ -1783,6 +1802,15 @@ class ConfigNotifications:
         sickbeard.NMA_NOTIFY_ONSUBTITLEDOWNLOAD = nma_notify_onsubtitledownload
         sickbeard.NMA_API = nma_api
         sickbeard.NMA_PRIORITY = nma_priority
+
+        sickbeard.USE_MAIL = use_mail
+        sickbeard.MAIL_USERNAME = mail_username
+        sickbeard.MAIL_PASSWORD = mail_password
+        sickbeard.MAIL_SERVER = mail_server
+        sickbeard.MAIL_SSL = mail_ssl
+        sickbeard.MAIL_FROM = mail_from
+        sickbeard.MAIL_TO = mail_to
+        sickbeard.MAIL_NOTIFY_ONSNATCH = mail_notify_onsnatch
 
         sickbeard.save_config()
 
@@ -2596,6 +2624,16 @@ class Home:
             return "Test notice sent successfully to Trakt"
         else:
             return "Test notice failed to Trakt"
+
+    @cherrypy.expose
+    def testMail(self, mail_from=None, mail_to=None, mail_server=None, mail_ssl=None, mail_user=None, mail_password=None):
+        cherrypy.response.headers['Cache-Control'] = "max-age=0,no-cache,no-store"
+
+        result = notifiers.mail_notifier.test_notify(mail_from, mail_to, mail_server, mail_ssl, mail_user, mail_password)
+        if result:
+            return "Mail sent"
+        else:
+            return "Can't sent mail."
 
     @cherrypy.expose
     def testNMA(self, nma_api=None, nma_priority=0):

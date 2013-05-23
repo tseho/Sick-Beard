@@ -188,4 +188,18 @@ $(document).ready(function () {
         $.get(sbRoot + "/home/testNMA", {'nma_api': nma_api, 'nma_priority': nma_priority},
             function (data) { $('#testNMA-result').html(data); });
     });
+    
+    $('#testMail').click(function () {
+        $('#testMail-result').html(loading);
+        var mail_from = $("#mail_from").val();
+        var mail_to = $("#mail_to").val();
+        var mail_server = $("#mail_server").val();
+        var mail_ssl = $("#mail_ssl").val();
+        var mail_username = $("#mail_username").val();
+        var mail_password = $("#mail_password").val();
+           
+        $.get(sbRoot + "/home/testMail", {},
+            function (data) { $('#testMail-result').html(data); });
+    });
+    
 });
