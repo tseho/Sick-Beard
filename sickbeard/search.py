@@ -308,9 +308,9 @@ def pickBestResult(results, quality_list=None, episode=None):
                     eplink=bestResult.url
                 else:
                     eplink=""
-            count=myDB.select("SELECT count(*) from episode_links where episode_id=? and link=?",[epidr[0][0],eplink])
-            if count[0][0]==0:
-                myDB.action("INSERT INTO episode_links (episode_id, link) VALUES (?,?)",[epidr[0][0],eplink])
+            #count=myDB.select("SELECT count(*) from episode_links where episode_id=? and link=?",[epidr[0][0],eplink])
+            #if count[0][0]==0:
+                #myDB.action("INSERT INTO episode_links (episode_id, link) VALUES (?,?)",[epidr[0][0],eplink])
         else:
             logger.log(u"No result picked.", logger.DEBUG)
     
