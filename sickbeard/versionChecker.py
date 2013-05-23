@@ -373,7 +373,7 @@ class GitUpdateManager(UpdateManager):
         output, err = self._run_git('pull git://github.com/sarakha63/Sick-Beard.git '+self.branch) #@UnusedVariable
         logger.log(u"Writing commit History", logger.DEBUG)
         histlog, err2 =self._run_git('log --pretty="%ar %h - %s" --no-merges -200')
-        print histlog
+        print histlog[1]
         logger.log(histlog, logger.DEBUG)
         fp = open (os.path.join(sickbeard.DATA_DIR, "hist.log"), 'wb')
         for line in histlog.split('\n'):
