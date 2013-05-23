@@ -372,10 +372,11 @@ class GitUpdateManager(UpdateManager):
         self._run_git('stash')
         output, err = self._run_git('pull git://github.com/sarakha63/Sick-Beard.git '+self.branch) #@UnusedVariable
         logger.log(u"Writing commit History", logger.DEBUG)
-        log, err2 =self._run_git('log --pretty="%ar %h - %s" --no-merges -200')
-        print log
+        histlog, err2 =self._run_git('log --pretty="%ar %h - %s" --no-merges -200')
+        print histlog
+        logger.log(histlog, logger.DEBUG)
         fp = open (os.path.join(sickbeard.DATA_DIR, "hist.log"), 'wb')
-        for line in log.split('\n'):
+        for line in histlog.split('\n'):
             fp.write (line)
         fp.close ()                        
         os.chmod(os.path.join(sickbeard.DATA_DIR, "hist.log"), 0777)
