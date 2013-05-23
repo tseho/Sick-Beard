@@ -32,6 +32,7 @@ from . import libnotify
 import pushover
 import boxcar
 import nma
+import mail
 
 import tweet
 import trakt
@@ -56,6 +57,7 @@ nma_notifier = nma.NMA_Notifier()
 # online
 twitter_notifier = tweet.TwitterNotifier()
 trakt_notifier = trakt.TraktNotifier()
+mail_notifier = mail.MailNotifier()
 
 notifiers = [
     libnotify_notifier, # Libnotify notifier goes first because it doesn't involve blocking on network activity.
@@ -73,6 +75,7 @@ notifiers = [
     nma_notifier,
     twitter_notifier,
     trakt_notifier,
+    mail_notifier,
 ]
 
 
