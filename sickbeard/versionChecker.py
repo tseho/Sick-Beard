@@ -399,7 +399,11 @@ class GitUpdateManager(UpdateManager):
             logger.log(u"Didn't find indication of success in output, assuming git pull succeeded", logger.DEBUG)
             logger.log(u"Output: "+str(output))
             return True
-
+        log=self._run_git('log --pretty="%h - %s" --no-merges -100')
+        fp = open (os.path.join(sickbeard.DATA_DIR, "hist.log"), 'wb')
+        fp.write (log)
+        fp.close ()                        
+        os.chmod(os.path.join(sickbeard.DATA_DIR, "hist.log"), 0777)
         return True
 
 
