@@ -20,9 +20,6 @@
             <h2>Home Theater</h2>
             <br />
 
-
-
-
                 <div class="component-group clearfix">
                     <div class="component-group-desc">
                         <img class="notifier-icon" src="$sbRoot/images/notifiers/xbmc.png" alt="" title="XBMC" />
@@ -1081,6 +1078,97 @@
 
                     </fieldset>
                 </div><!-- /trakt component-group //-->
+
+
+                <div class="component-group clearfix">
+                    <div class="component-group-desc">
+                        <img class="notifier-icon" src="$sbRoot/images/notifiers/mail.png" alt="" title="Mail" />
+                        <h3>Mail</h3>
+                        <p>Send mail when Tv Snatch</p>
+                    </div>
+                    <fieldset class="component-group-list">
+                        <div class="field-pair">
+                            <input type="checkbox" class="enabler" name="use_mail" id="use_mail" #if $sickbeard.USE_MAIL then "checked=\"checked\"" else ""# />
+                            <label class="clearfix" for="use_mail">
+                                <span class="component-title">Enable</span>
+                                <span class="component-desc">Should Sick Beard send mail notifications?</span>
+                            </label>
+                        </div>
+
+                        <div id="content_use_mail">
+                        	<div class="field-pair">
+                                <label class="nocheck clearfix">
+                                    <span class="component-title">Send E-Mail From</span>
+                                    <input type="text" name="mail_from" id="mail_from" value="$sickbeard.MAIL_FROM" size="35" />
+                                </label>
+                                <label class="nocheck clearfix">
+                                    <span class="component-title">&nbsp;</span>
+                                    <span class="component-desc">&nbsp;</span>
+                                </label>
+                            </div>
+                        	<div class="field-pair">
+                                <label class="nocheck clearfix">
+                                    <span class="component-title">Send E-Mail To</span>
+                                    <input type="text" name="mail_to" id="mail_to" value="$sickbeard.MAIL_TO" size="35" />
+                                </label>
+                                <label class="nocheck clearfix">
+                                    <span class="component-title">&nbsp;</span>
+                                    <span class="component-desc">&nbsp;</span>
+                                </label>
+                            </div>
+                        	<div class="field-pair">
+                                <label class="nocheck clearfix">
+                                    <span class="component-title">SMTP Server</span>
+                                    <input type="text" name="mail_server" id="mail_server" value="$sickbeard.MAIL_SERVER" size="35" />
+                                </label>
+                                <label class="nocheck clearfix">
+                                    <span class="component-title">&nbsp;</span>
+                                    <span class="component-desc">&nbsp;</span>
+                                </label>
+                            </div>
+                        	<div class="field-pair">
+                                <input type="checkbox" name="mail_ssl" id="mail_ssl" #if $sickbeard.MAIL_SSL then "checked=\"checked\"" else ""# />
+                                <label class="clearfix" for="mail_ssl">
+                                    <span class="component-title">Enable SSL</span>
+                                    <span class="component-desc"></span>
+                                </label>
+                            </div>
+                            <div class="field-pair">
+                                <label class="nocheck clearfix">
+                                    <span class="component-title">SMTP User</span>
+                                    <input type="text" name="mail_username" id="mail_username" value="$sickbeard.MAIL_USERNAME" size="35" />
+                                </label>
+                                <label class="nocheck clearfix">
+                                    <span class="component-title">&nbsp;</span>
+                                    <span class="component-desc">&nbsp;</span>
+                                </label>
+                            </div>
+                            <div class="field-pair">
+                                <label class="nocheck clearfix">
+                                    <span class="component-title">SMTP Password</span>
+                                    <input type="password" name="mail_password" id="mail_password" value="$sickbeard.MAIL_PASSWORD" size="35" />
+                                </label>
+                                <label class="nocheck clearfix">
+                                    <span class="component-title">&nbsp;</span>
+                                    <span class="component-desc">&nbsp;</span>
+                                </label>
+                            </div>        
+							 <div class="field-pair">
+                                <input type="checkbox" name="mail_notify_onsnatch" id="mail_notify_onsnatch" #if $sickbeard.MAIL_NOTIFY_ONSNATCH then "checked=\"checked\"" else ""# />
+                                <label class="clearfix" for="mail_notify_onsnatch">
+                                    <span class="component-title">Notify on Snatch</span>
+                                    <span class="component-desc">Also send message when movie is snatched.</span>
+                                </label>
+                            </div>
+                            <div class="testNotification" id="testMail-result">Click below to test.</div>
+                            <input type="button" class="btn" value="Test Mail" id="testMail" />
+                            <input type="submit" class="btn config_submitter" value="Save Changes" />
+                        </div><!-- /content_use_mail //-->
+
+                    </fieldset>
+                </div><!-- /mail component-group //-->
+
+
 
                 <div class="component-group-save">
                     <input type="submit" class="btn config_submitter" value="Save Changes" />

@@ -351,6 +351,15 @@ NMA_NOTIFY_ONSUBTITLEDOWNLOAD = False
 NMA_API = None
 NMA_PRIORITY = 0
 
+USE_MAIL = False
+MAIL_USERNAME = None
+MAIL_PASSWORD = None
+MAIL_SERVER = None
+MAIL_SSL = False
+MAIL_FROM = None
+MAIL_TO = None
+MAIL_NOTIFY_ONSNATCH = False
+
 COMING_EPS_LAYOUT = None
 COMING_EPS_DISPLAY_PAUSED = None
 COMING_EPS_SORT = None
@@ -408,6 +417,7 @@ def initialize(consoleLogging=True):
                 USE_GROWL, GROWL_HOST, GROWL_PASSWORD, USE_PROWL, PROWL_NOTIFY_ONSNATCH, PROWL_NOTIFY_ONDOWNLOAD, PROWL_NOTIFY_ONSUBTITLEDOWNLOAD, PROWL_API, PROWL_PRIORITY, PROG_DIR, NZBMATRIX, NZBMATRIX_USERNAME, \
                 USE_PYTIVO, PYTIVO_NOTIFY_ONSNATCH, PYTIVO_NOTIFY_ONDOWNLOAD, PYTIVO_NOTIFY_ONSUBTITLEDOWNLOAD, PYTIVO_UPDATE_LIBRARY, PYTIVO_HOST, PYTIVO_SHARE_NAME, PYTIVO_TIVO_NAME, \
                 USE_NMA, NMA_NOTIFY_ONSNATCH, NMA_NOTIFY_ONDOWNLOAD, NMA_NOTIFY_ONSUBTITLEDOWNLOAD, NMA_API, NMA_PRIORITY, \
+                USE_MAIL, MAIL_USERNAME, MAIL_PASSWORD, MAIL_SERVER, MAIL_SSL, MAIL_FROM, MAIL_TO, MAIL_NOTIFY_ONSNATCH, \
                 NZBMATRIX_APIKEY, versionCheckScheduler, VERSION_NOTIFY, PROCESS_AUTOMATICALLY, PROCESS_AUTOMATICALLY_TORRENT, \
                 KEEP_PROCESSED_DIR, TV_DOWNLOAD_DIR, TORRENT_DOWNLOAD_DIR, TVDB_BASE_URL, MIN_SEARCH_FREQUENCY, \
                 showQueueScheduler, searchQueueScheduler, ROOT_DIRS, CACHE_DIR, ACTUAL_CACHE_DIR, TVDB_API_PARMS, \
@@ -424,6 +434,7 @@ def initialize(consoleLogging=True):
                 GKS, GKS_KEY, \
                 COMING_EPS_LAYOUT, COMING_EPS_SORT, COMING_EPS_DISPLAY_PAUSED, COMING_EPS_MISSED_RANGE, METADATA_WDTV, METADATA_TIVO, IGNORE_WORDS, CREATE_MISSING_SHOW_DIRS, \
                 ADD_SHOWS_WO_DIR, USE_SUBTITLES, SUBTITLES_LANGUAGES, SUBTITLES_DIR, SUBTITLES_DIR_SUB, SUBSNOLANG, SUBTITLES_SERVICES_LIST, SUBTITLES_SERVICES_ENABLED, SUBTITLES_HISTORY, subtitlesFinderScheduler
+
 
         if __INITIALIZED__:
             return False
@@ -835,6 +846,17 @@ def initialize(consoleLogging=True):
         NMA_NOTIFY_ONSUBTITLEDOWNLOAD = bool(check_setting_int(CFG, 'NMA', 'nma_notify_onsubtitledownload', 0))
         NMA_API = check_setting_str(CFG, 'NMA', 'nma_api', '')
         NMA_PRIORITY = check_setting_str(CFG, 'NMA', 'nma_priority', "0")
+
+        CheckSection(CFG, 'Mail')
+        USE_MAIL = bool(check_setting_int(CFG, 'Mail', 'use_mail', 0))
+        MAIL_USERNAME = check_setting_str(CFG, 'Mail', 'mail_username', '')
+        MAIL_PASSWORD = check_setting_str(CFG, 'Mail', 'mail_password', '')
+        MAIL_SERVER = check_setting_str(CFG, 'Mail', 'mail_server', '')
+        MAIL_SSL = bool(check_setting_int(CFG, 'Mail', 'mail_ssl', 0))
+        MAIL_FROM = check_setting_str(CFG, 'Mail', 'mail_from', '')
+        MAIL_TO = check_setting_str(CFG, 'Mail', 'mail_to', '')
+        MAIL_NOTIFY_ONSNATCH = bool(check_setting_int(CFG, 'Mail', 'mail_notify_onsnatch', 0))
+
 
         USE_SUBTITLES = bool(check_setting_int(CFG, 'Subtitles', 'use_subtitles', 0))
         SUBTITLES_LANGUAGES = check_setting_str(CFG, 'Subtitles', 'subtitles_languages', '').split(',')
@@ -1446,6 +1468,16 @@ def save_config():
     new_config['NMA']['nma_notify_onsubtitledownload'] = int(NMA_NOTIFY_ONSUBTITLEDOWNLOAD)
     new_config['NMA']['nma_api'] = NMA_API
     new_config['NMA']['nma_priority'] = NMA_PRIORITY
+
+    new_config['Mail'] = {}
+    new_config['Mail']['use_mail'] = int(USE_MAIL)
+    new_config['Mail']['mail_username'] = MAIL_USERNAME
+    new_config['Mail']['mail_password'] = MAIL_PASSWORD
+    new_config['Mail']['mail_server'] = MAIL_SERVER
+    new_config['Mail']['mail_ssl'] = int(MAIL_SSL)
+    new_config['Mail']['mail_from'] = MAIL_FROM
+    new_config['Mail']['mail_to'] = MAIL_TO
+    new_config['Mail']['mail_notify_onsnatch'] = int(MAIL_NOTIFY_ONSNATCH)
 
     new_config['Newznab'] = {}
     new_config['Newznab']['newznab_data'] = '!!!'.join([x.configStr() for x in newznabProviderList])
