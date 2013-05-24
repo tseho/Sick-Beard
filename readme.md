@@ -12,6 +12,7 @@ Torrent gestion with transmission, utorrent deluge gestion
 Interfaces change
 subliminal integration
 next possiblble release download
+torrent/nzb preferred choice
 and much more
 
 
