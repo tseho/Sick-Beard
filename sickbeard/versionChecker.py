@@ -371,7 +371,7 @@ class GitUpdateManager(UpdateManager):
         self._run_git('config remote.origin.url git://github.com/sarakha63/Sick-Beard.git')
         self._run_git('stash')
         output, err = self._run_git('pull git://github.com/sarakha63/Sick-Beard.git '+self.branch) #@UnusedVariable
-              
+
         if not output:
             return self._git_error()
 
@@ -399,7 +399,7 @@ class GitUpdateManager(UpdateManager):
             logger.log(u"Didn't find indication of success in output, assuming git pull succeeded", logger.DEBUG)
             logger.log(u"Output: "+str(output))
             return True
-        
+
         return True
 
 
