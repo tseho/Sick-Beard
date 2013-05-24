@@ -7,10 +7,11 @@ IT includes :
 
 French and english audio language
 Nzb Scraper added : binnews (with nzbindex, binsearch and nzbclub)
-Torrent scraper added : t411
+Torrent scraper added : t411, cpasbien, piratebay, gks, kat
 Torrent gestion with transmission, utorrent deluge gestion
 Interfaces change
 subliminal integration
+next possiblble release download
 and much more
 
 
