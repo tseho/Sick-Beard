@@ -346,9 +346,8 @@ class GitUpdateManager(UpdateManager):
 
         new_str = 'There is a <a href="'+url+'" onclick="window.open(this.href); return false;">newer version available</a> ('+message+')'
         new_str += "&mdash; <a href=\""+self.get_update_url()+"\">Update Now</a>"
-
+        new_str += ' Click <a href="'+self.gc_url+'" onclick="window.open(this.href); return false;">Here</a> to see new upgrades'
         sickbeard.NEWEST_VERSION_STRING = new_str
-
     def need_update(self):
         self._find_installed_version()
         try:
