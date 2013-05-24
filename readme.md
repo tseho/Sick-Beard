@@ -1,4 +1,4 @@
-SickBeard VO/VF
+SickBeard VO/VF by sarakha63
 =====
 
 This version is base on Midgetspy's work.
