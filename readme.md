@@ -1,4 +1,4 @@
-Sick Beard_Lang_Version (French / English)
+SickBeard VO/VF
 =====
 
 This version is base on Midgetspy's work.
