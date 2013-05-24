@@ -34,15 +34,15 @@ class MailNotifier:
         return self._notifyMail("This is a test notification from SickBeard", "SickBeard message", mail_from, mail_to,mail_server,mail_ssl,mail_username,mail_password)
 
     def notify_snatch(self, ep_name):
-        logger.log("Notification MAIL SNATCH", logger.DEBUG)
         if sickbeard.MAIL_NOTIFY_ONSNATCH:
+            logger.log("Notification MAIL SNATCH", logger.DEBUG)
             message = str(ep_name)
             return self._notifyMail("SickBeard Snatch", message, None, None, None, None, None, None)
         else:
             return
 
     def notify_download(self, ep_name):
-        logger.log("Notification MAIL SNATCH", logger.DEBUG)
+        logger.log("Notification MAIL DOWNLOAD", logger.DEBUG)
         message = str(ep_name)
         return self._notifyMail("SickBeard Download", message, None, None, None, None, None, None)
     
