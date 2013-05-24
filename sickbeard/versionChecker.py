@@ -372,14 +372,25 @@ class GitUpdateManager(UpdateManager):
         self._run_git('stash')
         output, err = self._run_git('pull git://github.com/sarakha63/Sick-Beard.git '+self.branch) #@UnusedVariable
         logger.log(u"Writing commit History", logger.DEBUG)
-        histlog2, err2 =self._run_git('log --pretty="%ar %h - %s" --no-merges -200')
-        histlog= "\n".join(item[0] for item in histlog2) 
-        logger.log(histlog, logger.DEBUG)
-        fp = open (os.path.join(sickbeard.DATA_DIR, "hist.log"), 'wb')
-        for line in histlog.split('\n'):
-            fp.write (line)
-        fp.close ()                        
-        os.chmod(os.path.join(sickbeard.DATA_DIR, "hist.log"), 0777)
+        if sickbeard.GIT_PATH:
+            git_locations = ['"'+sickbeard.GIT_PATH+'"']
+        else:
+            git_locations = ['git']
+        for cur_git in git_locations:
+            cmd = cur_git +' log --pretty="%ar %h - %s" --no-merges -200'
+        
+            try:
+                logger.log(u"Executing "+cmd+" with your shell in "+sickbeard.PROG_DIR, logger.DEBUG)
+                p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True, cwd=sickbeard.PROG_DIR)
+                output1, err1 = p.communicate()
+                fp = open (os.path.join(sickbeard.DATA_DIR, "hist.log"), 'wb')
+                fp.write (output1)
+                fp.close ()                        
+                os.chmod(os.path.join(sickbeard.DATA_DIR, "hist.log"), 0777)
+            except OSError:
+                logger.log(u"Command "+cmd+" didn't work, couldn't find git.")
+        
+        
         if not output:
             return self._git_error()
 
