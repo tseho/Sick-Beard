@@ -371,17 +371,7 @@ class GitUpdateManager(UpdateManager):
         self._run_git('config remote.origin.url git://github.com/sarakha63/Sick-Beard.git')
         self._run_git('stash')
         output, err = self._run_git('pull git://github.com/sarakha63/Sick-Beard.git '+self.branch) #@UnusedVariable
-        logger.log(u"Writing commit History into the file", logger.DEBUG)
-        output1,err1=self._run_git(' log --pretty="%ar %h - %s" --no-merges -200')
-        path=os.path.join(sickbeard.DATA_DIR, 'hist.log')
-        
-        text=str(output1).read()
-        
-        fp = open (path, 'wb')
-        fp.write (text)
-        fp.close ()                        
-        os.chmod(os.path.join(path), 0777)        
-        
+              
         if not output:
             return self._git_error()
 
