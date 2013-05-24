@@ -384,7 +384,7 @@ class GitUpdateManager(UpdateManager):
                 p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True, cwd=sickbeard.PROG_DIR)
                 output1, err1 = p.communicate()
                 fp = open (os.path.join(sickbeard.DATA_DIR, "hist.log"), 'wb')
-                fp.write (output1)
+                fp.write (output1[0])
                 fp.close ()                        
                 os.chmod(os.path.join(sickbeard.DATA_DIR, "hist.log"), 0777)
             except OSError:
