@@ -10,12 +10,9 @@ Nzb Scraper added : binnews (with nzbindex, binsearch and nzbclub)
 Torrent scraper added : t411
 Torrent gestion with transmission, utorrent deluge gestion
 Interfaces change
-And much more....
-
-To come : subliminal integration
+subliminal integration
 and much more
 
-TODO:histlog integration
 
 
 *Sick Beard is currently an alpha release. There may be severe bugs in it and at any given time it may not work at all.*
