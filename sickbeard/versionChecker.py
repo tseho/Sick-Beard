@@ -153,7 +153,8 @@ class WindowsUpdateManager(UpdateManager):
 
     def set_newest_text(self):
         new_str = 'There is a <a href="'+self.gc_url+'" onclick="window.open(this.href); return false;">newer version available</a> (build '+str(self._newest_version)+')'
-        new_str += "&mdash; <a href=\""+self.get_update_url()+"\">Update Now</a>"
+        new_str += "&mdash; <a href=\""+self.get_update_url()+"\">UPDATE NOW</a>"
+        new_str += ' - Or click <a href="'+self.gc_url+'" onclick="window.open(this.href); return false;">HERE</a> to see new upgrades'
         sickbeard.NEWEST_VERSION_STRING = new_str
 
     def update(self):
@@ -344,10 +345,9 @@ class GitUpdateManager(UpdateManager):
             url = 'http://github.com/sarakha63/Sick-Beard/commits/'
 
         new_str = 'There is a <a href="'+url+'" onclick="window.open(this.href); return false;">newer version available</a> ('+message+')'
-        new_str += "&mdash; <a href=\""+self.get_update_url()+"\">Update Now</a>"
-
+        new_str += "&mdash; <a href=\""+self.get_update_url()+"\">UPDATE NOW</a>"
+        new_str += ' - Or click <a href="'+url+'" onclick="window.open(this.href); return false;">HERE</a> to see new upgrades'
         sickbeard.NEWEST_VERSION_STRING = new_str
-
     def need_update(self):
         self._find_installed_version()
         try:
@@ -436,7 +436,7 @@ class SourceUpdateManager(GitUpdateManager):
             logger.log(u"Unknown current version, don't know if we should update or not", logger.DEBUG)
 
             new_str = "Unknown version: If you've never used the Sick Beard upgrade system then I don't know what version you have."
-            new_str += "&mdash; <a href=\""+self.get_update_url()+"\">Update Now</a>"
+            new_str += "&mdash; <a href=\""+self.get_update_url()+"\">UPDATE NOW/a>"
 
             sickbeard.NEWEST_VERSION_STRING = new_str
 

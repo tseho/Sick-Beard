@@ -1,4 +1,4 @@
-Sick Beard_Lang_Version (French / English)
+SickBeard VO/VF by sarakha63
 =====
 
 This version is base on Midgetspy's work.
@@ -7,15 +7,14 @@ IT includes :
 
 French and english audio language
 Nzb Scraper added : binnews (with nzbindex, binsearch and nzbclub)
-Torrent scraper added : t411
+Torrent scraper added : t411, cpasbien, piratebay, gks, kat
 Torrent gestion with transmission, utorrent deluge gestion
 Interfaces change
-And much more....
-
-To come : subliminal integration
+subliminal integration
+next possiblble release download
+torrent/nzb preferred choice
 and much more
 
-TODO:histlog integration
 
 
 *Sick Beard is currently an alpha release. There may be severe bugs in it and at any given time it may not work at all.*
