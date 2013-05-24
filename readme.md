@@ -15,6 +15,8 @@ And much more....
 To come : subliminal integration
 and much more
 
+TODO:histlog integration
+
 
 *Sick Beard is currently an alpha release. There may be severe bugs in it and at any given time it may not work at all.*
 
