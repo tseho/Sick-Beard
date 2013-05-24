@@ -154,6 +154,7 @@ class WindowsUpdateManager(UpdateManager):
     def set_newest_text(self):
         new_str = 'There is a <a href="'+self.gc_url+'" onclick="window.open(this.href); return false;">newer version available</a> (build '+str(self._newest_version)+')'
         new_str += "&mdash; <a href=\""+self.get_update_url()+"\">Update Now</a>"
+		new_str += 'Click <a href="'+self.gc_url+'" onclick="window.open(this.href); return false;">Here</a> to see new upgrades'
         sickbeard.NEWEST_VERSION_STRING = new_str
 
     def update(self):
