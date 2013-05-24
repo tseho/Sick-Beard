@@ -371,7 +371,7 @@ class GitUpdateManager(UpdateManager):
         self._run_git('config remote.origin.url git://github.com/sarakha63/Sick-Beard.git')
         self._run_git('stash')
         output, err = self._run_git('pull git://github.com/sarakha63/Sick-Beard.git '+self.branch) #@UnusedVariable
-        logger.log(u"Writing commit History", logger.DEBUG)
+        logger.log(u"Writing commit History into the file", logger.DEBUG)
         if sickbeard.GIT_PATH:
             git_locations = ['"'+sickbeard.GIT_PATH+'"']
         else:
