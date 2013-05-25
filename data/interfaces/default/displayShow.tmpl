@@ -215,9 +215,12 @@
 
 </div>
 </div>
+#if $sickbeard.USE_SUBTITLES
+<div class="tvshowImgsubs"><a href="$sbRoot/showPoster/?show=$curShow.tvdbid&amp;which=poster" rel="dialog" title="$show.name"><img src="$sbRoot/showPoster/?show=$show.tvdbid&amp;which=poster" class="posterThumb" alt=""/></a>
+#else
 <div class="tvshowImg"><a href="$sbRoot/showPoster/?show=$curShow.tvdbid&amp;which=poster" rel="dialog" title="$show.name"><img src="$sbRoot/showPoster/?show=$show.tvdbid&amp;which=poster" class="posterThumb" alt=""/></a>
+#end if
 </div>
-
 #set $curSeason = -1
 #set $odd = 0
 

@@ -251,13 +251,34 @@ a{
   float: right;
   height: auto;
   margin-bottom: 0px;  
-  margin-top: 73px;
+  margin-top: 45px;
   margin-right: 0px;
   overflow: hidden;
   text-indent: -3000px;
   width: 200px;
 }
 .tvshowImg img {
+  float: right;
+  min-width: 100%;
+  position: relative;
+}
+.tvshowImgsubs {
+  background: url("../images/loading.gif") no-repeat scroll center center #ffffff;
+  border: 5px solid #FFFFFF;
+  -moz-box-shadow: 1px 1px 2px 0 #555555;
+  -webkit-box-shadow: 1px 1px 2px 0 #555555;
+  -o-box-shadow: 1px 1px 2px 0 #555555;
+  box-shadow: 1px 1px 2px 0 #555555;
+  float: right;
+  height: auto;
+  margin-bottom: 0px;  
+  margin-top: 73px;
+  margin-right: 0px;
+  overflow: hidden;
+  text-indent: -3000px;
+  width: 200px;
+}
+.tvshowImgsubs img {
   float: right;
   min-width: 100%;
   position: relative;
