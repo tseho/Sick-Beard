@@ -8,7 +8,7 @@
 #set $selected = None
 <select id="qualityPreset">
 <option value="0">Custom</option>
-#for $curPreset in sorted($qualityPresets, reverse=True):
+#for $curPreset in sorted($qualityPresets):
 <option value="$curPreset" #if $curPreset == $overall_quality then "selected=\"selected\"" else ""# #if $qualityPresetStrings[$curPreset].endswith("0p") then "style=\"padding-left: 15px;\"" else ""#>$qualityPresetStrings[$curPreset]</option>
 #end for
 </select>
@@ -19,10 +19,10 @@
 </div>
 
 <div id="customQualityWrapper">
-    <div id="customQuality">
-        <div class="component-group-desc">
-            <p>One of the <b>Initial</b> quality selections must be obtained before Sick Beard will attempt to process the <b>Archive</b> selections.</p>
-        </div>
+	<div id="customQuality">
+	    <div class="component-group-desc">
+	        <p>One of the <b>Initial</b> quality selections must be obtained before Sick Beard will attempt to process the <b>Archive</b> selections.</p>
+	    </div>
 
         <div style="padding-right: 40px; text-align: center;" class="float-left">
             <h4>Initial</h4>
@@ -44,4 +44,4 @@
             </select>
         </div>
     </div>
-</div><br />
+</div>

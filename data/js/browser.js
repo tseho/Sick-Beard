@@ -1,5 +1,4 @@
-;(function($) {
-"use strict";
+(function () {
 
     $.Browser = {
         defaults: {
@@ -33,7 +32,7 @@
             data = $.grep(data, function (value) {
                 return i++ != 0;
             });
-            $('<h2>').text(first_val.current_path).appendTo(fileBrowserDialog);
+            $('<h1>').text(first_val.current_path).appendTo(fileBrowserDialog);
             list = $('<ul>').appendTo(fileBrowserDialog);
             $.each(data, function (i, entry) {
                 link = $("<a href='javascript:void(0)' />").click(function () { browse(entry.path, endpoint); }).text(entry.name);
@@ -62,31 +61,26 @@
                 title:       options.title,
                 position:    ['center', 40],
                 minWidth:    Math.min($(document).width() - 80, 650),
-                height:      Math.min($(document).height() - 80, $(window).height() - 80),
-                maxHeight:   Math.min($(document).height() - 80, $(window).height() - 80),
-                maxWidth:    $(document).width() - 80,
+                minHeight:   320,
+                height:      $(document).height() - 80,
                 modal:       true,
-                autoOpen:    false,
-                buttons: [
-                    {
-                        text: "Ok",
-                        "class": "btn btn-large",
-                        click: function() {
-                            // store the browsed path to the associated text field
-                            callback(currentBrowserPath, options);
-                            fileBrowserDialog.dialog("close");
-                        }
-                    },
-                    {
-                        text: "Cancel",
-                        "class": "btn btn-large",
-                        click: function() {
-                            fileBrowserDialog.dialog("close");
-                        }
-                    }
-                ]
+                autoOpen:    false
             });
         }
+
+        // add the OK/Close buttons to the dialog
+        fileBrowserDialog.dialog('option', 'buttons', {
+            "Ok": function () {
+                // store the browsed path to the associated text field
+                //options.field.val(currentBrowserPath);
+                //alert(currentBrowserPath);
+                callback(currentBrowserPath, options);
+                fileBrowserDialog.dialog("close");
+            },
+            "Cancel": function () {
+                fileBrowserDialog.dialog("close");
+            }
+        });
 
         // set up the browser and launch the dialog
         var initialDir = '';
@@ -174,5 +168,4 @@
             return false;
         }));
     };
-
-})(jQuery);
+})();

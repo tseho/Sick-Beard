@@ -1,7 +1,7 @@
 #import sickbeard
 #from sickbeard import common
 #from sickbeard import exceptions
-#set global $title="Mass Edit"
+#set global $title=""
 #set global $header="Mass Edit"
 
 #set global $sbPath=".."
@@ -53,15 +53,16 @@
 });
 //-->
 </script>
+
 <form action="massEditSubmit" method="post">
 <input type="hidden" name="toEdit" value="$showList" />
 
-<div class="optionWrapper clearfix">
+<div class="optionWrapper">
 <span class="selectTitle">Root Directories <span class="separator">*</span></span><br />
         #for $cur_dir in $root_dir_list:
         #set $cur_index = $root_dir_list.index($cur_dir)
         <div style="padding: 6px 0 3px 25px;">
-            <input class="btn edit_root_dir" type="button" id="edit_root_dir_$cur_index" value="Edit" />
+            <input class="btn edit_root_dir" type="button" class="edit_root_dir" id="edit_root_dir_$cur_index" value="Edit" />
             $cur_dir => <span id="display_new_root_dir_$cur_index">$cur_dir</span>
         </div>
         <input type="hidden" name="orig_root_dir_$cur_index" value="$cur_dir" />
@@ -70,7 +71,7 @@
 
 </div>
 
-<div class="optionWrapper clearfix alt container">
+<div class="optionWrapper alt">
 <span class="selectTitle">Quality</span>
     <div class="selectChoices">
         <select id="qualityPreset" name="quality_preset">
@@ -81,11 +82,11 @@
             <option value="$curPreset" #if $quality_value == $curPreset then "selected=\"selected\"" else ""#>$common.qualityPresetStrings[$curPreset]</option>
             #end for
         </select>
-    </div>
+    </div><br />
 
     <div id="customQuality">
         <div style="width: 50%; text-align: center;" class="float-left">
-        <h4>Inital</h4>
+        <h3>Inital</h3>
             #set $anyQualityList = filter(lambda x: x > $common.Quality.NONE, $common.Quality.qualityStrings)
             <select id="anyQualities" name="anyQualities" multiple="multiple" size="len($anyQualityList)">
             #for $curQuality in sorted($anyQualityList):
@@ -94,14 +95,15 @@
             </select>
         </div>
         <div style="width: 50%; text-align: center;" class="float-left">
-        <h4>Archive</h4>
-            #set $bestQualityList = filter(lambda x: x > $common.Quality.SDTV and x < $common.Quality.UNKNOWN, $common.Quality.qualityStrings)
+        <h3>Archive</h3>
+            #set $bestQualityList = filter(lambda x: x > $common.Quality.SDTV, $common.Quality.qualityStrings)
             <select id="bestQualities" name="bestQualities" multiple="multiple" size="len($bestQualityList)">
             #for $curQuality in sorted($bestQualityList):
             <option value="$curQuality" #if $curQuality in $bestQualities then "selected=\"selected\"" else ""#>$common.Quality.qualityStrings[$curQuality]</option>
             #end for
             </select>
         </div>
+    <br />
     </div>
 </div>
 
@@ -116,7 +118,7 @@
     </div>
 </div>
 
-<div class="optionWrapper clearfix alt">
+<div class="optionWrapper alt">
     <span class="selectTitle">Paused</span>
     <div class="selectChoices">
         <select id="edit_paused" name="paused">
@@ -126,8 +128,9 @@
         </select>
     </div><br />
 </div>
-<div class="optionWrapper clearfix">
-	<span class="selectTitle">Subtitles</span>
+
+<div class="optionWrapper">
+<span class="selectTitle">Subtitles<span class="separator"></span></span>
     <div class="selectChoices">
         <select id="edit_subtitles" name="subtitles">
             <option value="keep">&lt; keep &gt;</option>
@@ -137,17 +140,19 @@
     </div><br />
 </div>
 
-<div class="optionWrapper clearfix alt">
+<div class="optionWrapper">
 	<span class="selectTitle">Metadata Language <span class="separator">*</span></span>
     <div class="selectChoices">
-        <select name="tvdbLang" id="tvdbLangSelect"></select><br />
+    	<select name="tvdbLang" id="tvdbLangSelect">
+       </select>
     </div><br />
 </div>
 
-<div class="optionWrapper clearfix">
+<div class="optionWrapper">
 	<span class="selectTitle">Desired Audio Language</span>
     <div class="selectChoices">
         <select name="audioLang" id="showLangSelect">
+        <option value="keep">&lt; keep &gt;</option>
         #for $k,$v in $common.showLanguages.iteritems():
             #if $k!="":
             <option value="$k" #if $audio_value == $k then "selected=\"selected\"" else ""#
@@ -158,16 +163,23 @@
     </div><br />
 </div>
 
-<div class="optionWrapper clearfix">
+<div class="optionWrapper">
     <br /><span class="separator" style="font-size: 1.2em; font-weight: 700;">*</span>
     Changing these settings will cause the selected shows to be refreshed.
-    Be sure the selected show are not being refreshed
+    Be sure the selected show are not being refreshed. Blank for metadata will keep.
 </div>
-<div class="optionWrapper clearfix" style="text-align: center;">
-    <input class="btn btn-primary" type="submit" value="Submit" /><br />
+
+<div class="optionWrapper" style="text-align: center;">
+    <input type="submit" value="Submit" class="btn btn-primary" /><br />
 </div>
 
 </form>
 <br />
+
+<script type="text/javascript" charset="utf-8">
+<!--
+    jQuery('#location').fileBrowser({ title: 'Select Show Location' });
+//-->
+</script>
 
 #include $os.path.join($sickbeard.PROG_DIR, "data/interfaces/default/inc_bottom.tmpl")

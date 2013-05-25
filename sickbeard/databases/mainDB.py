@@ -25,7 +25,7 @@ from sickbeard.providers.generic import GenericProvider
 from sickbeard import encodingKludge as ek
 from sickbeard.name_parser.parser import NameParser, InvalidNameException
 
-MAX_DB_VERSION = 14
+MAX_DB_VERSION = 15
 
 
 class MainSanityCheck(db.DBSanityCheck):
@@ -101,7 +101,9 @@ class InitialSchema (db.SchemaUpgrade):
             "CREATE TABLE tv_episodes (episode_id INTEGER PRIMARY KEY, showid NUMERIC, tvdbid NUMERIC, name TEXT, season NUMERIC, episode NUMERIC, description TEXT, airdate NUMERIC, hasnfo NUMERIC, hastbn NUMERIC, status NUMERIC, location TEXT);",
             "CREATE TABLE info (last_backlog NUMERIC, last_tvdb NUMERIC);",
             "CREATE TABLE history (action NUMERIC, date NUMERIC, showid NUMERIC, season NUMERIC, episode NUMERIC, quality NUMERIC, resource TEXT, provider NUMERIC);",
-            "CREATE TABLE episode_links (episode_id INTEGER, link TEXT);"
+            "CREATE TABLE episode_links (episode_id INTEGER, link TEXT);",
+            "CREATE TABLE imdb_info (tvdb_id INTEGER PRIMARY KEY, imdb_id TEXT, title TEXT, year NUMERIC, akas TEXT, runtimes NUMERIC, genres TEXT, countries TEXT, country_codes TEXT, certificates TEXT, rating TEXT, votes INTEGER, last_update NUMERIC);"
+       
         ]
         for query in queries:
             self.connection.action(query)
@@ -122,6 +124,12 @@ class AddTvrName (AddTvrId):
     def execute(self):
         self.addColumn("tv_shows", "tvr_name", "TEXT", "")
 
+class AddImdbId (InitialSchema):
+    def test(self):
+        return self.hasColumn("tv_shows", "imdb_id")
+
+    def execute(self):
+        self.addColumn("tv_shows", "imdb_id", "TEXT", "")
 
 class AddAirdateIndex (AddTvrName):
     def test(self):
@@ -142,7 +150,9 @@ class NumericProviders (AddAirdateIndex):
                 4: 'eztv',
                 5: 'nzbmatrix',
                 6: 'tvnzb',
-                7: 'ezrss'}
+                7: 'ezrss',
+                8: 'thepiratebay',
+                9: 'kat'},
 
     def execute(self):
         self.connection.action("ALTER TABLE history RENAME TO history_old")
@@ -706,4 +716,12 @@ class AddEpisodeLinkTable(AddSubtitlesSupport):
     def execute(self):
         if self.hasTable("episode_links") != True:
             self.connection.action("CREATE TABLE episode_links (episode_id INTEGER, link TEXT)")
+        self.incDBVersion()
+class AddIMDbInfo(AddEpisodeLinkTable):    
+    def test(self):
+        return self.checkDBVersion() >= 15
+
+    def execute(self):
+        
+        self.connection.action("CREATE TABLE imdb_info (tvdb_id INTEGER PRIMARY KEY, imdb_id TEXT, title TEXT, year NUMERIC, akas TEXT, runtimes NUMERIC, genres TEXT, countries TEXT, country_codes TEXT, certificates TEXT, rating TEXT, votes INTEGER, last_update NUMERIC)")
         self.incDBVersion()

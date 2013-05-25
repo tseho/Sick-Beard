@@ -1,6 +1,6 @@
 #import sickbeard
 #from sickbeard.providers.generic import GenericProvider
-#set global $title="Config - Search Providers"
+#set global $title="Config - Providers"
 #set global $header="Search Providers"
 
 #set global $sbPath="../.."
@@ -8,20 +8,24 @@
 #set global $topmenu="config"#
 #import os.path
 #include $os.path.join($sickbeard.PROG_DIR, "data/interfaces/default/inc_top.tmpl")
-
+#if $varExists('header') 
+	<h1 class="header">$header</h1>
+#else 
+	<h1 class="title">$title</h1>
+#end if
 <script type="text/javascript" src="$sbRoot/js/configProviders.js?$sbPID"></script>
 <script type="text/javascript" src="$sbRoot/js/config.js?$sbPID"></script>
-#if $sickbeard.USE_NZBS
 <script type="text/javascript" charset="utf-8">
 <!--
 \$(document).ready(function(){
+
+var show_nzb_providers = #if $sickbeard.USE_NZBS then "true" else "false"#;
 #for $curNewznabProvider in $sickbeard.newznabProviderList:
-    \$(this).addProvider('$curNewznabProvider.getID()', '$curNewznabProvider.name', '$curNewznabProvider.url', '$curNewznabProvider.key', $int($curNewznabProvider.default));
+\$(this).addProvider('$curNewznabProvider.getID()', '$curNewznabProvider.name', '$curNewznabProvider.url', '$curNewznabProvider.key', $int($curNewznabProvider.default), show_nzb_providers);
 #end for
 });
 //-->
 </script>
-#end if
 
 <div id="config">
 <div id="config-content">
@@ -29,7 +33,14 @@
 <form id="configForm" action="saveProviders" method="post">
 
             <div id="config-components">
-
+                <ul>
+                	<li><a href="#core-component-group1">Provider Priorities</a></li>
+                	<li><a href="#core-component-group2">Configure Built-In Providers</a></li>
+                  #if $sickbeard.USE_NZBS
+                	<li><a href="#core-component-group3">Configure Custom Newznab Providers</a></li>
+                  #end if
+                </ul>
+                
                 <div id="core-component-group1" class="component-group clearfix">
 
                     <div class="component-group-desc">
@@ -46,11 +57,12 @@
                         <div>
                             <h4 class="note">*</h4><p class="note">Provider does not support backlog searches at this time.</p>
                             <h4 class="note">**</h4><p class="note">Provider supports <b>limited</b> backlog searches, all episodes/qualities may not be available.</p>
+							<h4 class="note">!</h4><p class="note">Provider is <b>NOT WORKING</b>.</p>
                         </div>
                     </div>
 
-                    <fieldset class="component-group-list">
-                        <ul id="providerOrderList">
+                    <fieldset class="component-group-list" style="margin-left: 50px; margin-top:36px">
+                        <ul id="provider_order_list">
                         #for $curProvider in $sickbeard.providers.sortedProviderList():
                             #if $curProvider.providerType == $GenericProvider.NZB and not $sickbeard.USE_NZBS:
                                 #continue
@@ -59,11 +71,12 @@
                             #end if
                             #set $curName = $curProvider.getID()
                           <li class="ui-state-default" id="$curName">
-                            <input type="checkbox" id="enable_$curName" class="checkbox provider_enabler" #if $curProvider.isEnabled() then "checked=\"checked\"" else ""#/>
-                            <a href="$curProvider.url" class="imgLink" target="_new"><img src="$sbRoot/images/providers/$curProvider.imageName()" alt="" title="$curProvider.name" width="16" height="16" /></a>
+                            <input type="checkbox" id="enable_$curName" class="provider_enabler" #if $curProvider.isEnabled() then "checked=\"checked\"" else ""#/>
+                            <a href="$curProvider.url" class="imgLink" target="_new"><img src="$sbRoot/images/providers/$curProvider.imageName()" alt="$curProvider.name" title="$curProvider.name" width="16" height="16" /></a>
                             $curProvider.name
                             #if not $curProvider.supportsBacklog then "*" else ""#
-                            #if $curProvider.name == "EZRSS" then "**" else ""#
+                            #if $curProvider.name == "EZRSS" or $curProvider.name == "DailyTvTorrents" then "**" else ""#
+                            #if $curProvider.name == "DailyTvTorrents" then "!" else ""
                             <span class="ui-icon ui-icon-arrowthick-2-n-s pull-right"></span>
                           </li>
                         #end for
@@ -76,10 +89,10 @@
                 <div id="core-component-group2" class="component-group clearfix">
 
                     <div class="component-group-desc">
-                        <h3>Configure Built-In Providers</h3>
+                        <h3>Configure Built-In<br />Providers</h3>
                         <p>Check with provider's website on how to obtain an API key if needed.</p>
                     </div>
-
+                    
                     <fieldset class="component-group-list">
                         <div class="field-pair">
                             <label class="clearfix" for="editAProvider">
@@ -89,15 +102,15 @@
                                     #for $cur_provider in ("nzbs_r_us", "omgwtfnzbs", "tvtorrents", "torrentleech", "btn", "binnewz", "t411", "piratebay","gks"):
                                         #set $cur_provider_obj = $sickbeard.providers.getProviderClass($cur_provider)
                                         #if $cur_provider_obj.providerType == $GenericProvider.NZB and not $sickbeard.USE_NZBS:
-                                            #continue
+                                        	#continue
                                         #elif $cur_provider_obj.providerType == $GenericProvider.TORRENT and not $sickbeard.USE_TORRENTS:
-                                            #continue
-                                        #end if
+                                        	#continue	
+                                        #end if	
                                         $provider_config_list.append($cur_provider_obj)
                                     #end for
 
-                                    #if $provider_config_list:
-                                    <select id="editAProvider" class="input-medium" >
+                                    #if $provider_config_list:                                        
+                                    <select id="editAProvider">
                                         #for $cur_provider in $provider_config_list + [$curProvider for $curProvider in $sickbeard.newznabProviderList if $curProvider.default and $curProvider.needs_auth and $sickbeard.USE_NZBS]:
                                             <option value="$cur_provider.getID()">$cur_provider.name</option>
                                         #end for
@@ -159,9 +172,9 @@
                     </div><!-- /omgwtfnzbsDiv //-->
 
                     <div class="providerDiv" id="binnewzDiv">
-						<p>
-							Nothing to set up for this provider
-						</p>
+<p>
+Nothing to set up for this provider
+</p>
                     </div><!-- /binnewzDiv //-->
 
                     <div class="providerDiv" id="tvtorrentsDiv">
@@ -211,8 +224,8 @@
                             </label>
                         </div>
                     </div><!-- /btnDiv //-->
-					
-					<div class="providerDiv" id="gksDiv">
+
+<div class="providerDiv" id="gksDiv">
                         <div class="field-pair">
                             <label class="clearfix">
                                 <span class="component-title">GKS RSS Key:</span>
@@ -224,15 +237,15 @@
 <!-- end div for editing providers -->
 
                     <input type="submit" class="btn config_submitter" value="Save Changes" /><br/>
-
+            
                     </fieldset>
                 </div><!-- /component-group2 //-->
-#if $sickbeard.USE_NZBS:
 
+#if $sickbeard.USE_NZBS
                 <div id="core-component-group3" class="component-group clearfix">
 
                     <div class="component-group-desc">
-                        <h3>Configure Custom Newznab Providers</h3>
+                        <h3>Configure Custom<br />Newznab Providers</h3>
                         <p>Add and setup custom Newznab providers.</p>
                         <p>Some built-in Newznab providers are already available above.</p>
                     </div>
@@ -274,23 +287,27 @@
                             </label>
                         </div>
             <div id="newznab_add_div">
-                <input type="button" class="btn newznab_save" id="newznab_add" value="Add" />
+                <input class="btn" type="button" class="newznab_save" id="newznab_add" value="Add" />
             </div>
             <div id="newznab_update_div" style="display: none;">
-                <input type="button" class="btn btn-danger newznab_delete" id="newznab_delete" value="Delete" />
-            </div>
+                <input class="btn btn-danger newznab_delete" type="button" class="newznab_delete" id="newznab_delete" value="Delete" />
+            </div> 
 </div>
 
                     </fieldset>
                 </div><!-- /component-group3 //-->
 #end if
-                <div class="component-group-save">
-                    <input type="submit" class="btn config_submitter" value="Save Changes" />
-                </div><br />
-
+                    
+            <br/><input type="submit" class="btn config_submitter" value="Save Changes" /><br/>
+                
             </div><!-- /config-components //-->
 
 </form>
 </div></div>
-
-#include $os.path.join($sickbeard.PROG_DIR, "data/interfaces/default/inc_bottom.tmpl")
+<div class="clearfix"></div>
+<script type="text/javascript" charset="utf-8">
+<!--
+    jQuery('#config-components').tabs();
+//-->
+</script>
+#include $os.path.join($sickbeard.PROG_DIR,"data/interfaces/default/inc_bottom.tmpl")

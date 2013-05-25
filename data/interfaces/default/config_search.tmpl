@@ -1,6 +1,7 @@
 #import sickbeard
-#set global $title="Config - Search Settings"
-#set global $header="Search Settings"
+#from sickbeard import clients
+#set global $title="Config - Episode Search"
+#set global $header="Search Options"
 
 #set global $sbPath="../.."
 
@@ -10,14 +11,24 @@
 
 <script type="text/javascript" src="$sbRoot/js/configSearch.js?$sbPID"></script>
 <script type="text/javascript" src="$sbRoot/js/config.js?$sbPID"></script>
-
+#if $varExists('header') 
+	<h1 class="header">$header</h1>
+#else 
+	<h1 class="title">$title</h1>
+#end if
 <div id="config">
 <div id="config-content">
-<h5>All non-absolute folder locations are relative to <span class="path">$sickbeard.DATA_DIR</span></h5>
 
 <form id="configForm" action="saveSearch" method="post">
 
             <div id="config-components">
+                <ul>
+                	<li><a href="#core-component-group1">Episode Search</a></li>
+                	<li><a href="#core-component-group2">NZB Search</a></li>
+                	<li><a href="#core-component-group3">Torrent Search</a></li>                	
+                	<li><a href="#core-component-group4">Preferred Method</a></li>
+                </ul>
+                
                 
                 <div id="core-component-group1" class="component-group clearfix">
 
@@ -38,7 +49,7 @@
                         <div class="field-pair">
                             <label class="nocheck clearfix">
                                 <span class="component-title">Search Frequency</span>
-                                <input type="number" name="search_frequency" value="$sickbeard.SEARCH_FREQUENCY" size="5" min="10" class="input-small" />
+                                <input type="text" name="search_frequency" value="$sickbeard.SEARCH_FREQUENCY" size="5" />
                             </label>
                             <label class="nocheck clearfix">
                                 <span class="component-title">&nbsp;</span>
@@ -49,7 +60,7 @@
                         <div class="field-pair">
                             <label class="nocheck clearfix">
                                 <span class="component-title">Usenet Retention</span>
-                                <input type="number" name="usenet_retention" value="$sickbeard.USENET_RETENTION" size="5" min="0" class="input-small" />
+                                <input type="text" name="usenet_retention" value="$sickbeard.USENET_RETENTION" size="5" />
                             </label>
                             <label class="nocheck clearfix">
                                 <span class="component-title">&nbsp;</span>
@@ -60,14 +71,18 @@
                         <div class="field-pair">
                             <label class="nocheck clearfix">
                                 <span class="component-title">Ignore Words</span>
-                                <input type="text" name="ignore_words" value="$sickbeard.IGNORE_WORDS" size="45"/>
+                                <input type="text" name="ignore_words" value="$sickbeard.IGNORE_WORDS" size="45" />
                             </label>
                             <label class="nocheck clearfix">
                                 <span class="component-title">&nbsp;</span>
-                                <span class="component-desc">List of words to ignore during search (comma separated without spaces) (eg. german,french,core2hd,dutch,swedish)</span>
+                                <span class="component-desc">Comma separated words to check in episode search.</span>
+                            </label>
+                            <label class="nocheck clearfix">
+                                <span class="component-title">&nbsp;</span>
+                                <span class="component-desc">Results containing any word in the list won't be snatched.</span>
                             </label>
                         </div>
-
+                        
                         <div class="clearfix"></div>
                         <input type="submit" class="btn config_submitter" value="Save Changes" /><br/>
                         
@@ -96,8 +111,8 @@
                             <label class="clearfix" for="nzb_method">
                                 <span class="component-title jumbo">NZB Method:</span>
                                 <span class="component-desc">
-                                    <select name="nzb_method" id="nzb_method" class="input-medium" >
-                                    #set $nzb_method_text = {'blackhole': "Black Hole", 'sabnzbd': "SABnzbd", 'nzbget': "NZBget"}
+                                    <select name="nzb_method" id="nzb_method">
+                                    #set $nzb_method_text = {'blackhole': "Black hole", 'sabnzbd': "SABnzbd", 'nzbget': "NZBget"}
                                     #for $curAction in ('sabnzbd', 'blackhole', 'nzbget'):
                                       #if $sickbeard.NZB_METHOD == $curAction:
                                         #set $nzb_method = "selected=\"selected\""
@@ -128,7 +143,7 @@
                             <div class="field-pair">
                                 <label class="nocheck clearfix">
                                     <span class="component-title">SABnzbd URL</span>
-                                    <input type="text" name="sab_host" value="$sickbeard.SAB_HOST" size="45" />
+                                    <input type="text" id="sab_host" name="sab_host" value="$sickbeard.SAB_HOST" size="45" />
                                 </label>
                                 <label class="nocheck clearfix">
                                     <span class="component-title">&nbsp;</span>
@@ -143,7 +158,7 @@
                             <div class="field-pair">
                                 <label class="nocheck clearfix">
                                     <span class="component-title">SABnzbd Username</span>
-                                    <input type="text" name="sab_username" value="$sickbeard.SAB_USERNAME" size="20" />
+                                    <input type="text" name="sab_username" id="sab_username" value="$sickbeard.SAB_USERNAME" size="20" />
                                 </label>
                                 <label class="nocheck clearfix">
                                     <span class="component-title">&nbsp;</span>
@@ -154,7 +169,7 @@
                             <div class="field-pair">
                                 <label class="nocheck clearfix">
                                     <span class="component-title">SABnzbd Password</span>
-                                    <input type="password" name="sab_password" value="$sickbeard.SAB_PASSWORD" size="20" />
+                                    <input type="password" name="sab_password" id="sab_password" value="$sickbeard.SAB_PASSWORD" size="20" />
                                 </label>
                                 <label class="nocheck clearfix">
                                     <span class="component-title">&nbsp;</span>
@@ -165,7 +180,7 @@
                             <div class="field-pair">
                                 <label class="nocheck clearfix">
                                     <span class="component-title">SABnzbd API Key</span>
-                                    <input type="text" name="sab_apikey" value="$sickbeard.SAB_APIKEY" size="45" />
+                                    <input type="text" name="sab_apikey" id="sab_apikey" value="$sickbeard.SAB_APIKEY" size="45" />
                                 </label>
                                 <label class="nocheck clearfix">
                                     <span class="component-title">&nbsp;</span>
@@ -176,7 +191,7 @@
                             <div class="field-pair">
                                 <label class="nocheck clearfix">
                                     <span class="component-title">SABnzbd Category</span>
-                                    <input type="text" name="sab_category" value="$sickbeard.SAB_CATEGORY" size="20" />
+                                    <input type="text" name="sab_category" id="sab_category" value="$sickbeard.SAB_CATEGORY" size="20" />
                                 </label>
                                 <label class="nocheck clearfix">
                                     <span class="component-title">&nbsp;</span>
@@ -189,7 +204,7 @@
                             <div class="field-pair">
                                 <label class="nocheck clearfix">
                                     <span class="component-title">NZBget HOST:PORT</span>
-                                    <input type="text" name="nzbget_host" value="$sickbeard.NZBGET_HOST" size="45" />
+                                    <input type="text" name="nzbget_host" id="nzbget_host" value="$sickbeard.NZBGET_HOST" size="45" />
                                 </label>
                                 <label class="nocheck clearfix">
                                     <span class="component-title">&nbsp;</span>
@@ -204,7 +219,7 @@
                             <div class="field-pair">
                                 <label class="nocheck clearfix">
                                     <span class="component-title">NZBget Password</span>
-                                    <input type="password" name="nzbget_password" value="$sickbeard.NZBGET_PASSWORD" size="20" />
+                                    <input type="password" name="nzbget_password" id="nzbget_password" value="$sickbeard.NZBGET_PASSWORD" size="20" />
                                 </label>
                                 <label class="nocheck clearfix">
                                     <span class="component-title">&nbsp;</span>
@@ -215,7 +230,7 @@
                             <div class="field-pair">
                                 <label class="nocheck clearfix">
                                     <span class="component-title">NZBget Category</span>
-                                    <input type="text" name="nzbget_category" value="$sickbeard.NZBGET_CATEGORY" size="20" />
+                                    <input type="text" name="nzbget_category" id="nzbget_category" value="$sickbeard.NZBGET_CATEGORY" size="20" />
                                 </label>
                                 <label class="nocheck clearfix">
                                     <span class="component-title">&nbsp;</span>
@@ -227,7 +242,7 @@
                         <div class="clearfix"></div>
                         
                         <div class="testNotification" id="testSABnzbd-result">Click below to test.</div>
-                        <input type="button" value="Test SABnzbd" id="testSABnzbd" class="btn test-button"/>
+                        <input class="btn" type="button" value="Test SABnzbd" id="testSABnzbd" class="btn test-button"/>
                         <input type="submit" class="btn config_submitter" value="Save Changes" /><br/>
                         
                         </div><!-- /content_use_nzbs //-->
@@ -235,7 +250,6 @@
                     </fieldset>
                 </div><!-- /component-group2 //-->
 
-                
                 <div id="core-component-group3" class="component-group clearfix">
 
                     <div class="component-group-desc">
@@ -280,10 +294,6 @@
 	                            <label class="nocheck clearfix">
     	                            <span class="component-title">&nbsp;</span>
         	                        <span class="component-desc">The directory where Sick Beard should store your <i>Torrent</i> files.</span>
-            	                </label>
-	                            <label class="nocheck clearfix">
-    	                            <span class="component-title">&nbsp;</span>
-									<span class="component-desc"><b>NOTE:</b> This method will not working for ThePirateBay Provider</span>
             	                </label>
                         	</div>
 
@@ -377,14 +387,20 @@
                                     <span class="component-desc">Don't start downloading when torrent is added?</span>
                                 </label>
                             </div>
-
+                            
                         	<div class="testNotification" id="testTorrent-result">Click below to test.</div>
                         	<input class="btn" type="button" value="Test Connection" id="testTorrent" class="btn test-button"/>
                         	<input type="submit" class="btn config_submitter" value="Save Changes" /><br/>
                             </div>
+                    </div>                       
+                    </fieldset>
+                </div><!-- /component-group3 //-->
+				 <div id="core-component-group4" class="component-group clearfix">
+
+                    <div class="component-group-desc">
+                        <h3>Preferred Method</h3>
+                        <p>Settings that dictate how Sick Beard will choose best result among NZBs and Torrents</p>
                     </div>
-                    </div><!-- /component-group3 //-->
-                    <div id="core-component-group4" class="component-group clearfix">
                     <div class="field-pair">
                             <label class="clearfix" for="prefered_method">
                                 <span class="component-title jumbo">Preferred Method</span>
@@ -397,25 +413,36 @@
                                   #else
                                     #set $prefered_method = ""
                                   #end if
-                                  <option value="$curAction" $prefered_method>$prefered_method_text[$curAction]</option>  
+                                  <option value="$curAction" $prefered_method>$prefered_method_text[$curAction]</option>
                                  #end for
-                                  </select>                     
+                                  </select>
+                                  <div class="clearfix"></div>
+                        <input type="submit" class="btn config_submitter" value="Save Changes" /><br/>
                     </fieldset>
-                </div><!-- /component-group4 //-->
-
-				<div class="component-group-save">
-                <input type="submit" class="btn config_submitter button" value="Save Changes" /><br/>
-				</div><br />
+                    
+                     </div><!-- /component-group4 //-->
+                    
+                <!--<div class="title-group clearfix" id="no-torrents">
+                    <div class="ui-corner-all config_message">Note: Sick Beard works better with Usenet than with Torrents, <a href="http://www.sickbeard.com/usenet.html" target="_blank">here's why</a>.</div>
+                </div> //-->
+                
+</div><br />
+                
+		<br/>
+		<small class="float-right"><b>All non-absolute folder locations are relative to <span class="path">$sickbeard.DATA_DIR</span></b> </small>
+		<input type="submit" class="btn config_submitter button" value="Save Changes" /><br/>
+			
 
             </div><!-- /config-components //-->
 
 </form>
 
 </div></div>
+<div class="clearfix"></div>
 
 <script type="text/javascript" charset="utf-8">
 <!--
-	
+	jQuery('#config-components').tabs();
     jQuery('#nzb_dir').fileBrowser({ title: 'Select NZB Black Hole/Watch Directory' });
     jQuery('#torrent_dir').fileBrowser({ title: 'Select Torrent Black Hole/Watch Directory' });
     jQuery('#torrent_path').fileBrowser({ title: 'Select Torrent Download Directory' });
@@ -424,4 +451,4 @@
 //-->
 </script>
 
-#include $os.path.join($sickbeard.PROG_DIR, "data/interfaces/default/inc_bottom.tmpl")
+#include $os.path.join($sickbeard.PROG_DIR,"data/interfaces/default/inc_bottom.tmpl")
