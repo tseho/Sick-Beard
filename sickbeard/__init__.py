@@ -1042,7 +1042,8 @@ def start():
                 subtitlesFinderScheduler.thread.start()
 
             # start the trakt watchlist
-            traktWatchListCheckerSchedular.thread.start()
+            if USE_TRAKT:
+                traktWatchListCheckerSchedular.thread.start()
 
             started = True
 
