@@ -21,6 +21,7 @@ from sickbeard import version, ui
 from sickbeard import logger
 from sickbeard import scene_exceptions
 from sickbeard.exceptions import ex
+from sickbeard import network_timezones
 
 import os, platform, shutil
 import subprocess, re
@@ -52,6 +53,9 @@ class CheckVersion():
         
         # refresh scene exceptions too
         scene_exceptions.retrieve_exceptions()
+        
+        # refresh network timezones
+        network_timezones.update_network_dict()
 
     def find_install_type(self):
         """

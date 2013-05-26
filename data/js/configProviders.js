@@ -13,7 +13,7 @@ $(document).ready(function(){
         });
     } 
 
-    $.fn.addProvider = function (id, name, url, key, isDefault) {
+    $.fn.addProvider = function (id, name, url, key, isDefault, showProvider) {
 
         if (url.match('/$') == null)
             url = url + '/'
@@ -27,11 +27,11 @@ $(document).ready(function(){
             $(this).populateNewznabSection();
         }
 
-        if ($('#providerOrderList > #'+id).length == 0) {
+        if ($('#provider_order_list > #'+id).length == 0 && showProvider != false) {
             var toAdd = '<li class="ui-state-default" id="'+id+'"> <input type="checkbox" id="enable_'+id+'" class="provider_enabler" CHECKED> <a href="'+url+'" class="imgLink" target="_new"><img src="'+sbRoot+'/images/providers/newznab.gif" alt="'+name+'" width="16" height="16"></a> '+name+'</li>'
 
-            $('#providerOrderList').append(toAdd);
-            $('#providerOrderList').sortable("refresh");
+            $('#provider_order_list').append(toAdd);
+            $('#provider_order_list').sortable("refresh");
         }
 
         $(this).makeNewznabProviderString();
@@ -55,7 +55,7 @@ $(document).ready(function(){
         delete newznabProviders[id];
         $(this).populateNewznabSection();
 
-        $('#providerOrderList > #'+id).remove();
+        $('#provider_order_list > #'+id).remove();
 
         $(this).makeNewznabProviderString();
 
@@ -112,7 +112,7 @@ $(document).ready(function(){
     }
     
     $.fn.refreshProviderList = function() {
-            var idArr = $("#providerOrderList").sortable('toArray');
+            var idArr = $("#provider_order_list").sortable('toArray');
             var finalArr = new Array();
             $.each(idArr, function(key, val) {
                     var checked = + $('#enable_'+val).prop('checked') ? '1' : '0';
@@ -139,9 +139,6 @@ $(document).ready(function(){
     $('#newznab_key,#newznab_url').change(function(){
         
         var selectedProvider = $('#editANewznabProvider :selected').val();
-
-		if (selectedProvider == "addNewznab")
-			return;
 
         var url = $('#newznab_url').val();
         var key = $('#newznab_key').val();
@@ -199,13 +196,13 @@ $(document).ready(function(){
 
     $(this).showHideProviders();
 
-    $("#providerOrderList").sortable({
+    $("#provider_order_list").sortable({
         placeholder: 'ui-state-highlight',
         update: function (event, ui) {
             $(this).refreshProviderList();
         }
     });
 
-    $("#providerOrderList").disableSelection();
+    $("#provider_order_list").disableSelection();
 
 });

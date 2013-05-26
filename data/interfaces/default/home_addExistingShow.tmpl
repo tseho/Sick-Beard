@@ -2,6 +2,7 @@
 #import sickbeard
 #from sickbeard.common import *
 #set global $title="Existing Show"
+#set global $header="Existing Show"
 
 #set global $sbPath="../.."
 
@@ -27,6 +28,11 @@
 });
 //-->
 </script>
+#if $varExists('header') 
+	<h1 class="header">$header</h1>
+#else 
+	<h1 class="title">$title</h1>
+#end if
 
 <div id="tabs">
     <ul>
@@ -44,19 +50,18 @@
 
 <p class="align-left">Sick Beard can add existing shows, using the current options, by using locally stored NFO/XML metadata to eliminate user interaction.<br />
 If you would rather have Sick Beard prompt you to customize each show, then use the checkbox below.</p>
-<p class="align-left">
-    <input class="cb" type="checkbox" name="promptForSettings" id="promptForSettings" /> <label for="promptForSettings">Prompt me to set settings for each show</label>
-</p>
-
+<br />
+<p class="align-left"><input type="checkbox" name="promptForSettings" id="promptForSettings" /> <label for="promptForSettings">Prompt me to set settings for each show</label></p>
+<br />
 <hr />
-
-<h4>Displaying folders within these directories which aren't already added to Sick Beard:</h4><br/>
+<br />
+<h4>Displaying folders within these directories which aren't already added to Sick Beard:</h4>
+<br />
 <ul id="rootDirStaticList"><li></li></ul>
 
 <br />
 <div id="tableDiv"></div>
 <br />
-
 <input class="btn btn-primary" type="button" value="Submit" id="submitShowDirs" />
 </form>
 #include $os.path.join($sickbeard.PROG_DIR, "data/interfaces/default/inc_bottom.tmpl")

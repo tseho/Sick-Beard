@@ -2,17 +2,23 @@
 #import datetime
 #from sickbeard import common
 #set global $title="Episode Overview"
+#set global $header="Episode Overview"
 
 #set global $sbPath=".."
 
 #set global $topmenu="manage"#
 #import os.path
 #include $os.path.join($sickbeard.PROG_DIR, "data/interfaces/default/inc_top.tmpl")
+#if $varExists('header') 
+	<h1 class="header">$header</h1>
+#else 
+	<h1 class="title">$title</h1>
+#end if
 
 #if not $whichStatus or ($whichStatus and not $ep_counts):
 
 #if $whichStatus:
-<h3>None of your episodes have status $common.statusStrings[$int($whichStatus)]</h3>
+<h2>None of your episodes have status $common.statusStrings[$int($whichStatus)]</h2>
 <br />
 #end if
 
@@ -32,7 +38,7 @@ Manage episodes with status <select name="whichStatus">
 <form action="$sbRoot/manage/changeEpisodeStatuses" method="post">
 <input type="hidden" id="oldStatus" name="oldStatus" value="$whichStatus" />
 
-<h3>Shows containing $common.statusStrings[$int($whichStatus)] episodes</h3>
+<h2>Shows containing $common.statusStrings[$int($whichStatus)] episodes</h2>
 
 <br />
 
@@ -55,13 +61,17 @@ $statusList.remove($int($whichStatus))
 </select>
 <input class="btn" type="submit" value="Go" />
 
-<br /><br /><br />
+<div>
+	<button type="button" class="btn btn-mini selectAllShows" style="line-height: 8px;"><a>Select all</a></button> 
+	<button type="button" class="btn btn-mini unselectAllShows" style="line-height: 8px;"><a>Clear all</a></button>
+</div>
+<br />
 
 <table class="sickbeardTable" cellspacing="1" border="0" cellpadding="0">
 #for $cur_tvdb_id in $sorted_show_ids:
  <tr id="$cur_tvdb_id">
   <th><input type="checkbox" class="allCheck" id="allCheck-$cur_tvdb_id" name="$cur_tvdb_id-all" checked="checked" /></th>
-  <th colspan="2" style="width: 100%; text-align: left;"><a class="whitelink" href="$sbRoot/home/displayShow?show=$cur_tvdb_id">$show_names[$cur_tvdb_id]</a> ($ep_counts[$cur_tvdb_id]) <input type="button" class="btn get_more_eps" id="$cur_tvdb_id" value="Expand" /></th>
+  <th colspan="2" style="width: 100%; text-align: left;"><a class="whitelink" href="$sbRoot/home/displayShow?show=$cur_tvdb_id">$show_names[$cur_tvdb_id]</a> ($ep_counts[$cur_tvdb_id]) <input type="button" class="get_more_eps btn" id="$cur_tvdb_id" value="Expand" /></th>
  </tr>
 #end for
 </table>

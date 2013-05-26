@@ -23,6 +23,7 @@ import datetime
 import threading
 import re
 import glob
+import traceback
 
 import sickbeard
 
@@ -33,6 +34,8 @@ from name_parser.parser import NameParser, InvalidNameException
 from lib import subliminal
 
 from lib.tvdb_api import tvdb_api, tvdb_exceptions
+
+from lib.imdb import imdb
 
 from sickbeard import db
 from sickbeard import helpers, exceptions, logger
@@ -50,6 +53,7 @@ from common import Quality, Overview
 from common import DOWNLOADED, SNATCHED, SNATCHED_PROPER, ARCHIVED, IGNORED, UNAIRED, WANTED, SKIPPED, UNKNOWN
 from common import NAMING_DUPLICATE, NAMING_EXTEND, NAMING_LIMITED_EXTEND, NAMING_SEPARATED_REPEAT, NAMING_LIMITED_EXTEND_E_PREFIXED
 
+
 class TVShow(object):
 
     def __init__ (self, tvdbid, lang="", audio_lang=""):
@@ -60,9 +64,11 @@ class TVShow(object):
         self.name = ""
         self.tvrid = 0
         self.tvrname = ""
+        self.imdbid = "" 
         self.network = ""
         self.genre = ""
         self.runtime = 0
+        self.imdb_info = {}
         self.quality = int(sickbeard.QUALITY_DEFAULT)
         self.flatten_folders = int(sickbeard.FLATTEN_FOLDERS_DEFAULT)
 
@@ -71,7 +77,7 @@ class TVShow(object):
         self.startyear = 0
         self.paused = 0
         self.air_by_date = 0
-        self.subtitles = int(sickbeard.SUBTITLES_DEFAULT)
+        self.subtitles = int(sickbeard.SUBTITLES_DEFAULT if sickbeard.SUBTITLES_DEFAULT else 0)
         self.lang = lang
         self.audio_lang = audio_lang
         self.custom_search_names = ""
@@ -283,7 +289,7 @@ class TVShow(object):
                         logger.log(str(self.tvdbid) + ": Could not refresh subtitles", logger.ERROR)
                         logger.log(traceback.format_exc(), logger.DEBUG)
                 curEpisode.saveToDB()
-
+                
 
     def loadEpisodesFromDB(self):
 
@@ -639,6 +645,18 @@ class TVShow(object):
 
             if self.custom_search_names == "":
                 self.custom_search_names = sqlResults[0]["custom_search_names"]                
+            
+            if self.imdbid == "":
+                self.imdbid = sqlResults[0]["imdb_id"]                    
+
+        #Get IMDb_info from database
+        sqlResults = myDB.select("SELECT * FROM imdb_info WHERE tvdb_id = ?", [self.tvdbid])
+
+        if len(sqlResults) == 0:
+            logger.log(str(self.tvdbid) + ": Unable to find IMDb show info in the database")
+            return
+        else:
+            self.imdb_info = dict(zip(sqlResults[0].keys(), sqlResults[0]))
 
     def loadFromTVDB(self, cache=True, tvapi=None, cachedSeason=None):
 
@@ -666,6 +684,8 @@ class TVShow(object):
 
         self.genre = myEp['genre']
         self.network = myEp['network']
+        self.runtime = myEp['runtime']
+        self.imdbid = myEp['imdb_id']
 
         if myEp["airs_dayofweek"] != None and myEp["airs_time"] != None:
             self.airs = myEp["airs_dayofweek"] + " " + myEp["airs_time"]
@@ -682,9 +702,76 @@ class TVShow(object):
         if self.status == None:
             self.status = ""
 
-        self.saveToDB()
+#        self.saveToDB()
 
+    def loadIMDbInfo(self, imdbapi=None):
 
+        imdb_info = {'imdb_id' : self.imdbid,
+                     'title' : '',
+                     'year' : '',
+                     'akas' : [],
+                     'runtimes' : '', 
+                     'genres' : [],
+                     'countries' : '',
+                     'country codes' : '',
+                     'certificates' : [],
+                     'rating' : '',
+                     'votes': '',
+                     'last_update': ''
+                     }
+        
+        if self.imdbid:
+        
+            logger.log(str(self.tvdbid) + ": Loading show info from IMDb")
+    
+            i = imdb.IMDb()
+            imdbTv = i.get_movie(str(self.imdbid[2:]))
+            
+            for key in filter(lambda x: x in imdbTv.keys(), imdb_info.keys()):
+                # Store only the first value for string type
+                if type(imdb_info[key]) == type('') and type(imdbTv.get(key)) == type([]):
+                    imdb_info[key] = imdbTv.get(key)[0]
+                else:
+                    imdb_info[key] = imdbTv.get(key)
+            
+            #Filter only the value
+            if imdb_info['runtimes']:   
+                imdb_info['runtimes'] = re.search('\d+',imdb_info['runtimes']).group(0)   
+            else:
+                imdb_info['runtimes'] = self.runtime    
+    
+            if imdb_info['akas']:
+                imdb_info['akas'] = '|'.join(imdb_info['akas'])
+            else:
+                imdb_info['akas'] = ''    
+            
+            #Join all genres in a string
+            if imdb_info['genres']:
+                imdb_info['genres'] = '|'.join(imdb_info['genres'])
+            else:
+                imdb_info['genres'] = ''    
+                
+            #Get only the production country certificate if any 
+            if imdb_info['certificates'] and imdb_info['countries']:
+                dct = {}
+                try:
+                    for item in imdb_info['certificates']:
+                        dct[item.split(':')[0]] = item.split(':')[1]
+        
+                    imdb_info['certificates'] = dct[imdb_info['countries']]
+                except:
+                    imdb_info['certificates'] = ''    
+    
+            else:
+                imdb_info['certificates'] = ''       
+            
+            imdb_info['last_update'] = datetime.date.today().toordinal()
+            
+            #Rename dict keys without spaces for DB upsert
+            self.imdb_info = dict((k.replace(' ', '_'),f(v) if hasattr(v,'keys') else v) for k,v in imdb_info.items())
+    
+            logger.log(str(self.tvdbid) + ": Obtained info from IMDb ->" +  str(self.imdb_info), logger.DEBUG)
+        
     def loadNFO (self):
 
         if not os.path.isdir(self._location):
@@ -772,7 +859,8 @@ class TVShow(object):
         myDB = db.DBConnection()
         myDB.action("DELETE FROM tv_episodes WHERE showid = ?", [self.tvdbid])
         myDB.action("DELETE FROM tv_shows WHERE tvdb_id = ?", [self.tvdbid])
-
+        myDB.action("DELETE FROM imdb_info WHERE tvdb_id = ?", [self.tvdbid])
+        
         # remove self from show list
         sickbeard.showList = [x for x in sickbeard.showList if x.tvdbid != self.tvdbid]
         
@@ -872,12 +960,18 @@ class TVShow(object):
                         "startyear": self.startyear,
                         "tvr_name": self.tvrname,
                         "lang": self.lang,
+                        "imdb_id": self.imdbid,
                         "audio_lang": self.audio_lang,
                         "custom_search_names": self.custom_search_names
                         }
 
         myDB.upsert("tv_shows", newValueDict, controlValueDict)
-
+        
+        if self.imdbid:
+            controlValueDict = {"tvdb_id": self.tvdbid}
+            newValueDict = self.imdb_info
+            
+            myDB.upsert("imdb_info", newValueDict, controlValueDict)
 
     def __str__(self):
         toReturn = ""
@@ -966,7 +1060,7 @@ class TVShow(object):
                 maxBestQuality = None
 
             epStatus, curQuality = Quality.splitCompositeStatus(epStatus)
-
+    
             if epStatus in (SNATCHED, SNATCHED_PROPER):
                 return Overview.SNATCHED
             # if they don't want re-downloads then we call it good if they have anything
@@ -978,7 +1072,7 @@ class TVShow(object):
             # if it's >= maxBestQuality then it's good
             else:
                 return Overview.GOOD
-
+            
 def dirty_setter(attr_name):
     def wrapper(self, val):
         if getattr(self, attr_name) != val:
@@ -1072,7 +1166,7 @@ class TVEpisode(object):
             return
 
         self.refreshSubtitles()
-        self.subtitles_searchcount = self.subtitles_searchcount + 1
+        self.subtitles_searchcount = self.subtitles_searchcount + 1 if self.subtitles_searchcount else 1 #added the if because sometime it raise an error
         self.subtitles_lastsearch = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         self.saveToDB()
         
@@ -1686,7 +1780,7 @@ class TVEpisode(object):
                 result_name = result_name.replace('%RN', '%S.N.S%0SE%0E.%E.N-SiCKBEARD')
                 result_name = result_name.replace('%rn', '%s.n.s%0se%0e.%e.n-sickbeard')
 
-            result_name = result_name.replace('%RG', 'SiCKBEARD')
+            result_name = result_name.replace('%RG', 'SICKBEARD')
             result_name = result_name.replace('%rg', 'sickbeard')
             logger.log(u"Episode has no release name, replacing it with a generic one: "+result_name, logger.DEBUG)
         
@@ -1760,10 +1854,10 @@ class TVEpisode(object):
 
                 # add "E04"
                 ep_string += ep_sep
-
+                
                 if multi == NAMING_LIMITED_EXTEND_E_PREFIXED:
                     ep_string += 'E'
-
+                
                 ep_string += other_ep._format_string(ep_format.upper(), other_ep._replace_map())
 
             if season_ep_match:
@@ -1778,9 +1872,8 @@ class TVEpisode(object):
             result_name = result_name.replace(cur_name_group, cur_name_group_result)
 
         result_name = self._format_string(result_name, replace_map)
-
-        logger.log(u"formatting pattern: "+pattern+" -> "+result_name, logger.DEBUG)
         
+        logger.log(u"formatting pattern: "+pattern+" -> "+result_name, logger.DEBUG)
         
         return result_name
 

@@ -27,6 +27,8 @@ import threading
 import datetime
 import random
 
+import locale
+
 from Cheetah.Template import Template
 import cherrypy.lib
 
@@ -51,6 +53,8 @@ from sickbeard.exceptions import ex
 from sickbeard.webapi import Api
 
 from lib.tvdb_api import tvdb_api
+from lib.dateutil import tz
+import network_timezones
 
 import subliminal
 
@@ -763,7 +767,7 @@ class History:
         t.submenu = [
             { 'title': 'Clear History', 'path': 'history/clearHistory' },
             { 'title': 'Trim History',  'path': 'history/trimHistory'  },
-            { 'title': 'Trunc Episode History Links',  'path': 'history/truncEplinks'  },
+            { 'title': 'Trunc Episode Links',  'path': 'history/truncEplinks'  },
         ]
 
         return _munge(t)
@@ -880,8 +884,8 @@ class ConfigGeneral:
 
     @cherrypy.expose
     def saveGeneral(self, log_dir=None, web_port=None, web_log=None, web_ipv6=None,
-                    launch_browser=None, web_username=None, use_api=None, api_key=None,
-                    web_password=None, version_notify=None, enable_https=None, https_cert=None, https_key=None, display_posters=None):
+                    update_shows_on_start=None,launch_browser=None, web_username=None, use_api=None, api_key=None,
+                    web_password=None, version_notify=None, enable_https=None, https_cert=None, https_key=None, sort_article=None):
 
         results = []
 
@@ -900,10 +904,15 @@ class ConfigGeneral:
         else:
             launch_browser = 0
             
-        if display_posters == "on":
-            display_posters = 1
+        if update_shows_on_start == "on":
+            update_shows_on_start = 1
         else:
-            display_posters = 0            
+            update_shows_on_start = 0
+
+        if sort_article == "on":
+            sort_article = 1
+        else:
+            sort_article = 0            
 
         if version_notify == "on":
             version_notify = 1
@@ -913,9 +922,10 @@ class ConfigGeneral:
         if not config.change_LOG_DIR(log_dir):
             results += ["Unable to create directory " + os.path.normpath(log_dir) + ", log dir not changed."]
 
+        sickbeard.UPDATE_SHOWS_ON_START = update_shows_on_start
         sickbeard.LAUNCH_BROWSER = launch_browser
-        sickbeard.DISPLAY_POSTERS = display_posters
-
+        sickbeard.SORT_ARTICLE = sort_article
+        
         sickbeard.WEB_PORT = int(web_port)
         sickbeard.WEB_IPV6 = web_ipv6
         sickbeard.WEB_LOG = web_log
@@ -1418,9 +1428,11 @@ class ConfigNotifications:
                           use_nmj=None, nmj_host=None, nmj_database=None, nmj_mount=None, use_synoindex=None,
                           use_nmjv2=None, nmjv2_host=None, nmjv2_dbloc=None, nmjv2_database=None,
                           use_trakt=None, trakt_username=None, trakt_password=None, trakt_api=None,trakt_remove_watchlist=None,trakt_use_watchlist=None,trakt_start_paused=None,trakt_method_add=None,
+                          use_synologynotifier=None, synologynotifier_notify_onsnatch=None, synologynotifier_notify_ondownload=None, synologynotifier_notify_onsubtitledownload=None,
                           use_pytivo=None, pytivo_notify_onsnatch=None, pytivo_notify_ondownload=None, pytivo_notify_onsubtitledownload=None, pytivo_update_library=None, 
                           pytivo_host=None, pytivo_share_name=None, pytivo_tivo_name=None,
                           use_nma=None, nma_notify_onsnatch=None, nma_notify_ondownload=None, nma_notify_onsubtitledownload=None, nma_api=None, nma_priority=0,
+                          use_pushalot=None, pushalot_notify_onsnatch=None, pushalot_notify_ondownload=None, pushalot_notify_onsubtitledownload=None, pushalot_authorizationtoken=None,
                           use_mail=None, mail_username=None, mail_password=None, mail_server=None, mail_ssl=None, mail_from=None, mail_to=None, mail_notify_onsnatch=None ):
 
 
@@ -1616,6 +1628,26 @@ class ConfigNotifications:
             use_synoindex = 1
         else:
             use_synoindex = 0
+            
+        if use_synologynotifier == "on":
+            use_synologynotifier = 1
+        else:
+            use_synologynotifier = 0
+            
+        if synologynotifier_notify_onsnatch == "on":
+            synologynotifier_notify_onsnatch = 1
+        else:
+            synologynotifier_notify_onsnatch = 0
+
+        if synologynotifier_notify_ondownload == "on":
+            synologynotifier_notify_ondownload = 1
+        else:
+            synologynotifier_notify_ondownload = 0
+
+        if synologynotifier_notify_onsubtitledownload == "on":
+            synologynotifier_notify_onsubtitledownload = 1
+        else:
+            synologynotifier_notify_onsubtitledownload = 0
 
         if use_nmjv2 == "on":
             use_nmjv2 = 1
@@ -1700,6 +1732,26 @@ class ConfigNotifications:
             mail_notify_onsnatch = 1
         else:
             mail_notify_onsnatch = 0
+        
+        if use_pushalot == "on":
+            use_pushalot = 1
+        else:
+            use_pushalot = 0
+
+        if pushalot_notify_onsnatch == "on":
+            pushalot_notify_onsnatch = 1
+        else:
+            pushalot_notify_onsnatch = 0
+
+        if pushalot_notify_ondownload == "on":
+            pushalot_notify_ondownload = 1
+        else:
+            pushalot_notify_ondownload = 0
+
+        if pushalot_notify_onsubtitledownload == "on":
+            pushalot_notify_onsubtitledownload = 1
+        else:
+            pushalot_notify_onsubtitledownload = 0
 
 
         sickbeard.USE_XBMC = use_xbmc
@@ -1772,6 +1824,11 @@ class ConfigNotifications:
         sickbeard.NMJ_MOUNT = nmj_mount
 
         sickbeard.USE_SYNOINDEX = use_synoindex
+        
+        sickbeard.USE_SYNOLOGYNOTIFIER = use_synologynotifier
+        sickbeard.SYNOLOGYNOTIFIER_NOTIFY_ONSNATCH = synologynotifier_notify_onsnatch
+        sickbeard.SYNOLOGYNOTIFIER_NOTIFY_ONDOWNLOAD = synologynotifier_notify_ondownload
+        sickbeard.SYNOLOGYNOTIFIER_NOTIFY_ONSUBTITLEDOWNLOAD = synologynotifier_notify_onsubtitledownload
 
         sickbeard.USE_NMJv2 = use_nmjv2
         sickbeard.NMJv2_HOST = nmjv2_host
@@ -1811,6 +1868,12 @@ class ConfigNotifications:
         sickbeard.MAIL_FROM = mail_from
         sickbeard.MAIL_TO = mail_to
         sickbeard.MAIL_NOTIFY_ONSNATCH = mail_notify_onsnatch
+        
+        sickbeard.USE_PUSHALOT = use_pushalot
+        sickbeard.PUSHALOT_NOTIFY_ONSNATCH = pushalot_notify_onsnatch
+        sickbeard.PUSHALOT_NOTIFY_ONDOWNLOAD = pushalot_notify_ondownload
+        sickbeard.PUSHALOT_NOTIFY_ONSUBTITLEDOWNLOAD = pushalot_notify_onsubtitledownload
+        sickbeard.PUSHALOT_AUTHORIZATIONTOKEN = pushalot_authorizationtoken
 
         sickbeard.save_config()
 
@@ -3423,6 +3486,22 @@ class WebInterface:
         else:
             return cherrypy.lib.static.serve_file(default_image_path, content_type="image/png")
     @cherrypy.expose
+    def setHomeLayout(self, layout):
+
+        if layout not in ('poster', 'banner', 'simple'):
+            layout = 'poster'
+
+        sickbeard.HOME_LAYOUT = layout
+            
+        redirect("/home")
+    @cherrypy.expose
+    def toggleDisplayShowSpecials(self, show):
+
+        sickbeard.DISPLAY_SHOW_SPECIALS = not sickbeard.DISPLAY_SHOW_SPECIALS
+        
+        redirect("/home/displayShow?show=" + show)
+    
+    @cherrypy.expose
     def setComingEpsLayout(self, layout):
         if layout not in ('poster', 'banner', 'list'):
             layout = 'banner'
@@ -3450,39 +3529,87 @@ class WebInterface:
     @cherrypy.expose
     def comingEpisodes(self, layout="None"):
 
-        myDB = db.DBConnection()
+        # get local timezone and load network timezones
+        sb_timezone = tz.tzlocal()
+        network_dict = network_timezones.load_network_dict()
 
-        today = datetime.date.today().toordinal()
-        next_week = (datetime.date.today() + datetime.timedelta(days=7)).toordinal()
-        recently = (datetime.date.today() - datetime.timedelta(days=3)).toordinal()
+        myDB = db.DBConnection()
+        
+        today1 = datetime.date.today()
+        today = today1.toordinal()
+        next_week1 = (datetime.date.today() + datetime.timedelta(days=7))
+        next_week = next_week1.toordinal()
+        recently = (datetime.date.today() - datetime.timedelta(days=sickbeard.COMING_EPS_MISSED_RANGE)).toordinal()
 
         done_show_list = []
         qualList = Quality.DOWNLOADED + Quality.SNATCHED + [ARCHIVED, IGNORED]
-        sql_results = myDB.select("SELECT *, tv_shows.status as show_status FROM tv_episodes, tv_shows WHERE season != 0 AND airdate >= ? AND airdate < ? AND tv_shows.tvdb_id = tv_episodes.showid AND tv_episodes.status NOT IN ("+','.join(['?']*len(qualList))+")", [today, next_week] + qualList)
-        for cur_result in sql_results:
-            done_show_list.append(int(cur_result["showid"]))
+        sql_results1 = myDB.select("SELECT *, 0 as localtime, tv_shows.status as show_status FROM tv_episodes, tv_shows WHERE season != 0 AND airdate >= ? AND airdate < ? AND tv_shows.tvdb_id = tv_episodes.showid AND tv_episodes.status NOT IN ("+','.join(['?']*len(qualList))+")", [today, next_week] + qualList)
+        for cur_result in sql_results1:
+            done_show_list.append(helpers.tryInt(cur_result["showid"]))
 
-        more_sql_results = myDB.select("SELECT *, tv_shows.status as show_status FROM tv_episodes outer_eps, tv_shows WHERE season != 0 AND showid NOT IN ("+','.join(['?']*len(done_show_list))+") AND tv_shows.tvdb_id = outer_eps.showid AND airdate = (SELECT airdate FROM tv_episodes inner_eps WHERE inner_eps.showid = outer_eps.showid AND inner_eps.airdate >= ? ORDER BY inner_eps.airdate ASC LIMIT 1) AND outer_eps.status NOT IN ("+','.join(['?']*len(Quality.DOWNLOADED+Quality.SNATCHED))+")", done_show_list + [next_week] + Quality.DOWNLOADED + Quality.SNATCHED)
-        sql_results += more_sql_results
+        more_sql_results = myDB.select("SELECT *, tv_shows.status as show_status FROM tv_episodes outer_eps, tv_shows WHERE season != 0 AND showid NOT IN ("+','.join(['?']*len(done_show_list))+") AND tv_shows.tvdb_id = outer_eps.showid AND airdate IN (SELECT airdate FROM tv_episodes inner_eps WHERE inner_eps.showid = outer_eps.showid AND inner_eps.airdate >= ? AND inner_eps.status NOT IN ("+','.join(['?']*len(Quality.DOWNLOADED+Quality.SNATCHED))+") ORDER BY inner_eps.airdate ASC LIMIT 1)", done_show_list + [next_week] + Quality.DOWNLOADED + Quality.SNATCHED)
+        sql_results1 += more_sql_results
 
-        more_sql_results = myDB.select("SELECT *, tv_shows.status as show_status FROM tv_episodes, tv_shows WHERE season != 0 AND tv_shows.tvdb_id = tv_episodes.showid AND airdate < ? AND airdate >= ? AND tv_episodes.status = ? AND tv_episodes.status NOT IN ("+','.join(['?']*len(qualList))+")", [today, recently, WANTED] + qualList)
-        sql_results += more_sql_results
+        more_sql_results = myDB.select("SELECT *, 0 as localtime, tv_shows.status as show_status FROM tv_episodes, tv_shows WHERE season != 0 AND tv_shows.tvdb_id = tv_episodes.showid AND airdate < ? AND airdate >= ? AND tv_episodes.status = ? AND tv_episodes.status NOT IN ("+','.join(['?']*len(qualList))+")", [today, recently, WANTED] + qualList)
+        sql_results1 += more_sql_results
 
-        #epList = sickbeard.comingList
-
-        # sort by air date
+        # sort by localtime
         sorts = {
-            'date': (lambda x, y: cmp(int(x["airdate"]), int(y["airdate"]))),
-            'show': (lambda a, b: cmp(a["show_name"], b["show_name"])),
-            'network': (lambda a, b: cmp(a["network"], b["network"])),
+            'date': (lambda x, y: cmp(x["localtime"], y["localtime"])),
+            'show': (lambda a, b: cmp((a["show_name"], a["localtime"]), (b["show_name"], b["localtime"]))),
+            'network': (lambda a, b: cmp((a["network"], a["localtime"]), (b["network"], b["localtime"]))),
         }
 
-        #epList.sort(sorts[sort])
+        # make a dict out of the sql results
+        sql_results = [dict(row) for row in sql_results1]
+        
+        # regex to parse time (12/24 hour format)
+        time_regex = re.compile(r"(\d{1,2}):(\d{2,2})( [PA]M)?\b", flags=re.IGNORECASE)
+        
+        # add localtime to the dict
+        for index, item in enumerate(sql_results1):
+            mo = time_regex.search(item['airs'])
+            if mo != None and len(mo.groups()) >= 2:
+                try:
+                    hr = helpers.tryInt(mo.group(1))
+                    m = helpers.tryInt(mo.group(2))
+                    ap = mo.group(3)
+                    # convert am/pm to 24 hour clock
+                    if ap != None:
+                        if ap.lower() == u" pm" and hr != 12:
+                            hr += 12
+                        elif ap.lower() == u" am" and hr == 12:
+                            hr -= 12
+                except:
+                    hr = 0
+                    m = 0
+            else:
+                hr = 0
+                m = 0
+            if hr < 0 or hr > 23 or m < 0 or m > 59:
+                hr = 0
+                m = 0
+                
+            te = datetime.datetime.fromordinal(helpers.tryInt(item['airdate']))
+            foreign_timezone = network_timezones.get_network_timezone(item['network'], network_dict, sb_timezone)
+            foreign_naive = datetime.datetime(te.year, te.month, te.day, hr, m,tzinfo=foreign_timezone)
+            sql_results[index]['localtime'] = foreign_naive.astimezone(sb_timezone)
+            
+            #Normalize/Format the Airing Time
+            try:
+                locale.setlocale(locale.LC_TIME, 'us_US')
+                sql_results[index]['localtime_string'] = sql_results[index]['localtime'].strftime("%A %H:%M %p")
+                locale.setlocale(locale.LC_ALL, '') #Reseting to default locale
+            except:
+                sql_results[index]['localtime_string'] = sql_results[index]['localtime'].strftime("%A %H:%M %p")    
+            
         sql_results.sort(sorts[sickbeard.COMING_EPS_SORT])
 
         t = PageTemplate(file="comingEpisodes.tmpl")
-        paused_item = { 'title': '', 'path': 'toggleComingEpsDisplayPaused' }
-        paused_item['title'] = 'Hide Paused' if sickbeard.COMING_EPS_DISPLAY_PAUSED else 'Show Paused'
+#        paused_item = { 'title': '', 'path': 'toggleComingEpsDisplayPaused' }
+#        paused_item['title'] = 'Hide Paused' if sickbeard.COMING_EPS_DISPLAY_PAUSED else 'Show Paused'
+        paused_item = { 'title': 'View Paused:', 'path': {'': ''} }
+        paused_item['path'] = {'Hide': 'toggleComingEpsDisplayPaused'} if sickbeard.COMING_EPS_DISPLAY_PAUSED else {'Show': 'toggleComingEpsDisplayPaused'}
         t.submenu = [
             { 'title': 'Sort by:', 'path': {'Date': 'setComingEpsSort/?sort=date',
                                             'Show': 'setComingEpsSort/?sort=show',
@@ -3496,8 +3623,8 @@ class WebInterface:
             paused_item,
         ]
 
-        t.next_week = next_week
-        t.today = today
+        t.next_week = datetime.datetime.combine(next_week1, datetime.time(tzinfo=sb_timezone))
+        t.today = datetime.datetime.now().replace(tzinfo=sb_timezone)
         t.sql_results = sql_results
 
         # Allow local overriding of layout parameter
@@ -3505,9 +3632,90 @@ class WebInterface:
             t.layout = layout
         else:
             t.layout = sickbeard.COMING_EPS_LAYOUT
-
+                
 
         return _munge(t)
+        
+    # Raw iCalendar implementation by Pedro Jose Pereira Vieito (@pvieito).
+    #
+    # iCalendar (iCal) - Standard RFC 5545 <http://tools.ietf.org/html/rfc5546> 
+    # Works with iCloud, Google Calendar and Outlook.
+    @cherrypy.expose
+    def calendar(self):
+        """ Provides a subscribeable URL for iCal subscriptions
+        """
+
+        logger.log(u"Receiving iCal request from %s" % cherrypy.request.remote.ip)
+
+        poster_url = cherrypy.url().replace('ical', '')
+
+        time_re = re.compile('([0-9]{1,2})\:([0-9]{2})(\ |)([AM|am|PM|pm]{2})')
+
+        # Create a iCal string        
+        ical = 'BEGIN:VCALENDAR\n' 
+        ical += 'VERSION:2.0\n'
+        ical += 'PRODID://Sick-Beard Upcoming Episodes//\n'
+
+        # Get shows info
+        myDB = db.DBConnection()
+        
+        # Limit dates
+        past_date = (datetime.date.today() + datetime.timedelta(weeks=-52)).toordinal()
+        future_date = (datetime.date.today() + datetime.timedelta(weeks=52)).toordinal()
+        
+        # Get all the shows that are not paused and are currently on air (from kjoconnor Fork)
+        calendar_shows = myDB.select("SELECT show_name, tvdb_id, network, airs, runtime FROM tv_shows WHERE status = 'Continuing' AND paused != '1'")
+        for show in calendar_shows:
+            # Get all episodes of this show airing between today and next month
+            episode_list = myDB.select("SELECT tvdbid, name, season, episode, description, airdate FROM tv_episodes WHERE airdate >= ? AND airdate < ? AND showid = ?", (past_date, future_date, int(show["tvdb_id"])))
+
+            for episode in episode_list:
+                
+                # Get local timezone and load network timezones
+                local_zone = tz.tzlocal() 
+                try:
+                    network_zone = network_timezones.get_network_timezone(show['network'], network_timezones.load_network_dict(), local_zone)
+                except:
+                    # Dummy network_zone for exceptions
+                    network_zone = None
+                
+                # Get the air date and time
+                air_date = datetime.datetime.fromordinal(int(episode['airdate']))
+                air_time = re.compile('([0-9]{1,2})\:([0-9]{2})(\ |)([AM|am|PM|pm]{2})').search(show["airs"])
+                
+                # Parse out the air time
+                try:
+                    if (air_time.group(4).lower() == 'pm' and int(air_time.group(1)) == 12):
+                        t = datetime.time(12, int(air_time.group(2)), 0, tzinfo=network_zone)
+                    elif (air_time.group(4).lower() == 'pm'):
+                        t = datetime.time((int(air_time.group(1)) + 12), int(air_time.group(2)), 0, tzinfo=network_zone)
+                    elif (air_time.group(4).lower() == 'am' and int(air_time.group(1)) == 12):
+                        t = datetime.time(0, int(air_time.group(2)), 0, tzinfo=network_zone)
+                    else:
+                        t = datetime.time(int(air_time.group(1)), int(air_time.group(2)), 0, tzinfo=network_zone)
+                except:
+                    # Dummy time for exceptions
+                    t = datetime.time(22, 0, 0, tzinfo=network_zone)
+                
+                # Combine air time and air date into one datetime object
+                air_date_time = datetime.datetime.combine(air_date, t).astimezone(local_zone)
+                
+                # Create event for episode
+                ical = ical + 'BEGIN:VEVENT\n'
+                ical = ical + 'DTSTART:' + str(air_date_time.date()).replace("-", "") + '\n'
+                ical = ical + 'SUMMARY:' + show['show_name'] + ': ' + episode['name'] + '\n'
+                ical = ical + 'UID:' + str(datetime.date.today().isoformat()) + '-' + str(random.randint(10000,99999)) + '@Sick-Beard\n'
+                if (episode['description'] != ''):
+                    ical = ical + 'DESCRIPTION:' + show['airs'] + ' on ' + show['network'] + '\\n\\n' + episode['description'] + '\n'
+                else:
+                    ical = ical + 'DESCRIPTION:' + show['airs'] + ' on ' + show['network'] + '\n'
+                ical = ical + 'LOCATION:' + 'Episode ' + str(episode['episode']) + ' - Season ' + str(episode['season']) + '\n'
+                ical = ical + 'END:VEVENT\n'
+
+        # Ending the iCal
+        ical += 'END:VCALENDAR\n' 
+        
+        return ical
 
     manage = Manage()
 

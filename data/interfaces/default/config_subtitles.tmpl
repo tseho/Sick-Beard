@@ -37,7 +37,11 @@
 	});
 </script>
 
-
+#if $varExists('header') 
+	<h1 class="header">$header</h1>
+#else 
+	<h1 class="title">$title</h1>
+#end if
 
 <div id="config">
 <div id="config-content">
@@ -45,7 +49,11 @@
 <form id="configForm" action="saveSubtitles" method="post">
 
             <div id="config-components">
-                                
+                <ul>
+                	<li><a href="#core-component-group4">Subtitles Search</a></li>
+                	<li><a href="#core-component-group2">Subtitles Plugin</a></li>
+                </ul>
+                
                 <div id="core-component-group4" class="component-group clearfix">
 
                     <div class="component-group-desc">
@@ -82,20 +90,20 @@
 	          	                	</label>
                         		</div>
                         		<div class="field-pair">
-                            <input type="checkbox" class="enabler" #if $sickbeard.SUBTITLES_DIR_SUB then " checked=\"checked\"" else ""# id="subtitles_dir_sub" name="subtitles_dir_sub">
-                            <label for="subtitles_dir_subs" class="clearfix">
-                                <span class="component-title">Use Subs Folder</span>
-		                                <span class="component-desc">Use Subs folder in episode path (usefull for Xbmc Subtitles plugin users) ? Do not use if you use a custom dir</span>
+                            		<input type="checkbox" class="enabler" #if $sickbeard.SUBTITLES_DIR_SUB then " checked=\"checked\"" else ""# id="subtitles_dir_sub" name="subtitles_dir_sub">
+                            		<label for="subtitles_dir_subs" class="clearfix">
+                                	<span class="component-title">Use Subs Folder</span>
+									<span class="component-desc">For XBMC users. Do not use if you use a custom dir</span>                       
                             </label>
                         </div>
-                        		<div class="field-pair">
+                         <div class="field-pair">
                             <input type="checkbox" class="enabler" #if $sickbeard.SUBSNOLANG then " checked=\"checked\"" else ""# id="subsnolang" name="subsnolang">
                             <label for="subsnolang" class="clearfix">
                                 <span class="component-title">Create Sub Files without language code</span>
-		                                <span class="component-desc">Create a sub file without language code next to the language coded one (usefull for players which needs exactly same name between video and srt files</span>
+								<span class="component-desc">Create a sub file without language code next to the language coded one (usefull for players which needs same name between video and srt files)</span>
                             </label>
                         </div>
-		                        <div class="field-pair">
+<div class="field-pair">
 		                            <input type="checkbox" name="subtitles_history" id="subtitles_history" #if $sickbeard.SUBTITLES_HISTORY then " checked=\"checked\"" else ""#/>
 		                            <label class="clearfix" for="subtitles_history">
 		                                <span class="component-title">Subtitles History</span>
@@ -116,7 +124,7 @@
                         <p class="note"><span style="color: #654B24; font-size: 16px;">*</span> Web-scraping plugin</p>
                     </div>
 
-                    <fieldset class="component-group-list">
+                    <fieldset class="component-group-list" style="margin-left: 50px; margin-top:36px">
                         <ul id="service_order_list">
                         #for $curService in $sickbeard.subtitles.sortedServiceList():
                             #set $curName = $curService.id
@@ -135,7 +143,6 @@
                         
                         <br/><input type="submit" class="btn config_submitter" value="Save Changes" /><br/>
                     </fieldset>
-					
                 </div><!-- /component-group2 //-->
 
 	            <br/><input type="submit" class="btn config_submitter" value="Save Changes" /><br/>
@@ -144,9 +151,10 @@
 
 </form>
 </div></div>
+<div class="clearfix"></div>
 <script type="text/javascript" charset="utf-8">
 <!--
-    
+    jQuery('#config-components').tabs();
 	jQuery('#subtitles_dir').fileBrowser({ title: 'Select Subtitles Download Directory' });    
 //-->
 </script>

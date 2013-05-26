@@ -11,21 +11,30 @@
 
 #set global $topmenu="config"#
 #include $os.path.join($sickbeard.PROG_DIR, "data/interfaces/default/inc_top.tmpl")
-
+#if $varExists('header') 
+	<h1 class="header">$header</h1>
+#else 
+	<h1 class="title">$title</h1>
+#end if
 <script type="text/javascript" src="$sbRoot/js/config.js?$sbPID"></script>
 
 <div id="config">
 <div id="config-content">
-<h5>All non-absolute folder locations are relative to <span class="path">$sickbeard.DATA_DIR</span></h5>
 
 <form id="configForm" action="saveGeneral" method="post">
-
             <div id="config-components">
-
+				
+				<ul>
+					<li><a href="#core-component-group1">Misc</a></li>
+					<li><a href="#core-component-group2">Web Interface</a></li>
+					<li><a href="#core-component-group4">Api</a></li>
+				</ul>
+				
                 <div id="core-component-group1" class="component-group clearfix">
-
+					
                     <div class="component-group-desc">
                         <h3>Misc</h3>
+                        <p>Startup options.</p>
                         <p><b>Some options may require a manual restart to take effect.</b></p>
                     </div>
 
@@ -37,6 +46,14 @@
                                 <span class="component-desc">Should Sick Beard open its home page when started?</span>
                             </label>
                         </div>
+
+                        <div class="field-pair">
+                            <input type="checkbox" name="update_shows_on_start" id="update_shows_on_start" #if $sickbeard.UPDATE_SHOWS_ON_START then "checked=\"checked\"" else ""#/>
+                            <label class="clearfix" for="update_shows_on_start">
+                                <span class="component-title">Update Shows on Start</span>
+                                <span class="component-desc">Should Sick Beard update shows info when started?</span>
+                            </label>
+                        </div>  
                         
                         <div class="field-pair">
                             <input type="checkbox" name="version_notify" id="version_notify" #if $sickbeard.VERSION_NOTIFY then "checked=\"checked\"" else ""#/>
@@ -51,10 +68,10 @@
                         </div>
 
                         <div class="field-pair">
-                            <input type="checkbox" name="display_posters" id="display_posters" #if $sickbeard.DISPLAY_POSTERS then "checked=\"checked\"" else ""#/>
-                            <label class="clearfix" for="display_posters">
-                                <span class="component-title">Display Posters</span>
-                                <span class="component-desc">Display Posters in main view.</span>
+                            <input type="checkbox" name="sort_article" id="sort_article" #if $sickbeard.SORT_ARTICLE then "checked=\"checked\"" else ""#/>
+                            <label class="clearfix" for="sort_article"> 
+                                <span class="component-title">Sort articles</span> 
+                                <span class="component-desc">Include articles (The, A, An, Le, La ...) when sorting show lists.</span>
                             </label>
                         </div>
 
@@ -186,7 +203,7 @@
                             <label class="nocheck clearfix" for="api_key">
                                 <span class="component-title">API Key</span>
                                 <input type="text" name="api_key" id="api_key" value="$sickbeard.API_KEY" size="35" readonly="readonly" />
-                                <input type="button" class="btn" id="generate_new_apikey" value="Generate">
+                                <input class="btn" class="btn" type="button" id="generate_new_apikey" value="Generate">
                             </label>
                             <label class="nocheck clearfix">
                                 <span class="component-title">&nbsp;</span>
@@ -198,20 +215,22 @@
                         <input type="submit" class="btn config_submitter" value="Save Changes" />
                     </fieldset>
                 </div><!-- /component-group4 //-->
-
-                <div class="component-group-save">
-                    <input type="submit" class="btn config_submitter" value="Save Changes" />
-                </div><br />
-
+                <br/>
+				<small class="float-right"><b>All non-absolute folder locations are relative to <span class="path">$sickbeard.DATA_DIR</span></b> </small>
+				<input type="submit" class="btn config_submitter button" value="Save Changes" />
+            
             </div><!-- /config-components -->
-
+		
 </form>
 </div></div>
+
+<div class="clearfix"></div>
 
 <script type="text/javascript" charset="utf-8">
 <!--
     jQuery('#log_dir').fileBrowser({ title: 'Select Log Directory' });
+    jQuery('#config-components').tabs();
 //-->
 </script>
 
-#include $os.path.join($sickbeard.PROG_DIR, "data/interfaces/default/inc_bottom.tmpl")
+#include $os.path.join($sickbeard.PROG_DIR,"data/interfaces/default/inc_bottom.tmpl")

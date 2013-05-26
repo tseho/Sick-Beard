@@ -23,6 +23,7 @@ import plex
 import nmj
 import nmjv2
 import synoindex
+import synologynotifier
 import pytivo
 
 import growl
@@ -33,6 +34,7 @@ import pushover
 import boxcar
 import nma
 import mail
+import pushalot
 
 import tweet
 import trakt
@@ -45,6 +47,7 @@ plex_notifier = plex.PLEXNotifier()
 nmj_notifier = nmj.NMJNotifier()
 synoindex_notifier = synoindex.synoIndexNotifier()
 nmjv2_notifier = nmjv2.NMJv2Notifier()
+synology_notifier = synologynotifier.synologyNotifier()
 pytivo_notifier = pytivo.pyTivoNotifier()
 # devices
 growl_notifier = growl.GrowlNotifier()
@@ -54,6 +57,7 @@ libnotify_notifier = libnotify.LibnotifyNotifier()
 pushover_notifier = pushover.PushoverNotifier()
 boxcar_notifier = boxcar.BoxcarNotifier()
 nma_notifier = nma.NMA_Notifier()
+pushalot_notifier = pushalot.PushalotNotifier()
 # online
 twitter_notifier = tweet.TwitterNotifier()
 trakt_notifier = trakt.TraktNotifier()
@@ -66,6 +70,7 @@ notifiers = [
     nmj_notifier,
     nmjv2_notifier,
     synoindex_notifier,
+    synology_notifier,
     pytivo_notifier,
     growl_notifier,
     prowl_notifier,
@@ -73,6 +78,7 @@ notifiers = [
     pushover_notifier,
     boxcar_notifier,
     nma_notifier,
+    pushalot_notifier,
     twitter_notifier,
     trakt_notifier,
     mail_notifier,

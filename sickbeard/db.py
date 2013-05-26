@@ -67,15 +67,15 @@ class DBConnection:
             return 0
 
     def mass_action(self, querylist, logTransaction=False):
-
+    
         with db_lock:
-
+    
             if querylist == None:
                 return
-
+    
             sqlResult = []
             attempt = 0
-
+    
             while attempt < 5:
                 try:
                     for qu in querylist:
@@ -107,9 +107,9 @@ class DBConnection:
                         self.connection.rollback()
                     logger.log(u"Fatal error executing query: " + ex(e), logger.ERROR)
                     raise
-
+    
             return sqlResult
-
+        
     def action(self, query, args=None):
 
         with db_lock:
@@ -123,10 +123,10 @@ class DBConnection:
             while attempt < 5:
                 try:
                     if args == None:
-                        logger.log(self.filename+": "+query, logger.DEBUG)
+                        logger.log(self.filename+": "+query, logger.DB)
                         sqlResult = self.connection.execute(query)
                     else:
-                        logger.log(self.filename+": "+query+" with args "+str(args), logger.DEBUG)
+                        logger.log(self.filename+": "+query+" with args "+str(args), logger.DB)
                         sqlResult = self.connection.execute(query, args)
                     self.connection.commit()
                     # get out of the connection attempt loop since we were successful

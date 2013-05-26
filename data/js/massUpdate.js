@@ -43,8 +43,8 @@ $(document).ready(function(){
         renameArr.push($(this).attr('id').split('-')[1])
       }
     });
-    
-    $('.subtitleCheck').each(function() {
+
+	$('.subtitleCheck').each(function() {
       if (this.checked == true) {
         subtitleArr.push($(this).attr('id').split('-')[1])
       }
@@ -67,7 +67,7 @@ $(document).ready(function(){
       return false
 
     url = 'massUpdate?toUpdate='+updateArr.join('|')+'&toRefresh='+refreshArr.join('|')+'&toRename='+renameArr.join('|')+'&toSubtitle='+subtitleArr.join('|')+'&toDelete='+deleteArr.join('|')+'&toMetadata='+metadataArr.join('|')
-    
+
     window.location.href = url
 
   });
