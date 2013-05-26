@@ -154,7 +154,7 @@
 
 <table id="showListTable" class="sickbeardTable tablesorter" cellspacing="1" border="0" cellpadding="0">
 
-  <thead><tr><th class="nowrap">Next Ep</th>#if $layout=="poster" then "<th>Poster</th>" else "<th style='display: none;'></th>"#<th>Show</th><th>Network</th><th>Quality</th><th>Downloads</th><th>French</th><th>Active</th><th>Audio</th><th>Status</th></tr></thead>
+  <thead><tr><th class="nowrap">Next Ep</th>#if $layout=="poster" then "<th>Poster</th>" else "<th style='display: none;'></th>"#<th>Show</th><th>Network</th><th>Quality</th><th>Downloads</th><th>French Ep</th><th>Active</th><th>Audio</th><th>Status</th></tr></thead>
   <tfoot>
     <tr>
       <th rowspan="1" colspan="1" align="center"><a href="$sbRoot/home/addShows/">&nbsp Add Show</a></th>
@@ -258,9 +258,9 @@ $myShowList.sort(lambda x, y: cmp(x.name, y.name))
     <td align="center" style="color: #555555;font-weight:bold;">
     #if $layout != 'simple':	
         #if $curShow.network:
-        	<img id="network" width="44.8" height="22.4" src="$sbRoot/images/network/${curShow.network.lower()}.png" alt="$curShow.network" title="$curShow.network" />
+        	<img id="network" width="60" height="30" src="$sbRoot/images/network/${curShow.network.lower()}.png" alt="$curShow.network" title="$curShow.network" />
     	#else:
-    		<img id="network" width="44.8" height="22.4" src="$sbRoot/images/network/nonetwork.png" alt="No Network" title="No Network" />
+    		<img id="network" width="60" height="30" src="$sbRoot/images/network/nonetwork.png" alt="No Network" title="No Network" />
 		#end if
 	#else:
 		$curShow.network
