@@ -81,7 +81,11 @@
 
 <div class="showInfo">
 <h1 class="title"><a>$show.name#if $show.imdbid:
+	#if $show.imdb_info['rating'] !='':
 	<tr><td class="showLegend"></td><td><img src="$sbRoot/images/ratings/${$int($round($float($show.imdb_info['rating'])))}.png" width="70" height="16" alt="$show.imdb_info['rating']" title="$show.imdb_info['rating']"/></td></tr>
+	#else:
+	<tr><td class="showLegend"></td><td></td></tr>
+	#end if
 	#else:
 	<tr><td class="showLegend"></td><td></td></tr>
 	#end if
@@ -186,7 +190,11 @@
     <tr><td class="showLegend">Audio Language:</td><td><img src="$sbRoot/images/flags/${show.audio_lang}.png" width="16" height="11" alt="$show.audio_lang" title="$show.lang" /></td></tr>
 	<tr><td class="showLegend">Custom Names :</td><td>$show.custom_search_names</td></tr>
 	#if $show.imdbid:
-	<tr><td class="showLegend">Rating :</td><td><img src="$sbRoot/images/ratings/${$int($round($float($show.imdb_info['rating'])))}.png" width="70" height="16" alt="$show.imdb_info['rating']" title="$show.imdb_info['rating']"/></td></tr>
+	#if $show.imdb_info['rating'] !='':
+	<tr><td class="showLegend">Rating :</td><td>$show.imdb_info['rating']</td></tr>
+	#else:	
+	<tr><td class="showLegend">No Rating</td><td></td></tr>
+	#end if:
 	#else:
 	<tr><td class="showLegend">No Rating</td><td></td></tr>
 	#end if
@@ -216,9 +224,9 @@
 </div>
 </div>
 #if $sickbeard.USE_SUBTITLES
-<div class="tvshowImgsubs"><a href="$sbRoot/showPoster/?show=$curShow.tvdbid&amp;which=poster" rel="dialog" title="$show.name"><img src="$sbRoot/showPoster/?show=$show.tvdbid&amp;which=poster" class="posterThumb" alt=""/></a>
+<div class="tvshowImgsubs"><a href="$sbRoot/showPoster/?show=$show.tvdbid&amp;which=poster" rel="dialog" title="$show.name"><img src="$sbRoot/showPoster/?show=$show.tvdbid&amp;which=poster" class="posterThumb" alt="$show.tvdbid&amp"/></a>
 #else
-<div class="tvshowImg"><a href="$sbRoot/showPoster/?show=$curShow.tvdbid&amp;which=poster" rel="dialog" title="$show.name"><img src="$sbRoot/showPoster/?show=$show.tvdbid&amp;which=poster" class="posterThumb" alt=""/></a>
+<div class="tvshowImg"><a href="$sbRoot/showPoster/?show=$show.tvdbid&amp;which=poster" rel="dialog" title="$show.name"><img src="$sbRoot/showPoster/?show=$show.tvdbid&amp;which=poster" class="posterThumb" alt="$show.tvdbid&amp"/></a>
 #end if
 </div>
 #set $curSeason = -1
