@@ -1991,7 +1991,7 @@ def HomeMenu():
         { 'title': 'Manual Post-Processing', 'path': 'home/postprocess/'                                        },
         { 'title': 'Update XBMC',            'path': 'home/updateXBMC/', 'requires': haveXBMC                   },
         { 'title': 'Update Plex',            'path': 'home/updatePLEX/', 'requires': havePLEX                   },
-        { 'title': 'Update',              'path': 'home/manage/manageSearches/forceVersionCheck', 'confirm':True}, 
+        { 'title': 'Update',                 'path': 'manage/manageSearches/forceVersionCheck', 'confirm': True}, 
         { 'title': 'Restart',                'path': 'home/restart/?pid='+str(sickbeard.PID), 'confirm': True   },
         { 'title': 'Shutdown',               'path': 'home/shutdown/?pid='+str(sickbeard.PID), 'confirm': True  },
     ]
