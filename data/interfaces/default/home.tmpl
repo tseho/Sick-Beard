@@ -1,7 +1,7 @@
 #import sickbeard
 #import datetime
 #from sickbeard.common import *
-#from sickbeard import db
+#from sickbeard import db,helpers
 
 #set global $title="Home"
 #set global $header="Show List"
@@ -19,6 +19,29 @@
 #set $fr = $myDB.select("SELECT showid, COUNT(*) FROM tv_episodes WHERE audio_langs = 'fr' AND location != '' AND season != 0 and episode != 0 AND airdate <= "+$today+" GROUP BY showid")
 #set $layout = $sickbeard.HOME_LAYOUT
 #set $sort = $sickbeard.SORT_ARTICLE
+#set $show_message=''
+#set $listshow=myDB.select("SELECT tvdb_id from tv_shows")
+#for show in $listshow:
+	#set $showObj = helpers.findCertainShow(sickbeard.showList, show[0])
+	#if $showObj:
+		#if sickbeard.showQueueScheduler.action.isInUpdateQueue($showObj):
+			#set $show_message = 'Objects are being refreshed. When finished, all images and imdb infos will be available. '
+			#break
+		#end if
+	#end if
+#end for
+#for show in $listshow:
+	#set $showObj = helpers.findCertainShow(sickbeard.showList, show[0])
+	#if $showObj:
+		#if sickbeard.showQueueScheduler.action.isBeingUpdated(showObj):
+			#set $show_message += ' Current show being processed : '+ showObj.name
+			#break
+		#end if
+	#end if
+#end for
+#if $show_message:
+    <div id="show_message" class="ui-corner-all">$show_message</div>
+#end if
 
 <script type="text/javascript" charset="utf-8">
 <!--
