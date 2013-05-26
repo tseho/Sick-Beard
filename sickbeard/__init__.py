@@ -928,7 +928,7 @@ def initialize(consoleLogging=True):
 
         # the interval for this is stored inside the ShowUpdater class
         showUpdaterInstance = showUpdater.ShowUpdater()
-        if UPDATE_SHOWS_ON_START == True:
+        if UPDATE_SHOWS_ON_START:
             showUpdateScheduler = scheduler.Scheduler(showUpdaterInstance,
                                                    cycleTime=showUpdaterInstance.updateInterval,
                                                    threadName="SHOWUPDATER",
@@ -1044,6 +1044,13 @@ def start():
             # start the trakt watchlist
             if USE_TRAKT:
                 traktWatchListCheckerSchedular.thread.start()
+            if UPDATE_SHOWS_ON_START:
+                myDB = db.DBConnection()
+                listshow=myDB.select("SELECT tvdb_id from tv_shows")
+                for show in listshow:
+                    showObj = helpers.findCertainShow(showList, show[0])
+                    if showObj:
+                        showQueueScheduler.action.updateShow(showObj, True)
 
             started = True
 
