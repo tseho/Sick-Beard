@@ -3496,6 +3496,15 @@ class WebInterface:
             
         redirect("/home")
     @cherrypy.expose
+    def setHomeSearch(self, search):
+
+        if search not in ('True', 'False'):
+            search = 'False'
+
+        sickbeard.TOGGLE_SEARCH= search
+            
+        redirect("/home")
+    @cherrypy.expose
     def toggleDisplayShowSpecials(self, show):
 
         sickbeard.DISPLAY_SHOW_SPECIALS = not sickbeard.DISPLAY_SHOW_SPECIALS

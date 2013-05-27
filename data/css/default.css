@@ -316,10 +316,31 @@ h1.title {
   text-rendering: optimizelegibility;
 }
 
+h1.titleshow{
+  padding-bottom: 10px;  
+  margin-top: -15px;
+  margin-bottom: 25px;
+  font-weight: bold;
+  font-family: "Trebuchet MS", Helvetica, Arial, sans-serif;
+  font-size: 38px;
+  line-height: 5px;
+  text-rendering: optimizelegibility;
+}
+
+
 h1.header {
   padding-bottom: 10px;
   margin-top: 12px;
   margin-bottom: 12px;
+  font-size: 30px;
+  font-family: "Trebuchet MS", Helvetica, Arial, sans-serif;
+  font-weight: bold;
+}
+
+h1.headershow {
+  padding-bottom: 10px;
+  margin-top: -15px;
+  margin-bottom: 20px;
   font-size: 30px;
   font-family: "Trebuchet MS", Helvetica, Arial, sans-serif;
   font-weight: bold;
@@ -1843,6 +1864,9 @@ input[type="submit"].btn.btn-mini {
 
 .icon-calendar {
   background-position: -192px -120px;
+}
+.icon-search {
+  background-position: -48px 1px;
 }
 
 h3 {

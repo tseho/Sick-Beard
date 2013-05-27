@@ -18,6 +18,7 @@
 #set $allEps = $myDB.select("SELECT showid, COUNT(*) FROM tv_episodes WHERE season != 0 and episode != 0 AND (airdate != 1 OR status IN ("+",".join([str(x) for x in ($Quality.DOWNLOADED + $Quality.SNATCHED + $Quality.SNATCHED_PROPER) + [$ARCHIVED]])+")) AND airdate <= "+$today+" AND status != "+str($IGNORED)+" GROUP BY showid")
 #set $fr = $myDB.select("SELECT showid, COUNT(*) FROM tv_episodes WHERE audio_langs = 'fr' AND location != '' AND season != 0 and episode != 0 AND airdate <= "+$today+" GROUP BY showid")
 #set $layout = $sickbeard.HOME_LAYOUT
+#set $search = $sickbeard.TOGGLE_SEARCH
 #set $sort = $sickbeard.SORT_ARTICLE
 #set $show_message=''
 #set $listshow=myDB.select("SELECT tvdb_id from tv_shows")
@@ -107,29 +108,54 @@
     });
 
     \$("#showListTable:has(tbody tr)").tablesorter({
-	
-	        sortList: [[7,0],[2,0]],
+			#if ($layout == 'poster'):
+	        	sortList: [[7,0],[2,0]],
+	       	#else:
+	       		sortList: [[6,0],[1,0]],
+	       	#end if
 	        textExtraction: {
 	        #if ( $layout == 'poster'):
 		        1: function(node) { return \$(node).find("img").attr("alt"); },
-	        #end if
-	        #if ( $layout != 'simple'):
 		        3: function(node) { return \$(node).find("img").attr("alt"); },
-	        #end if
-	            4: function(node) { return \$(node).find("span").text(); },
+		        4: function(node) { return \$(node).find("span").text(); },
 	            7: function(node) { return \$(node).find("img").attr("alt"); },	            
 	            8: function(node) { return \$(node).find("img").attr("alt"); }
+	        #else:
+	        	#if ( $layout != 'simple'):
+		        2: function(node) { return \$(node).find("img").attr("alt"); },
+	        	#end if
+	            3: function(node) { return \$(node).find("span").text(); },
+	            6: function(node) { return \$(node).find("img").attr("alt"); },	            
+	            7: function(node) { return \$(node).find("img").attr("alt"); }
+	        #end if
 	        },
-	        widgets: ['saveSort', 'zebra', 'stickyHeaders'],
+	        #if sickbeard.TOGGLE_SEARCH=='True':
+	        widgets: ['zebra', 'stickyHeaders', 'filter'],
+	        #else:
+	        widgets: ['zebra', 'stickyHeaders'],	        
+	        #end if
 	        headers: {
-	            0: { sorter: 'isoDate' },
+	            0: {filter : false ,sorter: 'isoDate' },
 	         #if ($layout == 'poster'):
+	            1: {filter : false ,sorter: 'loadingNames'},
+	            2: {sorter: 'loadingNames'},
+	            3: { filter: false},
+	            4: { filter : false ,sorter: 'quality' },
+	            5: { filter : false ,sorter: 'eps' },
+	            6: { filter : false ,sorter: 'eps' },
+	            7: { filter: false},
+	            8: { filter: false},
+	            9: { filter: false},
+	         #else:
 	            1: {sorter: 'loadingNames'},
-	         #end if
-	            2: { sorter: 'loadingNames' },
-	            4: { sorter: 'quality' },
-	            5: { sorter: 'eps' },
-	            6: { sorter: 'eps' },
+	            2: { filter: false},
+	            3: { filter : false ,sorter: 'quality' },
+	            4: { filter : false ,sorter: 'eps' },
+	            5: { filter : false ,sorter: 'eps' },
+	            6: { filter: false},
+	            7: { filter: false},
+	            8: { filter: false},
+	          #end if
 	        }
     });
 
@@ -139,26 +165,38 @@
 </script>
 
 #if $varExists('header') 
-	<h1 class="header">$header</h1>
+	<h1 class="headershow">$header</h1>
 #else 
-	<h1 class="title">$title</h1>
+	<h1 class="titleshow">$title</h1>
 #end if
-
-<div id="HomeLayout" style="float: right; margin-top: -25px;">
+<div id="HomeLayout" style="float: left; margin-top: -18px;">
+#if sickbeard.TOGGLE_SEARCH=='True':
+		<a class="btn btn-mini" href="$sbRoot/setHomeSearch/?search=False">
+		<i class="icon-search icon-black"></i>Toggle search</a> 
+		#else:
+		<a class="btn btn-mini" href="$sbRoot/setHomeSearch/?search=True">
+		<i class="icon-search icon-black"></i>Toggle search</a> 
+		#end if	
+</div>
+<div id="HomeLayout" style="float: right; margin-top: -18px;">
 	<span><b>Layout:</b>
 		<a class="inner" href="$sbRoot/setHomeLayout/?layout=poster" style="font-size: 12px;">Poster</a> &middot;
 		<a class="inner" href="$sbRoot/setHomeLayout/?layout=banner" style="font-size: 12px;">Banner</a> &middot;
-		<a class="inner" href="$sbRoot/setHomeLayout/?layout=simple" style="font-size: 12px;">Simple</a>
+		<a class="inner" href="$sbRoot/setHomeLayout/?layout=simple" style="font-size: 12px;">Simple</a>		
 	</span>
 </div>
 
 <table id="showListTable" class="sickbeardTable tablesorter" cellspacing="1" border="0" cellpadding="0">
 
-  <thead><tr><th class="nowrap">Next Ep</th>#if $layout=="poster" then "<th>Poster</th>" else "<th style='display: none;'></th>"#<th>Show</th><th>Network</th><th>Quality</th><th>Downloads</th><th>French Ep</th><th>Active</th><th>Audio</th><th>Status</th></tr></thead>
+  <thead><tr><th class="nowrap">Next Ep</th>#if $layout=="poster" then "<th>Poster</th>" else ""#<th>Show</th><th>Network</th><th>Quality</th><th>Downloads</th><th>French Ep</th><th>Active</th><th>Audio</th><th>Status</th></tr></thead>
   <tfoot>
     <tr>
       <th rowspan="1" colspan="1" align="center"><a href="$sbRoot/home/addShows/">&nbsp Add Show</a></th>
+      #if ($layout == 'poster'):
       <th rowspan="1" colspan="9"></th>
+      #else:
+      <th rowspan="1" colspan="8"></th>
+      #end if      
     </tr>
   </tfoot>
   <tbody>
@@ -185,7 +223,9 @@
     <td></td>
     <td></td>
     <td></td>
+    #if ($layout == 'poster'):
     <td></td>
+    #end if
   </tr>
 #end for
 
@@ -242,7 +282,6 @@ $myShowList.sort(lambda x, y: cmp(x.name, y.name))
 	    </td>
     	<td class="tvShow"><a href="$sbRoot/home/displayShow?show=$curShow.tvdbid">$curShow.name</a></td>
 	#else if $layout == 'banner':
-    	<td style="display: none;"/>
 	    <td>
 	    	<span style="display: none;">$curShow.name</span>
 	    	<div class="imgHomeWrapper imgHomeWrapperRounded $layout">
@@ -251,7 +290,6 @@ $myShowList.sort(lambda x, y: cmp(x.name, y.name))
 	    	</div>
 	    </td>
 	#else if $layout == 'simple':
-	    <td style="display: none;"/>
 	    <td class="tvShow"><a href="$sbRoot/home/displayShow?show=$curShow.tvdbid">$curShow.name</a></td>
     #end if
     <!--<td align="center">$curShow.network</td>//-->
