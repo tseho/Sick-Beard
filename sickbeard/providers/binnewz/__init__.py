@@ -67,6 +67,7 @@ class BinNewzProvider(generic.NZBProvider):
         for showName in showNames:
             strings.append("%s S%02dE%02d" % ( showName, ep_obj.season, ep_obj.episode) )
             strings.append("%s %dx%d" % ( showName, ep_obj.season, ep_obj.episode ) )
+            strings.append("%s S%02d E%02d" % ( showName, ep_obj.season, ep_obj.episode) )
 
         return strings
     
