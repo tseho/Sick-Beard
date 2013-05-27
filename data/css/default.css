@@ -203,7 +203,8 @@ a{
 #header .wrapper {
   margin: 0 auto;
   position: relative;
-  width: 960px;
+  min-width: 960px;
+  width: 80%;
 }
 #header a:hover {
   background: none;
@@ -787,7 +788,8 @@ div#summary tr td {
   line-height: 24px;
   margin: 0 auto;
   padding: 105px 0 0;
-  width: 960px;
+  min-width: 960px;
+  width: 100%;
 }
 .showLegend {
   font-weight: 700;
