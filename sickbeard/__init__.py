@@ -580,7 +580,7 @@ def initialize(consoleLogging=True):
             EZRSS = bool(check_setting_int(CFG, 'EZRSS', 'ezrss', 0))
 
         GIT_PATH = check_setting_str(CFG, 'General', 'git_path', '')
-        IGNORE_WORDS = check_setting_str(CFG, 'General', 'ignore_words', '')
+        IGNORE_WORDS = check_setting_str(CFG, 'General', 'ignore_words', 'german,spanish,core2hd,dutch,swedish')
         EXTRA_SCRIPTS = [x for x in check_setting_str(CFG, 'General', 'extra_scripts', '').split('|') if x]
 
         USE_BANNER = bool(check_setting_int(CFG, 'General', 'use_banner', 0))
