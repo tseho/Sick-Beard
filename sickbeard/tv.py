@@ -24,6 +24,7 @@ import threading
 import re
 import glob
 import traceback
+import hashlib
 
 import sickbeard
 
@@ -967,6 +968,7 @@ class TVShow(object):
 
         myDB.upsert("tv_shows", newValueDict, controlValueDict)
         
+        
         if self.imdbid:
             controlValueDict = {"tvdb_id": self.tvdbid}
             newValueDict = self.imdb_info
@@ -1616,8 +1618,11 @@ class TVEpisode(object):
                             "season": self.season,
                             "episode": self.episode}
 
+
+
         # use a custom update/insert method to get the data into the DB
         myDB.upsert("tv_episodes", newValueDict, controlValueDict)
+
 
     def fullPath (self):
         if self.location == None or self.location == "":
