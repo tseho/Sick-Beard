@@ -38,13 +38,12 @@ class Addic7ed(ServiceBase):
     api_based = False
     #TODO: Complete this
     languages = language_set(['ar', 'ca', 'de', 'el', 'en', 'es', 'eu', 'fr', 'ga', 'gl', 'he', 'hr', 'hu',
-                              'it', 'pl', 'pt', 'ro', 'ru', 'se', 'pt-br'])
-    language_map = {'Portuguese (Brazilian)': Language('por-BR'), 'Greek': Language('gre'),
+                              'it', 'pl', 'pt', 'ro', 'ru', 'se', 'pb'])
+    language_map = {'Portuguese (Brazilian)': Language('pob'), 'Greek': Language('gre'),
                     'Spanish (Latin America)': Language('spa'), 'Galego': Language('glg'),
                     u'Català': Language('cat')}
     videos = [Episode]
     require_video = False
-    required_features = ['permissive']
 
     @cachedmethod
     def get_series_id(self, name):
@@ -64,6 +63,7 @@ class Addic7ed(ServiceBase):
         return self.query(video.path or video.release, languages, get_keywords(video.guess), video.series, video.season, video.episode)
 
     def query(self, filepath, languages, keywords, series, season, episode):
+
         logger.debug(u'Getting subtitles for %s season %d episode %d with languages %r' % (series, season, episode, languages))
         self.init_cache()
         try:
