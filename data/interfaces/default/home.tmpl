@@ -109,9 +109,9 @@
 
     \$("#showListTable:has(tbody tr)").tablesorter({
 			#if ($layout == 'poster'):
-	        	sortList: [[7,0],[2,0]],
+	        	sortList: [[7,1],[2,0]],
 	       	#else:
-	       		sortList: [[6,0],[1,0]],
+	       		sortList: [[6,1],[1,0]],
 	       	#end if
 	        textExtraction: {
 	        #if ( $layout == 'poster'):

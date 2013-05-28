@@ -209,7 +209,9 @@ class PostProcessor(object):
         for dummy_file_path in dum_files:
             if os.path.isdir(dummy_file_path):
                 self._list_dummy_files(dummy_file_path, base_name,"d")
-            elif dummy_file_path==self.file_path or dummy_file_path[len(dummy_file_path)-3:] in common.mediaExtensions or sickbeard.MOVE_ASSOCIATED_FILES:
+                print sickbeard.TORRENT_DOWNLOAD_DIR
+                print cur_dir
+            elif dummy_file_path==self.file_path or dummy_file_path[len(dummy_file_path)-3:] in common.mediaExtensions or sickbeard.MOVE_ASSOCIATED_FILES or (sickbeard.TORRENT_DOWNLOAD_DIR in cur_dir and sickbeard.PROCESS_METHOD in ['copy','hardlink','symlink']):
                 continue
             else:
                 dumb_files_list.append(dummy_file_path)
@@ -362,7 +364,7 @@ class PostProcessor(object):
 
         self._combined_file_operation(file_path, new_path, new_base_name, associated_files, action=_int_copy, subtitles=subtitles)
 
-        def _hardlink(self, file_path, new_path, new_base_name, associated_files=False):
+    def _hardlink(self, file_path, new_path, new_base_name, associated_files=False):
             """
             file_path: The full path of the media file to move
             new_path: Destination path where we want to create a hard linked file
@@ -381,7 +383,7 @@ class PostProcessor(object):
                     raise e
             self._combined_file_operation(file_path, new_path, new_base_name, associated_files, action=_int_hard_link)
 
-        def _moveAndSymlink(self, file_path, new_path, new_base_name, associated_files=False):
+    def _moveAndSymlink(self, file_path, new_path, new_base_name, associated_files=False):
             """
             file_path: The full path of the media file to move
             new_path: Destination path where we want to move the file to create a symbolic link to
@@ -958,7 +960,11 @@ class PostProcessor(object):
                     self._copy(self.file_path, dest_path, new_base_name, sickbeard.MOVE_ASSOCIATED_FILES)
                 elif sickbeard.PROCESS_METHOD == "move":
                     self._move(self.file_path, dest_path, new_base_name, sickbeard.MOVE_ASSOCIATED_FILES)
-                else:
+                elif sickbeard.PROCESS_METHOD == "hardlink":
+                    self._hardlink(self.file_path, dest_path, new_base_name, sickbeard.MOVE_ASSOCIATED_FILES)
+                elif sickbeard.PROCESS_METHOD == "symlink":
+                    self._moveAndSymlink(self.file_path, dest_path, new_base_name, sickbeard.MOVE_ASSOCIATED_FILES)
+                else: 
                     logger.log(u"Unknown process method: " + str(sickbeard.PROCESS_METHOD), logger.ERROR)
                     raise exceptions.PostProcessingFailed("Unable to move the files to their new home") 
             else:

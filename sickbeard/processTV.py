@@ -126,7 +126,7 @@ def processDir (dirName, nzbName=None, recurse=False):
 
         for sqlProcess in sqlResults:
             if sqlProcess["md5"] == MD5:
-                logger.log("File " + cur_video_file_path + " already processed for " + sqlProcess["filename"])
+                logger.log("File " + cur_video_file_path + " already processed for ")
                 process_file = False
                 
         if process_file:
