@@ -25,6 +25,7 @@ import shlex
 import subprocess
 
 import sickbeard
+import hashlib
 
 from sickbeard import db
 from sickbeard import classes
@@ -208,7 +209,9 @@ class PostProcessor(object):
         for dummy_file_path in dum_files:
             if os.path.isdir(dummy_file_path):
                 self._list_dummy_files(dummy_file_path, base_name,"d")
-            elif dummy_file_path==self.file_path or dummy_file_path[len(dummy_file_path)-3:] in common.mediaExtensions or sickbeard.MOVE_ASSOCIATED_FILES:
+                print sickbeard.TORRENT_DOWNLOAD_DIR
+                print cur_dir
+            elif dummy_file_path==self.file_path or dummy_file_path[len(dummy_file_path)-3:] in common.mediaExtensions or sickbeard.MOVE_ASSOCIATED_FILES or (sickbeard.TORRENT_DOWNLOAD_DIR in cur_dir and sickbeard.PROCESS_METHOD in ['copy','hardlink','symlink']):
                 continue
             else:
                 dumb_files_list.append(dummy_file_path)
@@ -360,6 +363,44 @@ class PostProcessor(object):
                 raise e
 
         self._combined_file_operation(file_path, new_path, new_base_name, associated_files, action=_int_copy, subtitles=subtitles)
+
+    def _hardlink(self, file_path, new_path, new_base_name, associated_files=False):
+            """
+            file_path: The full path of the media file to move
+            new_path: Destination path where we want to create a hard linked file
+            new_base_name: The base filename (no extension) to use during the link. Use None to keep the same name.
+            associated_files: Boolean, whether we should move similarly-named files too
+            """
+    
+            def _int_hard_link(cur_file_path, new_file_path):
+    
+                self._log(u"Hard linking file from " + cur_file_path + " to " + new_file_path, logger.DEBUG)
+                try:
+                    helpers.hardlinkFile(cur_file_path, new_file_path)
+                    helpers.chmodAsParent(new_file_path)
+                except (IOError, OSError), e:
+                    self._log("Unable to link file " + cur_file_path + " to " + new_file_path + ": "+ex(e), logger.ERROR)
+                    raise e
+            self._combined_file_operation(file_path, new_path, new_base_name, associated_files, action=_int_hard_link)
+
+    def _moveAndSymlink(self, file_path, new_path, new_base_name, associated_files=False):
+            """
+            file_path: The full path of the media file to move
+            new_path: Destination path where we want to move the file to create a symbolic link to
+            new_base_name: The base filename (no extension) to use during the link. Use None to keep the same name.
+            associated_files: Boolean, whether we should move similarly-named files too
+            """
+    
+            def _int_move_and_sym_link(cur_file_path, new_file_path):
+    
+                self._log(u"Moving then symbolic linking file from " + cur_file_path + " to " + new_file_path, logger.DEBUG)
+                try:
+                    helpers.moveAndSymlinkFile(cur_file_path, new_file_path)
+                    helpers.chmodAsParent(new_file_path)
+                except (IOError, OSError), e:
+                    self._log("Unable to link file " + cur_file_path + " to " + new_file_path + ": " + ex(e), logger.ERROR)
+                    raise e
+            self._combined_file_operation(file_path, new_path, new_base_name, associated_files, action=_int_move_and_sym_link) 
 
     def _history_lookup(self):
         """
@@ -900,14 +941,52 @@ class PostProcessor(object):
             new_base_name = None
             new_file_name = self.file_name
 
+        with open(self.file_path, 'rb') as fh:
+            m = hashlib.md5()
+            while True:
+                data = fh.read(8192)
+                if not data:
+                    break
+                m.update(data)
+            MD5 = m.hexdigest()
+       
         try:
-            # move the episode and associated files to the show dir
-            if sickbeard.KEEP_PROCESSED_DIR:
-                self._copy(self.file_path, dest_path, new_base_name, sickbeard.MOVE_ASSOCIATED_FILES)
+            
+            path,file=os.path.split(self.file_path)
+            
+            if sickbeard.TORRENT_DOWNLOAD_DIR == path:
+                #Action possible pour les torrent
+                if sickbeard.PROCESS_METHOD == "copy":
+                    self._copy(self.file_path, dest_path, new_base_name, sickbeard.MOVE_ASSOCIATED_FILES)
+                elif sickbeard.PROCESS_METHOD == "move":
+                    self._move(self.file_path, dest_path, new_base_name, sickbeard.MOVE_ASSOCIATED_FILES)
+                elif sickbeard.PROCESS_METHOD == "hardlink":
+                    self._hardlink(self.file_path, dest_path, new_base_name, sickbeard.MOVE_ASSOCIATED_FILES)
+                elif sickbeard.PROCESS_METHOD == "symlink":
+                    self._moveAndSymlink(self.file_path, dest_path, new_base_name, sickbeard.MOVE_ASSOCIATED_FILES)
+                else: 
+                    logger.log(u"Unknown process method: " + str(sickbeard.PROCESS_METHOD), logger.ERROR)
+                    raise exceptions.PostProcessingFailed("Unable to move the files to their new home") 
             else:
-                self._move(self.file_path, dest_path, new_base_name, sickbeard.MOVE_ASSOCIATED_FILES)
+                #action pour le reste des fichier
+                if sickbeard.KEEP_PROCESSED_DIR:
+                    self._copy(self.file_path, dest_path, new_base_name, sickbeard.MOVE_ASSOCIATED_FILES)
+                else:
+                    self._move(self.file_path, dest_path, new_base_name, sickbeard.MOVE_ASSOCIATED_FILES)       
+                
         except (OSError, IOError):
             raise exceptions.PostProcessingFailed("Unable to move the files to their new home")
+
+        myDB = db.DBConnection()
+
+        ## INSERT MD5 of file
+        controlMD5 = {"episode_id" : int(ep_obj.tvdbid) }
+        NewValMD5 = {"filename" : new_base_name ,
+                     "md5" : MD5
+                     }       
+        myDB.upsert("processed_files", NewValMD5,  controlMD5)
+
+
 
         # put the new location in the database
         for cur_ep in [ep_obj] + ep_obj.relatedEps:

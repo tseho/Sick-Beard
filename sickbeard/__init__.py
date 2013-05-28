@@ -182,6 +182,7 @@ RENAME_EPISODES = False
 PROCESS_AUTOMATICALLY = False
 PROCESS_AUTOMATICALLY_TORRENT = False
 KEEP_PROCESSED_DIR = False
+PROCESS_METHOD = None
 MOVE_ASSOCIATED_FILES = False
 TV_DOWNLOAD_DIR = None
 TORRENT_DOWNLOAD_DIR = None
@@ -437,7 +438,7 @@ def initialize(consoleLogging=True):
                 USE_SYNOLOGYNOTIFIER, SYNOLOGYNOTIFIER_NOTIFY_ONSNATCH, SYNOLOGYNOTIFIER_NOTIFY_ONDOWNLOAD, SYNOLOGYNOTIFIER_NOTIFY_ONSUBTITLEDOWNLOAD, \
                 USE_MAIL, MAIL_USERNAME, MAIL_PASSWORD, MAIL_SERVER, MAIL_SSL, MAIL_FROM, MAIL_TO, MAIL_NOTIFY_ONSNATCH, \
                 NZBMATRIX_APIKEY, versionCheckScheduler, VERSION_NOTIFY, PROCESS_AUTOMATICALLY, PROCESS_AUTOMATICALLY_TORRENT, \
-                KEEP_PROCESSED_DIR, TV_DOWNLOAD_DIR, TORRENT_DOWNLOAD_DIR, TVDB_BASE_URL, MIN_SEARCH_FREQUENCY, \
+                KEEP_PROCESSED_DIR, PROCESS_METHOD, TV_DOWNLOAD_DIR, TORRENT_DOWNLOAD_DIR, TVDB_BASE_URL, MIN_SEARCH_FREQUENCY, \
                 showQueueScheduler, searchQueueScheduler, ROOT_DIRS, CACHE_DIR, ACTUAL_CACHE_DIR, TVDB_API_PARMS, \
                 NAMING_PATTERN, NAMING_MULTI_EP, NAMING_FORCE_FOLDERS, NAMING_ABD_PATTERN, NAMING_CUSTOM_ABD, \
                 RENAME_EPISODES, properFinderScheduler, PROVIDER_ORDER, autoPostProcesserScheduler, autoTorrentPostProcesserScheduler, \
@@ -525,8 +526,8 @@ def initialize(consoleLogging=True):
             TVDB_API_PARMS['cache'] = os.path.join(CACHE_DIR, 'tvdb')
 
         TVDB_BASE_URL = 'http://thetvdb.com/api/' + TVDB_API_KEY
-        
-        TOGGLE_SEARCH = check_setting_int(CFG, 'General', 'toggle_search', '')
+
+        TOGGLE_SEARCH = check_setting_int(CFG, 'General', 'toggle_search', '') 
         QUALITY_DEFAULT = check_setting_int(CFG, 'General', 'quality_default', SD)
         STATUS_DEFAULT = check_setting_int(CFG, 'General', 'status_default', SKIPPED)
         AUDIO_SHOW_DEFAULT = check_setting_str(CFG, 'General', 'audio_show_default', 'fr' )
@@ -570,6 +571,7 @@ def initialize(consoleLogging=True):
         PROCESS_AUTOMATICALLY_TORRENT = check_setting_int(CFG, 'General', 'process_automatically_torrent', 0)
         RENAME_EPISODES = check_setting_int(CFG, 'General', 'rename_episodes', 1)
         KEEP_PROCESSED_DIR = check_setting_int(CFG, 'General', 'keep_processed_dir', 1)
+        PROCESS_METHOD = check_setting_str(CFG, 'General', 'process_method', 'copy' if KEEP_PROCESSED_DIR else 'move') 
         MOVE_ASSOCIATED_FILES = check_setting_int(CFG, 'General', 'move_associated_files', 0)
         CREATE_MISSING_SHOW_DIRS = check_setting_int(CFG, 'General', 'create_missing_show_dirs', 0)
         ADD_SHOWS_WO_DIR = check_setting_int(CFG, 'General', 'add_shows_wo_dir', 0)
@@ -974,7 +976,7 @@ def initialize(consoleLogging=True):
             autoTorrentPostProcesserScheduler = scheduler.Scheduler(autoPostProcesser.PostProcesser( TORRENT_DOWNLOAD_DIR ),
                                                      cycleTime=datetime.timedelta(minutes=10),
                                                      threadName="TORRENT_POSTPROCESSER",
-                                                     runImmediately=True)
+                                                     runImmediately='torrent')
 
         traktWatchListCheckerSchedular = scheduler.Scheduler(traktWatchListChecker.TraktChecker(),
                                                      cycleTime=datetime.timedelta(minutes=10),
@@ -1298,6 +1300,7 @@ def save_config():
     new_config['General']['tv_download_dir'] = TV_DOWNLOAD_DIR
     new_config['General']['torrent_download_dir'] = TORRENT_DOWNLOAD_DIR
     new_config['General']['keep_processed_dir'] = int(KEEP_PROCESSED_DIR)
+    new_config['General']['process_method'] = PROCESS_METHOD
     new_config['General']['move_associated_files'] = int(MOVE_ASSOCIATED_FILES)
     new_config['General']['process_automatically'] = int(PROCESS_AUTOMATICALLY)
     new_config['General']['process_automatically_torrent'] = int(PROCESS_AUTOMATICALLY_TORRENT)

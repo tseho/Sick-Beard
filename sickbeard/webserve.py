@@ -768,6 +768,7 @@ class History:
             { 'title': 'Clear History', 'path': 'history/clearHistory' },
             { 'title': 'Trim History',  'path': 'history/trimHistory'  },
             { 'title': 'Trunc Episode Links',  'path': 'history/truncEplinks'  },
+            { 'title': 'Trunc Episode List Processed',  'path': 'history/truncEpListProc'  },
         ]
 
         return _munge(t)
@@ -799,6 +800,15 @@ class History:
         myDB.action("DELETE FROM episode_links WHERE 1=1")
         messnum = str(nbep[0][0]) + ' history links deleted'
         ui.notifications.message('All Episode Links Removed', messnum)
+        redirect("/history")
+
+    @cherrypy.expose
+    def truncEpListProc(self):
+        myDB = db.DBConnection()
+        nbep=myDB.select("SELECT count(*) from processed_files")
+        myDB.action("DELETE FROM processed_files WHERE 1=1")
+        messnum = str(nbep[0][0]) + ' record for file processed delete'
+        ui.notifications.message('Clear list of file processed', messnum)
         redirect("/history")
 
 
@@ -1086,7 +1096,7 @@ class ConfigPostProcessing:
     @cherrypy.expose
     def savePostProcessing(self, naming_pattern=None, naming_multi_ep=None,
                     xbmc_data=None, xbmc__frodo__data=None, mediabrowser_data=None, synology_data=None, sony_ps3_data=None, wdtv_data=None, tivo_data=None,
-                    use_banner=None, keep_processed_dir=None, process_automatically=None, process_automatically_torrent=None, rename_episodes=None,
+                    use_banner=None, keep_processed_dir=None, process_method=None, process_automatically=None, process_automatically_torrent=None, rename_episodes=None,
                     move_associated_files=None, tv_download_dir=None, torrent_download_dir=None, naming_custom_abd=None, naming_abd_pattern=None):
 
         results = []
@@ -1135,6 +1145,7 @@ class ConfigPostProcessing:
         sickbeard.PROCESS_AUTOMATICALLY = process_automatically
         sickbeard.PROCESS_AUTOMATICALLY_TORRENT = process_automatically_torrent
         sickbeard.KEEP_PROCESSED_DIR = keep_processed_dir
+        sickbeard.PROCESS_METHOD = process_method
         sickbeard.RENAME_EPISODES = rename_episodes
         sickbeard.MOVE_ASSOCIATED_FILES = move_associated_files
         sickbeard.NAMING_CUSTOM_ABD = naming_custom_abd
@@ -3495,6 +3506,7 @@ class WebInterface:
         sickbeard.HOME_LAYOUT = layout
             
         redirect("/home")
+    
     @cherrypy.expose
     def setHomeSearch(self, search):
 
@@ -3504,6 +3516,7 @@ class WebInterface:
         sickbeard.TOGGLE_SEARCH= search
             
         redirect("/home")
+    
     @cherrypy.expose
     def toggleDisplayShowSpecials(self, show):
 

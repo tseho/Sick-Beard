@@ -24,6 +24,7 @@ import re, socket
 import shutil
 import traceback
 import time, sys
+from lib.linktastic import linktastic 
 
 import hashlib
 
@@ -41,6 +42,7 @@ from sickbeard import db
 from sickbeard import encodingKludge as ek
 from sickbeard import notifiers
 
+#from lib.linktastic import linktastic
 from lib.tvdb_api import tvdb_api, tvdb_exceptions
 
 import xml.etree.cElementTree as etree
@@ -480,6 +482,25 @@ def moveFile(srcFile, destFile):
         copyFile(srcFile, destFile)
         ek.ek(os.unlink, srcFile)
 
+def hardlinkFile(srcFile, destFile):
+    try:
+        ek.ek(linktastic.link, srcFile, destFile)
+        fixSetGroupID(destFile)
+    except OSError:
+        logger.log(u"Failed to create hardlink of " + srcFile + " at " + destFile + ". Copying instead", logger.ERROR)
+        copyFile(srcFile, destFile)
+        ek.ek(os.unlink, srcFile)
+ 
+def moveAndSymlinkFile(srcFile, destFile):
+    try:
+        ek.ek(os.rename, srcFile, destFile)
+        fixSetGroupID(destFile)
+        ek.ek(linktastic.symlink, destFile, srcFile)
+    except OSError:
+        logger.log(u"Failed to create symlink of " + srcFile + " at " + destFile + ". Copying instead", logger.ERROR)
+        copyFile(srcFile, destFile)
+        ek.ek(os.unlink, srcFile)
+
 def del_empty_dirs(s_dir):
     b_empty = True
 
@@ -492,8 +513,9 @@ def del_empty_dirs(s_dir):
             b_empty = False
 
     if b_empty:
-        logger.log(u"Deleting " + s_dir.decode('utf-8')+ ' because it is empty')
-        os.rmdir(s_dir)
+        if s_dir!=sickbeard.TORRENT_DOWNLOAD_DIR and s_dir!=sickbeard.TV_DOWNLOAD_DIR:
+            logger.log(u"Deleting " + s_dir.decode('utf-8')+ ' because it is empty')
+            os.rmdir(s_dir)
 
 def make_dirs(path):
     """

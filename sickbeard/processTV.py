@@ -20,6 +20,7 @@ from __future__ import with_statement
 
 import os
 import shutil
+import hashlib
 
 import sickbeard 
 from sickbeard import postProcessor
@@ -103,39 +104,65 @@ def processDir (dirName, nzbName=None, recurse=False):
 
         cur_video_file_path = ek.ek(os.path.join, dirName, cur_video_file_path)
 
-        try:
-            processor = postProcessor.PostProcessor(cur_video_file_path, nzbName)
-            process_result = processor.process()
-            process_fail_message = ""
-        except exceptions.PostProcessingFailed, e:
-            process_result = False
-            process_fail_message = ex(e)
+        # IF VIDEO_FILE ALREADY PROCESS THEN CONTINUE
+        # TODO
+        
+        myDB = db.DBConnection()
 
-        returnStr += processor.log 
+        with open(cur_video_file_path, 'rb') as fh:
+            m = hashlib.md5()
+            while True:
+                data = fh.read(8192)
+                if not data:
+                    break
+                m.update(data)
+            MD5 = m.hexdigest()
 
-        # as long as the postprocessing was successful delete the old folder unless the config wants us not to
-        if process_result:
+        logger.log("MD5 search : " + MD5, logger.DEBUG)
 
-            if len(videoFiles) == 1 and not sickbeard.KEEP_PROCESSED_DIR and \
-                ek.ek(os.path.normpath, dirName) != ek.ek(os.path.normpath, sickbeard.TV_DOWNLOAD_DIR) and \
-                ek.ek(os.path.normpath, dirName) != ek.ek(os.path.normpath, sickbeard.TORRENT_DOWNLOAD_DIR) and \
-                len(remainingFolders) == 0:
+        sqlResults = myDB.select("select * from processed_files where md5 = \"" + MD5 + "\"")
 
-                returnStr += logHelper(u"Deleting folder " + dirName, logger.DEBUG)
+        process_file = True
 
-                try:
-                    shutil.rmtree(dirName)
-                except (OSError, IOError), e:
-                    returnStr += logHelper(u"Warning: unable to remove the folder " + dirName + ": " + ex(e), logger.WARNING)
-
-            returnStr += logHelper(u"Processing succeeded for "+cur_video_file_path)
-                                    
-        else:
-            returnStr += logHelper(u"Processing failed for "+cur_video_file_path+": "+process_fail_message, logger.WARNING)
-        if sickbeard.TV_DOWNLOAD_DIR !="":
-            for i in range(1,5):
-                helpers.del_empty_dirs(sickbeard.TV_DOWNLOAD_DIR)
-        if sickbeard.TORRENT_DOWNLOAD_DIR !="":
-            for i in range(1,5):
-                helpers.del_empty_dirs(sickbeard.TORRENT_DOWNLOAD_DIR)
+        for sqlProcess in sqlResults:
+            if sqlProcess["md5"] == MD5:
+                logger.log("File " + cur_video_file_path + " already processed for ")
+                process_file = False
+                
+        if process_file:
+            try:
+                processor = postProcessor.PostProcessor(cur_video_file_path, nzbName)
+                process_result = processor.process()
+                process_fail_message = ""
+            except exceptions.PostProcessingFailed, e:
+                process_result = False
+                process_fail_message = ex(e)
+    
+            returnStr += processor.log 
+    
+            # as long as the postprocessing was successful delete the old folder unless the config wants us not to
+            if process_result:
+    
+                if len(videoFiles) == 1 \
+                    and ( ( not sickbeard.KEEP_PROCESSED_DIR and ek.ek(os.path.normpath, dirName) != ek.ek(os.path.normpath, sickbeard.TV_DOWNLOAD_DIR) ) \
+                    or ( sickbeard.PROCESS_METHOD == "move" and ek.ek(os.path.normpath, dirName) != ek.ek(os.path.normpath, sickbeard.TORRENT_DOWNLOAD_DIR) ) ) \
+                    and  len(remainingFolders) == 0:
+    
+                    returnStr += logHelper(u"Deleting folder " + dirName, logger.DEBUG)
+    
+                    try:
+                        shutil.rmtree(dirName)
+                    except (OSError, IOError), e:
+                        returnStr += logHelper(u"Warning: unable to remove the folder " + dirName + ": " + ex(e), logger.WARNING)
+    
+                returnStr += logHelper(u"Processing succeeded for "+cur_video_file_path)
+                                        
+            else:
+                returnStr += logHelper(u"Processing failed for "+cur_video_file_path+": "+process_fail_message, logger.WARNING)
+            if sickbeard.TV_DOWNLOAD_DIR !="":
+                for i in range(1,5):
+                    helpers.del_empty_dirs(sickbeard.TV_DOWNLOAD_DIR)
+            if sickbeard.TORRENT_DOWNLOAD_DIR !="":
+                for i in range(1,5):
+                    helpers.del_empty_dirs(sickbeard.TORRENT_DOWNLOAD_DIR)
     return returnStr
