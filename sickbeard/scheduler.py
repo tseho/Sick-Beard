@@ -28,8 +28,10 @@ class Scheduler:
 
     def __init__(self, action, cycleTime=datetime.timedelta(minutes=10), runImmediately=True, threadName="ScheduledThread", silent=False):
 
-        if runImmediately:
+        if runImmediately == True:
             self.lastRun = datetime.datetime.fromordinal(1)
+        elif runImmediately =='torrent':
+            self.lastRun= datetime.datetime.now() - datetime.timedelta(minutes=5)
         else:
             self.lastRun = datetime.datetime.now()
 

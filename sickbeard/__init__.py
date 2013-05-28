@@ -976,7 +976,7 @@ def initialize(consoleLogging=True):
             autoTorrentPostProcesserScheduler = scheduler.Scheduler(autoPostProcesser.PostProcesser( TORRENT_DOWNLOAD_DIR ),
                                                      cycleTime=datetime.timedelta(minutes=10),
                                                      threadName="TORRENT_POSTPROCESSER",
-                                                     runImmediately=True)
+                                                     runImmediately='torrent')
 
         traktWatchListCheckerSchedular = scheduler.Scheduler(traktWatchListChecker.TraktChecker(),
                                                      cycleTime=datetime.timedelta(minutes=10),
