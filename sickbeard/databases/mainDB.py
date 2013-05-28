@@ -25,7 +25,7 @@ from sickbeard.providers.generic import GenericProvider
 from sickbeard import encodingKludge as ek
 from sickbeard.name_parser.parser import NameParser, InvalidNameException
 
-MAX_DB_VERSION = 15
+MAX_DB_VERSION = 16
 
 
 class MainSanityCheck(db.DBSanityCheck):
@@ -103,7 +103,7 @@ class InitialSchema (db.SchemaUpgrade):
             "CREATE TABLE history (action NUMERIC, date NUMERIC, showid NUMERIC, season NUMERIC, episode NUMERIC, quality NUMERIC, resource TEXT, provider NUMERIC);",
             "CREATE TABLE episode_links (episode_id INTEGER, link TEXT);",
             "CREATE TABLE imdb_info (tvdb_id INTEGER PRIMARY KEY, imdb_id TEXT, title TEXT, year NUMERIC, akas TEXT, runtimes NUMERIC, genres TEXT, countries TEXT, country_codes TEXT, certificates TEXT, rating TEXT, votes INTEGER, last_update NUMERIC);"
-       
+            "CREATE TABLE processed_files (episode_id INTEGER, filename TEXT, md5 TEXT)"
         ]
         for query in queries:
             self.connection.action(query)
@@ -717,6 +717,7 @@ class AddEpisodeLinkTable(AddSubtitlesSupport):
         if self.hasTable("episode_links") != True:
             self.connection.action("CREATE TABLE episode_links (episode_id INTEGER, link TEXT)")
         self.incDBVersion()
+        
 class AddIMDbInfo(AddEpisodeLinkTable):    
     def test(self):
         return self.checkDBVersion() >= 15
@@ -725,3 +726,12 @@ class AddIMDbInfo(AddEpisodeLinkTable):
         if self.hasTable("imdb_info") != True:
             self.connection.action("CREATE TABLE imdb_info (tvdb_id INTEGER PRIMARY KEY, imdb_id TEXT, title TEXT, year NUMERIC, akas TEXT, runtimes NUMERIC, genres TEXT, countries TEXT, country_codes TEXT, certificates TEXT, rating TEXT, votes INTEGER, last_update NUMERIC)")
         self.incDBVersion()
+        
+class AddProcessedFilesTable(AddIMDbInfo):
+    def test(self):
+        return self.checkDBVersion() >= 16
+    
+    def execute(self):
+        if self.hasTable("processed_files") != True:
+            self.connection.action("CREATE TABLE processed_files (episode_id INTEGER, filename TEXT, md5 TEXT)")
+        self.incDBVersion()   
