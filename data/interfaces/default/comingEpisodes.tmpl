@@ -46,7 +46,7 @@
         if (s.indexOf('Loading...') == 0)
             return s.replace('Loading...','000');
 		#if not $sickbeard.SORT_ARTICLE:
-			return (s || '').replace(/^(The|A|An|Le|La|Un|Une)\s/i,'');
+			return (s || '').replace(/^(The|A|An|Un|Une|Le|La|Les)\s/i,'');
 		#else:
 			return (s || '');
 		#end if		

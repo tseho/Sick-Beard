@@ -56,7 +56,7 @@
         if (s.indexOf('Loading...') == 0)
             return s.replace('Loading...','000');
         #if $sort != 1:  
-        	return (s || '').replace(/^(The|A|An|Un|Une\Le|La)\s/i,'');
+        	return (s || '').replace(/^(The|A|An|Un|Une|Le|La|Les)\s/i,'');
        	#else:
        		return (s || '');
        	#end if
