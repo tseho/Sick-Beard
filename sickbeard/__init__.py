@@ -390,6 +390,7 @@ SUBTITLES_SERVICES_ENABLED = []
 SUBTITLES_HISTORY = False
 
 DISPLAY_POSTERS = None
+TOGGLE_SEARCH = False
 
 EXTRA_SCRIPTS = []
 
@@ -450,7 +451,7 @@ def initialize(consoleLogging=True):
                 NEWZBIN, NEWZBIN_USERNAME, NEWZBIN_PASSWORD, GIT_PATH, MOVE_ASSOCIATED_FILES, \
                 GKS, GKS_KEY, \
                 HOME_LAYOUT, DISPLAY_SHOW_SPECIALS, COMING_EPS_LAYOUT, COMING_EPS_SORT, COMING_EPS_DISPLAY_PAUSED, COMING_EPS_MISSED_RANGE, METADATA_WDTV, METADATA_TIVO, IGNORE_WORDS, CREATE_MISSING_SHOW_DIRS, \
-                ADD_SHOWS_WO_DIR, USE_SUBTITLES, SUBTITLES_LANGUAGES, SUBTITLES_DIR, SUBTITLES_DIR_SUB, SUBSNOLANG, SUBTITLES_SERVICES_LIST, SUBTITLES_SERVICES_ENABLED, SUBTITLES_HISTORY, subtitlesFinderScheduler
+                ADD_SHOWS_WO_DIR, USE_SUBTITLES, SUBTITLES_LANGUAGES, SUBTITLES_DIR, SUBTITLES_DIR_SUB, SUBSNOLANG, SUBTITLES_SERVICES_LIST, SUBTITLES_SERVICES_ENABLED, SUBTITLES_HISTORY, subtitlesFinderScheduler, TOGGLE_SEARCH
 
 
         if __INITIALIZED__:
@@ -524,7 +525,8 @@ def initialize(consoleLogging=True):
             TVDB_API_PARMS['cache'] = os.path.join(CACHE_DIR, 'tvdb')
 
         TVDB_BASE_URL = 'http://thetvdb.com/api/' + TVDB_API_KEY
-
+        
+        TOGGLE_SEARCH = check_setting_int(CFG, 'General', 'toggle_search', '')
         QUALITY_DEFAULT = check_setting_int(CFG, 'General', 'quality_default', SD)
         STATUS_DEFAULT = check_setting_int(CFG, 'General', 'status_default', SKIPPED)
         AUDIO_SHOW_DEFAULT = check_setting_str(CFG, 'General', 'audio_show_default', 'fr' )
@@ -578,7 +580,7 @@ def initialize(consoleLogging=True):
             EZRSS = bool(check_setting_int(CFG, 'EZRSS', 'ezrss', 0))
 
         GIT_PATH = check_setting_str(CFG, 'General', 'git_path', '')
-        IGNORE_WORDS = check_setting_str(CFG, 'General', 'ignore_words', '')
+        IGNORE_WORDS = check_setting_str(CFG, 'General', 'ignore_words', 'german,spanish,core2hd,dutch,swedish')
         EXTRA_SCRIPTS = [x for x in check_setting_str(CFG, 'General', 'extra_scripts', '').split('|') if x]
 
         USE_BANNER = bool(check_setting_int(CFG, 'General', 'use_banner', 0))
@@ -1245,6 +1247,7 @@ def save_config():
     new_config.filename = CONFIG_FILE
 
     new_config['General'] = {}
+    new_config['General']['toggle_search'] = TOGGLE_SEARCH
     new_config['General']['log_dir'] = LOG_DIR
     new_config['General']['web_port'] = WEB_PORT
     new_config['General']['web_host'] = WEB_HOST
