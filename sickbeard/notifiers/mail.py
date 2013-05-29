@@ -42,6 +42,10 @@ class MailNotifier:
             return
 
     def notify_download(self, ep_name):
+        
+        if not sickbeard.USE_MAIL:
+            return False
+        
         logger.log("Notification MAIL DOWNLOAD", logger.DEBUG)
         message = str(ep_name)
         return self._notifyMail("SickBeard Download", message, None, None, None, None, None, None)
