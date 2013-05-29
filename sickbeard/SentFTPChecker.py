@@ -32,46 +32,59 @@ class SentFTPChecker():
 
     def _sendToFTP(self, filter, dir):
         """
-        Send all torrent of the specified filter (eg "*.torrent") to the appropriate FTP.
+        Send all of the specified filtered files (eg "*.torrent") to the appropriate FTP.
 
         """
+        iCount = self.count_files(dir, filter)
+        logger.log(u"Files Found (" + filter + "): " + str(iCount), logger.DEBUG)
 
-        MyFTP = ftp.FTP()
+        if (iCount>0):
+            MyFTP = ftp.FTP()
 
-        logger.log(u"Initializing FTP Session", logger.DEBUG)
-        MyFTP.connect(sickbeard.FTP_HOST, sickbeard.FTP_PORT, sickbeard.FTP_TIMEOUT)
+            logger.log(u"Initializing FTP Session", logger.DEBUG)
+            MyFTP.connect(sickbeard.FTP_HOST, sickbeard.FTP_PORT, sickbeard.FTP_TIMEOUT)
 
-        # Connect to the FTP server
-        MyFTP.login(sickbeard.FTP_LOGIN, sickbeard.FTP_PASSWORD, '')
+            # Connect to the FTP server
+            MyFTP.login(sickbeard.FTP_LOGIN, sickbeard.FTP_PASSWORD, '')
 
-        # Assign passive mode
-        logger.log(u"Assign Session Passive Mode", logger.DEBUG)
-        MyFTP.set_pasv(sickbeard.FTP_PASSIVE)
+            # Assign passive mode
+            logger.log(u"Assign Session Passive Mode", logger.DEBUG)
+            MyFTP.set_pasv(sickbeard.FTP_PASSIVE)
 
-        # change remote directory
-        try:
-            logger.log(u"Set Remote Directory : %s" % sickbeard.FTP_DIR, logger.DEBUG)
-            MyFTP.cwd(sickbeard.FTP_DIR)
-        except Exception, e:
-            logger.log(u"Change directory failed :" + e.message, logger.ERROR)
+            # change remote directory
+            try:
+                logger.log(u"Set Remote Directory : %s" % sickbeard.FTP_DIR, logger.DEBUG)
+                MyFTP.cwd(sickbeard.FTP_DIR)
+            except Exception, e:
+                logger.log(u"Change directory failed :" + e.message, logger.ERROR)
 
-        for fileName in glob.glob(os.path.join(dir,filter)):
+            for fileName in glob.glob(os.path.join(dir,filter)):
 
-            file_handler = open(fileName, 'rb')
+                file_handler = open(fileName, 'rb')
 
-            # Send the file
-            logger.log(u"Send local file : " + fileName, logger.DEBUG)
-            MyFTP.set_debuglevel(1)
-            MyFTP.storbinary('STOR %s' % os.path.basename(fileName), file_handler)
-            MyFTP.set_debuglevel(0)
-            file_handler.close()
+                # Send the file
+                logger.log(u"Send local file : " + fileName, logger.DEBUG)
+                MyFTP.set_debuglevel(1)
+                MyFTP.storbinary('STOR %s' % os.path.basename(fileName), file_handler)
+                MyFTP.set_debuglevel(0)
+                file_handler.close()
 
-            # delete local file after uploading
-            logger.log(u"Deleting local file : " + fileName, logger.DEBUG)
-            os.remove(fileName)
+                # delete local file after uploading
+                logger.log(u"Deleting local file : " + fileName, logger.DEBUG)
+                os.remove(fileName)
 
-        # Close FTP session
-        logger.log(u"Close FTP Session", logger.DEBUG)
-        MyFTP.quit()
+            # Close FTP session
+            logger.log(u"Close FTP Session", logger.DEBUG)
+            MyFTP.quit()
 
-        logger.log(u"It's working ... hop a beer !", logger.DEBUG)
+            logger.log(u"It's working ... hop a beer !", logger.DEBUG)
+        else:
+            logger.log(u"No local files found.", logger.DEBUG)
+
+    def count_files(self, path, filter):
+        list_dir = []
+        list_dir = os.listdir(path)
+        count = 0
+        for file in glob.glob(os.path.join(path,filter)):
+            count += 1
+        return count
