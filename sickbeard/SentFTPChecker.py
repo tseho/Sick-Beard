@@ -57,15 +57,13 @@ class SentFTPChecker():
 
         for fileName in glob.glob(os.path.join(dir,filter)):
 
-            buffersize = 1024
             file_handler = open(fileName, 'rb')
 
             # Send the file
             logger.log(u"Send local file : " + fileName, logger.DEBUG)
             MyFTP.set_debuglevel(1)
-            MyFTP.storbinary('STOR %s' % os.path.basename(fileName), file_handler, buffersize)
+            MyFTP.storbinary('STOR %s' % os.path.basename(fileName), file_handler)
             MyFTP.set_debuglevel(0)
-
             file_handler.close()
 
             # delete local file after uploading
