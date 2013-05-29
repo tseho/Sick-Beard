@@ -118,16 +118,16 @@ $(document).ready(function(){
 
     $('#testTorrent').click(function(){
         $('#testTorrent-result').html(loading);
-        var torrent_method = $('#torrent_method :selected').val();        
+        var torrent_method = $('#torrent_method :selected').val();
         var torrent_host = $('#torrent_host').val();
         var torrent_username = $('#torrent_username').val();
         var torrent_password = $('#torrent_password').val();
-        
-        $.get(sbRoot+"/home/testTorrent", {'torrent_method': torrent_method, 'host': torrent_host, 'username': torrent_username, 'password': torrent_password}, 
+
+        $.get(sbRoot+"/home/testTorrent", {'torrent_method': torrent_method, 'host': torrent_host, 'username': torrent_username, 'password': torrent_password},
         function (data){ $('#testTorrent-result').html(data); });
     });
     $('#prefered_method').change($(this).prefered_method_handler);
 	
 	$(this).prefered_method_handler();
-   
+
 });

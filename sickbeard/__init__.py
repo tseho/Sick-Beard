@@ -33,7 +33,7 @@ from sickbeard import providers, metadata
 from providers import ezrss, tvtorrents, torrentleech, btn, nzbsrus, newznab, womble, nzbx, omgwtfnzbs, binnewz, t411, cpasbien, piratebay, gks, kat
 from sickbeard.config import CheckSection, check_setting_int, check_setting_str, ConfigMigrator
 
-from sickbeard import searchCurrent, searchBacklog, showUpdater, versionChecker, properFinder, autoPostProcesser, subtitles, traktWatchListChecker
+from sickbeard import searchCurrent, searchBacklog, showUpdater, versionChecker, properFinder, autoPostProcesser, subtitles, traktWatchListChecker, SentFTPChecker
 from sickbeard import helpers, db, exceptions, show_queue, search_queue, scheduler
 from sickbeard import logger
 from sickbeard import naming
@@ -79,6 +79,7 @@ autoPostProcesserScheduler = None
 autoTorrentPostProcesserScheduler = None
 subtitlesFinderScheduler = None
 traktWatchListCheckerSchedular = None
+sentFTPSchedular = None
 
 showList = None
 loadingShowList = None
@@ -150,7 +151,6 @@ USE_NZBS = None
 USE_TORRENTS = None
 
 NZB_METHOD = None
-NZB_DIR = None
 USENET_RETENTION = None
 TORRENT_METHOD = None
 TORRENT_DIR = None
@@ -390,6 +390,15 @@ SUBTITLES_SERVICES_LIST = []
 SUBTITLES_SERVICES_ENABLED = []
 SUBTITLES_HISTORY = False
 
+USE_TORRENT_FTP = False
+FTP_HOST  = ''
+FTP_LOGIN  = ''
+FTP_PASSWORD  = ''
+FTP_PORT = 21
+FTP_TIMEOUT = 120
+FTP_DIR = ''
+FTP_PASSIVE = False
+
 DISPLAY_POSTERS = None
 TOGGLE_SEARCH = False
 
@@ -438,7 +447,7 @@ def initialize(consoleLogging=True):
                 USE_SYNOLOGYNOTIFIER, SYNOLOGYNOTIFIER_NOTIFY_ONSNATCH, SYNOLOGYNOTIFIER_NOTIFY_ONDOWNLOAD, SYNOLOGYNOTIFIER_NOTIFY_ONSUBTITLEDOWNLOAD, \
                 USE_MAIL, MAIL_USERNAME, MAIL_PASSWORD, MAIL_SERVER, MAIL_SSL, MAIL_FROM, MAIL_TO, MAIL_NOTIFY_ONSNATCH, \
                 NZBMATRIX_APIKEY, versionCheckScheduler, VERSION_NOTIFY, PROCESS_AUTOMATICALLY, PROCESS_AUTOMATICALLY_TORRENT, \
-                KEEP_PROCESSED_DIR, PROCESS_METHOD, TV_DOWNLOAD_DIR, TORRENT_DOWNLOAD_DIR, TVDB_BASE_URL, MIN_SEARCH_FREQUENCY, \
+                KEEP_PROCESSED_DIR, TV_DOWNLOAD_DIR, TORRENT_DOWNLOAD_DIR, TVDB_BASE_URL, MIN_SEARCH_FREQUENCY, \
                 showQueueScheduler, searchQueueScheduler, ROOT_DIRS, CACHE_DIR, ACTUAL_CACHE_DIR, TVDB_API_PARMS, \
                 NAMING_PATTERN, NAMING_MULTI_EP, NAMING_FORCE_FOLDERS, NAMING_ABD_PATTERN, NAMING_CUSTOM_ABD, \
                 RENAME_EPISODES, properFinderScheduler, PROVIDER_ORDER, autoPostProcesserScheduler, autoTorrentPostProcesserScheduler, \
@@ -452,8 +461,8 @@ def initialize(consoleLogging=True):
                 NEWZBIN, NEWZBIN_USERNAME, NEWZBIN_PASSWORD, GIT_PATH, MOVE_ASSOCIATED_FILES, \
                 GKS, GKS_KEY, \
                 HOME_LAYOUT, DISPLAY_SHOW_SPECIALS, COMING_EPS_LAYOUT, COMING_EPS_SORT, COMING_EPS_DISPLAY_PAUSED, COMING_EPS_MISSED_RANGE, METADATA_WDTV, METADATA_TIVO, IGNORE_WORDS, CREATE_MISSING_SHOW_DIRS, \
-                ADD_SHOWS_WO_DIR, USE_SUBTITLES, SUBTITLES_LANGUAGES, SUBTITLES_DIR, SUBTITLES_DIR_SUB, SUBSNOLANG, SUBTITLES_SERVICES_LIST, SUBTITLES_SERVICES_ENABLED, SUBTITLES_HISTORY, subtitlesFinderScheduler, TOGGLE_SEARCH
-
+                ADD_SHOWS_WO_DIR, USE_SUBTITLES, SUBTITLES_LANGUAGES, SUBTITLES_DIR, SUBTITLES_DIR_SUB, SUBSNOLANG, SUBTITLES_SERVICES_LIST, SUBTITLES_SERVICES_ENABLED, SUBTITLES_HISTORY, subtitlesFinderScheduler, TOGGLE_SEARCH, \
+                USE_TORRENT_FTP, FTP_HOST, FTP_LOGIN, FTP_PASSWORD, FTP_PORT, FTP_TIMEOUT, FTP_DIR, FTP_PASSIVE, sentFTPSchedular
 
         if __INITIALIZED__:
             return False
@@ -527,7 +536,7 @@ def initialize(consoleLogging=True):
 
         TVDB_BASE_URL = 'http://thetvdb.com/api/' + TVDB_API_KEY
 
-        TOGGLE_SEARCH = check_setting_int(CFG, 'General', 'toggle_search', '') 
+        TOGGLE_SEARCH = check_setting_int(CFG, 'General', 'toggle_search', '')
         QUALITY_DEFAULT = check_setting_int(CFG, 'General', 'quality_default', SD)
         STATUS_DEFAULT = check_setting_int(CFG, 'General', 'status_default', SKIPPED)
         AUDIO_SHOW_DEFAULT = check_setting_str(CFG, 'General', 'audio_show_default', 'fr' )
@@ -571,7 +580,7 @@ def initialize(consoleLogging=True):
         PROCESS_AUTOMATICALLY_TORRENT = check_setting_int(CFG, 'General', 'process_automatically_torrent', 0)
         RENAME_EPISODES = check_setting_int(CFG, 'General', 'rename_episodes', 1)
         KEEP_PROCESSED_DIR = check_setting_int(CFG, 'General', 'keep_processed_dir', 1)
-        PROCESS_METHOD = check_setting_str(CFG, 'General', 'process_method', 'copy' if KEEP_PROCESSED_DIR else 'move') 
+        PROCESS_METHOD = check_setting_str(CFG, 'General', 'process_method', 'copy' if KEEP_PROCESSED_DIR else 'move')
         MOVE_ASSOCIATED_FILES = check_setting_int(CFG, 'General', 'move_associated_files', 0)
         CREATE_MISSING_SHOW_DIRS = check_setting_int(CFG, 'General', 'create_missing_show_dirs', 0)
         ADD_SHOWS_WO_DIR = check_setting_int(CFG, 'General', 'add_shows_wo_dir', 0)
@@ -909,6 +918,17 @@ def initialize(consoleLogging=True):
         SUBTITLES_SERVICES_ENABLED = [int(x) for x in check_setting_str(CFG, 'Subtitles', 'SUBTITLES_SERVICES_ENABLED', '').split('|') if x]
         SUBTITLES_DEFAULT = bool(check_setting_int(CFG, 'Subtitles', 'subtitles_default', 0))
         SUBTITLES_HISTORY = bool(check_setting_int(CFG, 'Subtitles', 'subtitles_history', 0))
+
+        CheckSection(CFG, 'FTP')
+        USE_TORRENT_FTP = bool(check_setting_int(CFG, 'FTP', 'ftp_useftp', 0))
+        FTP_HOST = check_setting_str(CFG, 'FTP', 'ftp_host', '')
+        FTP_LOGIN = check_setting_str(CFG, 'FTP', 'ftp_login', '')
+        FTP_PASSWORD = check_setting_str(CFG, 'FTP', 'ftp_password', '')
+        FTP_PORT = check_setting_int(CFG, 'FTP', 'ftp_port', 21)
+        FTP_TIMEOUT = check_setting_int(CFG, 'FTP', 'ftp_timeout', 120)
+        FTP_DIR = check_setting_str(CFG, 'FTP', 'ftp_remotedir', '')
+        FTP_PASSIVE = bool(check_setting_int(CFG, 'FTP', 'ftp_passive', 1))
+
         # start up all the threads
         logger.sb_log_instance.initLogging(consoleLogging=consoleLogging)
 
@@ -995,6 +1015,12 @@ def initialize(consoleLogging=True):
                                                      threadName="FINDSUBTITLES",
                                                      runImmediately=True)
 
+        logger.log("Initializing FTP Thread", logger.DEBUG)
+        sentFTPSchedular = scheduler.Scheduler(SentFTPChecker.SentFTPChecker(),
+                                               cycleTime=datetime.timedelta(minutes=10),
+                                               threadName="FTP",
+                                               runImmediately=True)
+
         showList = []
         loadingShowList = {}
 
@@ -1008,7 +1034,8 @@ def start():
             showUpdateScheduler, versionCheckScheduler, showQueueScheduler, \
             properFinderScheduler, autoPostProcesserScheduler, autoTorrentPostProcesserScheduler, searchQueueScheduler, \
             subtitlesFinderScheduler, started, USE_SUBTITLES, \
-            traktWatchListCheckerSchedular, started
+            traktWatchListCheckerSchedular, started, \
+            sentFTPSchedular, started
 
     with INIT_LOCK:
 
@@ -1048,6 +1075,12 @@ def start():
             # start the trakt watchlist
             if USE_TRAKT:
                 traktWatchListCheckerSchedular.thread.start()
+
+            # start the FTP Scheduler torrent blackhole mode
+            if USE_TORRENT_FTP:
+                logger.log("Starting FTP Thread", logger.DEBUG)
+                sentFTPSchedular.thread.start()
+
             if UPDATE_SHOWS_ON_START:
                 myDB = db.DBConnection()
                 listshow=myDB.select("SELECT tvdb_id from tv_shows")
@@ -1134,6 +1167,13 @@ def halt():
             logger.log(u"Waiting for the TRAKTWATCHLIST thread to exit")
             try:
                 traktWatchListCheckerSchedular.thread.join(10)
+            except:
+                pass
+
+            sentFTPSchedular.abort = True
+            logger.log(u"Waiting for the TORRENT FTP thread to exit")
+            try:
+                sentFTPSchedular.thread.join(10)
             except:
                 pass
 
@@ -1573,6 +1613,16 @@ def save_config():
     new_config['Subtitles']['subsnolang'] = int(SUBSNOLANG)
     new_config['Subtitles']['subtitles_default'] = int(SUBTITLES_DEFAULT)
     new_config['Subtitles']['subtitles_history'] = int(SUBTITLES_HISTORY)
+
+    new_config['FTP'] = {}
+    new_config['FTP']['ftp_useftp'] = int(USE_TORRENT_FTP)
+    new_config['FTP']['ftp_host'] = FTP_HOST
+    new_config['FTP']['ftp_login'] = FTP_LOGIN
+    new_config['FTP']['ftp_password'] = FTP_PASSWORD
+    new_config['FTP']['ftp_port'] = int(FTP_PORT)
+    new_config['FTP']['ftp_timeout'] = int(FTP_TIMEOUT)
+    new_config['FTP']['ftp_remotedir'] = FTP_DIR
+    new_config['FTP']['ftp_passive'] = int(FTP_PASSIVE)
 
     new_config['General']['config_version'] = CONFIG_VERSION
 

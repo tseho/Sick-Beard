@@ -991,7 +991,7 @@ class ConfigSearch:
     def saveSearch(self, use_nzbs=None, use_torrents=None, nzb_dir=None, sab_username=None, sab_password=None,
                        sab_apikey=None, sab_category=None, sab_host=None, nzbget_password=None, nzbget_category=None, nzbget_host=None,
                        torrent_dir=None,torrent_method=None, nzb_method=None, usenet_retention=None, search_frequency=None, download_propers=None, torrent_username=None, torrent_password=None, torrent_host=None, torrent_label=None, torrent_path=None, 
-                       torrent_ratio=None, torrent_paused=None, ignore_words=None, prefered_method=None):
+                       torrent_ratio=None, torrent_paused=None, ignore_words=None, prefered_method=None, torrent_use_ftp = None, ftp_host=None, ftp_port=None, ftp_timeout=None, ftp_passive = None, ftp_login=None, ftp_password=None, ftp_remotedir=None):
 
         results = []
 
@@ -1023,6 +1023,12 @@ class ConfigSearch:
 
         if ignore_words == None:
             ignore_words = ""
+
+        if ftp_port == None:
+            ftp_port = 21
+
+        if ftp_timeout == None:
+            ftp_timeout = 120
 
         sickbeard.USE_NZBS = use_nzbs
         sickbeard.USE_TORRENTS = use_torrents
@@ -1071,6 +1077,26 @@ class ConfigSearch:
             torrent_host = torrent_host + '/'
 
         sickbeard.TORRENT_HOST = torrent_host
+
+        if torrent_use_ftp == "on":
+            torrent_use_ftp = 1
+        else:
+            torrent_use_ftp = 0
+
+        sickbeard.USE_TORRENT_FTP = torrent_use_ftp
+
+        sickbeard.FTP_HOST = ftp_host
+        sickbeard.FTP_PORT = ftp_port
+        sickbeard.FTP_TIMEOUT = ftp_timeout
+
+        if ftp_passive == "on":
+            ftp_passive = 1
+        else:
+            ftp_passive = 0
+        sickbeard.FTP_PASSIVE = ftp_passive
+        sickbeard.FTP_LOGIN = ftp_login
+        sickbeard.FTP_PASSWORD = ftp_password
+        sickbeard.FTP_DIR = ftp_remotedir
 
         sickbeard.save_config()
 
@@ -2002,7 +2028,7 @@ def HomeMenu():
         { 'title': 'Manual Post-Processing', 'path': 'home/postprocess/'                                        },
         { 'title': 'Update XBMC',            'path': 'home/updateXBMC/', 'requires': haveXBMC                   },
         { 'title': 'Update Plex',            'path': 'home/updatePLEX/', 'requires': havePLEX                   },
-        { 'title': 'Update',                 'path': 'manage/manageSearches/forceVersionCheck', 'confirm': True}, 
+        { 'title': 'Update',                 'path': 'manage/manageSearches/forceVersionCheck', 'confirm': True},
         { 'title': 'Restart',                'path': 'home/restart/?pid='+str(sickbeard.PID), 'confirm': True   },
         { 'title': 'Shutdown',               'path': 'home/shutdown/?pid='+str(sickbeard.PID), 'confirm': True  },
     ]
@@ -3506,7 +3532,7 @@ class WebInterface:
         sickbeard.HOME_LAYOUT = layout
             
         redirect("/home")
-    
+
     @cherrypy.expose
     def setHomeSearch(self, search):
 
@@ -3516,7 +3542,7 @@ class WebInterface:
         sickbeard.TOGGLE_SEARCH= search
             
         redirect("/home")
-    
+
     @cherrypy.expose
     def toggleDisplayShowSpecials(self, show):
 

@@ -28,6 +28,7 @@ tests/cache.db
 *.tmproj
 *.tmproject
 *.sw?
+/.idea
 
 # OS generated files #
 ######################

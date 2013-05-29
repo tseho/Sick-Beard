@@ -352,6 +352,9 @@ class QueueItemAdd(ShowQueueItem):
         # if there are specific episodes that need to be added by trakt
         sickbeard.traktWatchListCheckerSchedular.action.manageNewShow(self.show)
 
+        # if there is any episode we must upload to FTP
+        sickbeard.SentFTPSchedular.action.Send()
+
         self.finish()
 
     def _finishEarly(self):
