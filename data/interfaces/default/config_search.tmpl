@@ -302,9 +302,9 @@
 									<span class="component-desc"><b>NOTE:</b> This method will not working for ThePirateBay Provider</span>
             	                </label>
             	                <br />
-            	                <input type="checkbox" class="enabler" #if $sickbeard.UPLOAD_TORRENT_FTP then " checked=\"checked\"" else ""# id="torrent_use_ftp" name="torrent_use_ftp">
-            	                <label for="blackhole_useftp" class="clearfix">
-            	                <label class="clearfix" for="use_torrents">
+            	                <input type="checkbox" class="enabler" #if $sickbeard.USE_TORRENT_FTP then " checked=\"checked\"" else ""# id="torrent_use_ftp" name="torrent_use_ftp">
+            	                <label for="torrent_use_ftp" class="clearfix">
+            	                <label class="clearfix" for="torrent_use_ftp">
                                 <span class="component-title">Upload to FTP</span>
                                 <span class="component-desc">For seedbox user, you can upload your files directly to your seedbox.</span>
                                 </label>
@@ -321,7 +321,6 @@
                                     <span class="component-title">&nbsp;</span>
                                     <span class="component-desc">(eg. 88.88.88.88)</span>
                                 </label>
-                            </div>
 
                             <div class="field-pair" id="Ftp_Login">
                                 <label class="nocheck clearfix">
@@ -383,7 +382,16 @@
                                 </label>
                             </div>
 
-                            <div class="field-pair" id="Ftp_RemoteDir">
+                            <div class="field-pair"  id="Ftp_Mode">
+                                <input type="checkbox" class="enabler" #if $sickbeard.FTP_PASSIVE then " checked=\"checked\"" else ""# id="ftp_passive" name="ftp_passive">
+                                <label for="ftp_passive" class="clearfix">
+                                <label class="clearfix" for="Ftp_Mode">
+                                <span class="component-title">Passive Mode</span>
+                                <span class="component-desc">Connect to FTP in Passive Mode ?.</span>
+                                </label>
+                           </div>
+
+                           <div class="field-pair" id="Ftp_RemoteDir">
                                 <label class="nocheck clearfix">
                                     <span class="component-title" id="ftp_remotedir_desc">Ftp REMOTE DIRECTORY</span>
                                     <input type="text" name="ftp_remotedir" id="ftp_remotedir" value="$sickbeard.FTP_DIR" size="35" />
@@ -397,6 +405,8 @@
                                     <span class="component-desc">(eg. /downloads/watch)</span>
                                 </label>
                             </div>
+                        	</div>
+
                         	</div>
 
 	                        <div class="clearfix"></div>

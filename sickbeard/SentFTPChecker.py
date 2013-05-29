@@ -36,45 +36,44 @@ class SentFTPChecker():
 
         """
 
-        # Assign FTP Port
-        logger.log(u"Assign FTP Port", logger.DEBUG)
-        ftp.FTP_PORT = sickbeard.FTP_PORT
+        MyFTP = ftp.FTP()
 
-        # Assign FTP Timeout
-        logger.log(u"Assign FTP Timeout", logger.DEBUG)
-        ftp.timeout = sickbeard.FTP_TIMEOUT
+        logger.log(u"Initializing FTP Session", logger.DEBUG)
+        MyFTP.connect(sickbeard.FTP_HOST, sickbeard.FTP_PORT, sickbeard.FTP_TIMEOUT)
 
         # Connect to the FTP server
-        logger.log(u"Initializing FTP Session", logger.DEBUG)
-        session = ftp.FTP(sickbeard.FTP_HOST, sickbeard.FTP_LOGIN, sickbeard.FTP_PASSWORD)
+        MyFTP.login(sickbeard.FTP_LOGIN, sickbeard.FTP_PASSWORD, '')
 
         # Assign passive mode
         logger.log(u"Assign Session Passive Mode", logger.DEBUG)
-        session.set_pasv(sickbeard.FTP_PASSIVE)
+        MyFTP.set_pasv(sickbeard.FTP_PASSIVE)
 
         # change remote directory
-        logger.log(u"Set Remote Directory : %s" % sickbeard.FTP_DIR, logger.DEBUG)
-        session.cwd(sickbeard.FTP_DIR)
+        try:
+            logger.log(u"Set Remote Directory : %s" % sickbeard.FTP_DIR, logger.DEBUG)
+            MyFTP.cwd(sickbeard.FTP_DIR)
+        except Exception, e:
+            logger.log(u"Change directory failed :" + e.message, logger.ERROR)
 
         for fileName in glob.glob(os.path.join(dir,filter)):
 
-            bufsize = 1024
+            buffersize = 1024
             file_handler = open(fileName, 'rb')
 
             # Send the file
             logger.log(u"Send local file : " + fileName, logger.DEBUG)
-            session.set_debuglevel(1)
-            session.storbinary('STOR %s' % os.path.basename(fileName), file_handler, bufsize)
-            session.set_debuglevel(0)
+            MyFTP.set_debuglevel(1)
+            MyFTP.storbinary('STOR %s' % os.path.basename(fileName), file_handler, buffersize)
+            MyFTP.set_debuglevel(0)
 
             file_handler.close()
 
-            # delete local file
+            # delete local file after uploading
             logger.log(u"Deleting local file : " + fileName, logger.DEBUG)
             os.remove(fileName)
 
         # Close FTP session
         logger.log(u"Close FTP Session", logger.DEBUG)
-        session.quit()
+        MyFTP.quit()
 
         logger.log(u"It's working ... hop a beer !", logger.DEBUG)

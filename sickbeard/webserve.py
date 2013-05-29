@@ -991,7 +991,7 @@ class ConfigSearch:
     def saveSearch(self, use_nzbs=None, use_torrents=None, nzb_dir=None, sab_username=None, sab_password=None,
                        sab_apikey=None, sab_category=None, sab_host=None, nzbget_password=None, nzbget_category=None, nzbget_host=None,
                        torrent_dir=None,torrent_method=None, nzb_method=None, usenet_retention=None, search_frequency=None, download_propers=None, torrent_username=None, torrent_password=None, torrent_host=None, torrent_label=None, torrent_path=None, 
-                       torrent_ratio=None, torrent_paused=None, ignore_words=None, prefered_method=None, torrent_use_ftp = None, ftp_host=None, ftp_port=None, ftp_timeout=None, ftp_login=None, ftp_password=None, ftp_remotedir=None):
+                       torrent_ratio=None, torrent_paused=None, ignore_words=None, prefered_method=None, torrent_use_ftp = None, ftp_host=None, ftp_port=None, ftp_timeout=None, ftp_passive = None, ftp_login=None, ftp_password=None, ftp_remotedir=None):
 
         results = []
 
@@ -1078,10 +1078,22 @@ class ConfigSearch:
 
         sickbeard.TORRENT_HOST = torrent_host
 
+        if torrent_use_ftp == "on":
+            torrent_use_ftp = 1
+        else:
+            torrent_use_ftp = 0
+
         sickbeard.USE_TORRENT_FTP = torrent_use_ftp
+
         sickbeard.FTP_HOST = ftp_host
         sickbeard.FTP_PORT = ftp_port
         sickbeard.FTP_TIMEOUT = ftp_timeout
+
+        if ftp_passive == "on":
+            ftp_passive = 1
+        else:
+            ftp_passive = 0
+        sickbeard.FTP_PASSIVE = ftp_passive
         sickbeard.FTP_LOGIN = ftp_login
         sickbeard.FTP_PASSWORD = ftp_password
         sickbeard.FTP_DIR = ftp_remotedir

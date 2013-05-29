@@ -927,7 +927,7 @@ def initialize(consoleLogging=True):
         FTP_PORT = check_setting_int(CFG, 'FTP', 'ftp_port', 21)
         FTP_TIMEOUT = check_setting_int(CFG, 'FTP', 'ftp_timeout', 120)
         FTP_DIR = check_setting_str(CFG, 'FTP', 'ftp_remotedir', '')
-        FTP_PASSIVE = bool(check_setting_int(CFG, 'FTP', 'ftp_passive', 0))
+        FTP_PASSIVE = bool(check_setting_int(CFG, 'FTP', 'ftp_passive', 1))
 
         # start up all the threads
         logger.sb_log_instance.initLogging(consoleLogging=consoleLogging)
@@ -1076,7 +1076,7 @@ def start():
             if USE_TRAKT:
                 traktWatchListCheckerSchedular.thread.start()
 
-            # start the FTP Scheduler
+            # start the FTP Scheduler torrent blackhole mode
             if USE_TORRENT_FTP:
                 logger.log("Starting FTP Thread", logger.DEBUG)
                 sentFTPSchedular.thread.start()
@@ -1622,7 +1622,7 @@ def save_config():
     new_config['FTP']['ftp_port'] = int(FTP_PORT)
     new_config['FTP']['ftp_timeout'] = int(FTP_TIMEOUT)
     new_config['FTP']['ftp_remotedir'] = FTP_DIR
-    new_config['FTP']['ftp_passive'] = FTP_PASSIVE
+    new_config['FTP']['ftp_passive'] = int(FTP_PASSIVE)
 
     new_config['General']['config_version'] = CONFIG_VERSION
 
