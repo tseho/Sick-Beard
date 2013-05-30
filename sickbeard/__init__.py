@@ -1060,7 +1060,8 @@ def start():
             searchQueueScheduler.thread.start()
 
             # start the queue checker
-            properFinderScheduler.thread.start()
+            if DOWNLOAD_PROPERS:
+                properFinderScheduler.thread.start()
 
             if autoPostProcesserScheduler:
                 autoPostProcesserScheduler.thread.start()
@@ -1163,33 +1164,36 @@ def halt():
                     autoTorrentPostProcesserScheduler.thread.join(10)
                 except:
                     pass
-            traktWatchListCheckerSchedular.abort = True
-            logger.log(u"Waiting for the TRAKTWATCHLIST thread to exit")
-            try:
-                traktWatchListCheckerSchedular.thread.join(10)
-            except:
-                pass
+            if traktWatchListCheckerSchedular:  
+                traktWatchListCheckerSchedular.abort = True
+                logger.log(u"Waiting for the TRAKTWATCHLIST thread to exit")
+                try:
+                    traktWatchListCheckerSchedular.thread.join(10)
+                except:
+                    pass
+            
+            if sentFTPSchedular:
+                sentFTPSchedular.abort = True
+                logger.log(u"Waiting for the TORRENT FTP thread to exit")
+                try:
+                    sentFTPSchedular.thread.join(10)
+                except:
+                    pass
 
-            sentFTPSchedular.abort = True
-            logger.log(u"Waiting for the TORRENT FTP thread to exit")
-            try:
-                sentFTPSchedular.thread.join(10)
-            except:
-                pass
-
-            properFinderScheduler.abort = True
-            logger.log(u"Waiting for the PROPERFINDER thread to exit")
-            try:
-                properFinderScheduler.thread.join(10)
-            except:
-                pass
-
-            subtitlesFinderScheduler.abort = True
-            logger.log(u"Waiting for the SUBTITLESFINDER thread to exit")
-            try:
-                subtitlesFinderScheduler.thread.join(10)
-            except:
-                pass
+            if properFinderScheduler:
+                properFinderScheduler.abort = True
+                logger.log(u"Waiting for the PROPERFINDER thread to exit")
+                try:
+                    properFinderScheduler.thread.join(10)
+                except:
+                    pass
+    
+                subtitlesFinderScheduler.abort = True
+                logger.log(u"Waiting for the SUBTITLESFINDER thread to exit")
+                try:
+                    subtitlesFinderScheduler.thread.join(10)
+                except:
+                    pass
 
 
             __INITIALIZED__ = False
