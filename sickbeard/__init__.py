@@ -1013,13 +1013,13 @@ def initialize(consoleLogging=True):
         subtitlesFinderScheduler = scheduler.Scheduler(subtitles.SubtitlesFinder(),
                                                      cycleTime=datetime.timedelta(hours=1),
                                                      threadName="FINDSUBTITLES",
-                                                     runImmediately=True)
+                                                     runImmediately=False)
 
-        logger.log("Initializing FTP Thread", logger.DEBUG)
+        
         sentFTPSchedular = scheduler.Scheduler(SentFTPChecker.SentFTPChecker(),
-                                               cycleTime=datetime.timedelta(minutes=10),
+                                               cycleTime=datetime.timedelta(hours=1),
                                                threadName="FTP",
-                                               runImmediately=True)
+                                               runImmediately=False)
 
         showList = []
         loadingShowList = {}
