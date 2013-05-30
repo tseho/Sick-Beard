@@ -274,8 +274,8 @@
                                 <span class="component-title jumbo">TORRENT Method</span>
                                 <span class="component-desc">
                                 <select name="torrent_method" id="torrent_method">
-                                #set $torrent_method_text = {'blackhole': "Black hole", 'utorrent': "uTorrent", 'transmission': "Transmission", 'deluge': "Deluge", 'download_station': "Synology DS"}
-                                #for $curAction in ('blackhole', 'utorrent', 'transmission', 'deluge', 'download_station'):
+                                #set $torrent_method_text = {'blackhole': "Black hole", 'utorrent': "uTorrent", 'transmission': "Transmission", 'deluge': "Deluge", 'download_station': "Synology DS", 'ftpblackhole' : "FTP Black hole"}
+                                #for $curAction in ('blackhole', 'utorrent', 'transmission', 'deluge', 'download_station','ftpblackhole'):
                                   #if $sickbeard.TORRENT_METHOD == $curAction:
                                     #set $torrent_method = "selected=\"selected\""
                                   #else
@@ -290,7 +290,7 @@
                         <div id="t_blackhole_settings">
                             <div class="field-pair">
                                 <label class="nocheck clearfix">
-                                    <span class="component-title">TORRENT Black Hole</span>
+                                    <span class="component-title" id="desc_torrent_dir" >TORRENT Black Hole</span>
                                 	<input type="text" name="torrent_dir" id="torrent_dir" value="$sickbeard.TORRENT_DIR" size="35" />
                             	</label>
 	                            <label class="nocheck clearfix">
@@ -301,14 +301,20 @@
     	                            <span class="component-title">&nbsp;</span>
 									<span class="component-desc"><b>NOTE:</b> This method will not working for ThePirateBay Provider</span>
             	                </label>
-            	                <br />
-            	                <input type="checkbox" class="enabler" #if $sickbeard.USE_TORRENT_FTP then " checked=\"checked\"" else ""# id="torrent_use_ftp" name="torrent_use_ftp">
-            	                <label for="torrent_use_ftp" class="clearfix">
-            	                <label class="clearfix" for="torrent_use_ftp">
+                        	</div>
+
+	                        <div class="clearfix"></div>
+	                        <input type="submit" class="btn config_submitter" value="Save Changes" /><br/>
+	                    </div><!-- /content_use_torrents //-->
+
+                        <div id="ftp_blackhole_settings">
+                            <input type="checkbox" class="enabler" #if $sickbeard.USE_TORRENT_FTP then " checked=\"checked\"" else ""# id="torrent_use_ftp" name="torrent_use_ftp">
+                            <label class="clearfix" for="torrent_use_ftp">
                                 <span class="component-title">Upload to FTP</span>
                                 <span class="component-desc">For seedbox user, you can upload your files directly to your seedbox.</span>
-                                </label>
-                                <div class="field-pair" id="Ftp_Host">
+                                <span class="component-desc">Check that this dir is not already a local black hole.</span>
+                            </label>
+                            <div class="field-pair" id="Ftp_Host">
                                 <label class="nocheck clearfix">
                                     <span class="component-title" id="host_desc">Ftp HOST</span>
                                     <input type="text" name="ftp_host" id="ftp_host"  value="$sickbeard.FTP_HOST" size="35" />
@@ -321,7 +327,7 @@
                                     <span class="component-title">&nbsp;</span>
                                     <span class="component-desc">(eg. 88.88.88.88)</span>
                                 </label>
-
+                            </div>
                             <div class="field-pair" id="Ftp_Login">
                                 <label class="nocheck clearfix">
                                     <span class="component-title" id="ftp_login_desc">Ftp LOGIN</span>
@@ -389,7 +395,7 @@
                                 <span class="component-title">Passive Mode</span>
                                 <span class="component-desc">Connect to FTP in Passive Mode ?.</span>
                                 </label>
-                           </div>
+                            </div>
 
                            <div class="field-pair" id="Ftp_RemoteDir">
                                 <label class="nocheck clearfix">
@@ -405,13 +411,8 @@
                                     <span class="component-desc">(eg. /downloads/watch)</span>
                                 </label>
                             </div>
-                        	</div>
-
-                        	</div>
-
-	                        <div class="clearfix"></div>
-	                        <input type="submit" class="btn config_submitter" value="Save Changes" /><br/>
-	                        </div><!-- /content_use_torrents //-->
+                            <input type="submit" class="btn config_submitter" value="Save Changes" /><br/>
+                        </div>
 
                         <div id="torrent_settings">
                             <div class="field-pair">
@@ -498,6 +499,10 @@
                                     <span class="component-desc">Don't start downloading when torrent is added?</span>
                                 </label>
                             </div>
+                            
+                               <div class="testNotification" id="testTorrent-result">Click below to test.</div>
+                               <input class="btn" type="button" value="Test Connection" id="testTorrent" class="btn test-button"/>
+                            
                         	<input type="submit" class="btn config_submitter" value="Save Changes" /><br/>
                              </div>
                         </div>

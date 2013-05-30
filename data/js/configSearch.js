@@ -41,6 +41,8 @@ $(document).ready(function(){
         if (selectedProvider == "blackhole") {
             $('#t_blackhole_settings').show();
             $('#torrent_settings').hide();
+            $('#ftp_blackhole_settings').hide();
+            $('#desc_torrent_dir').text('TORRENT Black Hole');
         } else if (selectedProvider == "utorrent") {
             $('#t_blackhole_settings').hide();
             $('#torrent_settings').show();
@@ -51,6 +53,7 @@ $(document).ready(function(){
             $('#host_desc').text('uTorrent Host');
             $('#username_desc').text('uTorrent Username');
             $('#password_desc').text('uTorrent Password');
+            $('#ftp_blackhole_settings').hide();
             $('#label_desc').text('uTorrent Label');
         } else if (selectedProvider == "transmission"){
             $('#t_blackhole_settings').hide();
@@ -63,6 +66,7 @@ $(document).ready(function(){
             $('#username_desc').text('Transmission Username');
             $('#password_desc').text('Transmission Password');
             $('#directory_desc').text('Transmission Directory');
+            $('#ftp_blackhole_settings').hide();
         } else if (selectedProvider == "deluge"){
             $('#t_blackhole_settings').hide();
             $('#torrent_settings').show();
@@ -75,6 +79,7 @@ $(document).ready(function(){
             $('#password_desc').text('Deluge Password');
             $('#label_desc').text('Deluge Label');
             $('#directory_desc').text('Deluge Directory');
+            $('#ftp_blackhole_settings').hide();
         } else if (selectedProvider == "download_station"){
             $('#t_blackhole_settings').hide();
             $('#torrent_settings').show();
@@ -89,6 +94,12 @@ $(document).ready(function(){
             $('#password_desc').text('Synology Password');
             $('#label_desc').text('Synology Label');
             $('#directory_desc').text('Synology Directory');
+            $('#ftp_blackhole_settings').hide();
+        } else if (selectedProvider == "ftpblackhole"){
+            $('#t_blackhole_settings').show();
+            $('#torrent_settings').hide();
+            $('#ftp_blackhole_settings').show();
+            $('#desc_torrent_dir').text('FTP blackhole directory');
         }
     }
 
