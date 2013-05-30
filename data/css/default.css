@@ -282,8 +282,7 @@ a{
   float: right;
   height: auto;
   margin-bottom: 0px;  
-  margin-top: 73px;
-  margin-right: 0px;
+  margin-right: 20px;
   overflow: hidden;
   text-indent: -3000px;
   width: 200px;
@@ -750,7 +749,7 @@ tr.snatched {
 }
 .showInfo {
   min-width: 745px;
-  width : 80%;
+  width : 100%;
   float: left;
   margin-left: 0px;
   padding-top: 2px;
