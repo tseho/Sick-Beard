@@ -419,6 +419,7 @@ input:not(.btn){margin-right:6px;margin-top:5px;padding-top:4px;padding-bottom:4
 /* --------------- alignment ------------------- */
 .float-left {
   float: left;
+  clear: left;
 }
 .float-right {
   float: right;
