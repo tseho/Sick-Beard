@@ -18,6 +18,8 @@ $(document).ready(function(){
             $('#testSABnzbd').hide();
             $('#testSABnzbd-result').hide();
             $('#nzbget_settings').hide();
+            $('#t_blackhole_submit').show();
+            
         } else if (selectedProvider == "nzbget") {
             $('#blackhole_settings').hide();
             $('#sabnzbd_settings').hide();
@@ -100,6 +102,7 @@ $(document).ready(function(){
             $('#torrent_settings').hide();
             $('#ftp_blackhole_settings').show();
             $('#desc_torrent_dir').text('FTP blackhole directory');
+            $('#t_blackhole_submit').hide();
         }
     }
 
