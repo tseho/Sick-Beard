@@ -144,7 +144,7 @@ class XBMCNotifier:
                     if notifyResult:
                         result += curHost + ':' + notifyResult["result"].decode(sickbeard.SYS_ENCODING)
             else:
-                logger.log(u"Failed to detect XBMC version for '" + curHost + "', check configuration and try again.", logger.ERROR)
+                logger.log(u"Failed to detect XBMC version for '" + curHost + "', check configuration and try again.", logger.DEBUG)
                 result += curHost + ':False'
 
         return result
@@ -501,7 +501,7 @@ class XBMCNotifier:
                             logger.log(u"Single show update failed, falling back to full update", logger.WARNING)
                             self._update_library_json(curHost)
                 else:
-                    logger.log(u"Failed to detect XBMC version for '" + curHost + "', check configuration and try again.", logger.ERROR)
+                    logger.log(u"Failed to detect XBMC version for '" + curHost + "', check configuration and try again.", logger.DEBUG)
                     result = result + 1
 
             # needed for the 'update xbmc' submenu command
