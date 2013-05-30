@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+
+    <title>SickBeard VO\VF by sarakha63</title>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>SickBeard VO\VF</h1>
+        <h2>Version de Sickbeard pour les français</h2>
+
+        <section id="downloads">
+          <a href="https://github.com/sarakha63/Sick-Beard/zipball/master" class="btn">Download as .zip</a>
+          <a href="https://github.com/sarakha63/Sick-Beard/tarball/master" class="btn">Download as .tar.gz</a>
+          <a href="https://github.com/sarakha63/Sick-Beard" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
+        </section>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+        <p>Je fais ce sujet pour présenter une version de sickbeard qui va plaire à la communauté. J'en ai déjà parlé sur de nombreux sujet mais il est temps de faire une présentation offcicielle.</p>
+
+<p>Fonctionnalités supplémentaires de cette version :</p>
+
+<p>-Cette version permet pour chaque série de choisir si on la veut en VO ou en VF.</p>
+
+<p>-La plupart des providers permettent de télécharger en VF</p>
+
+<p>-Binnews à été rajouté</p>
+
+<p>-T411 a été rajouté</p>
+
+<p>-Cpasbien a été rajouté</p>
+
+<p>-GKS a été rajouté</p>
+
+<p>-L'envoi automatique de torrent a transmission, utorrent, déluge et DS Download a été implémenté en plus du black hole</p>
+
+<p>-Subliminal a été implémenté pour télécharger les sous titre.</p>
+
+<p>-De nombreuses modifications d'interfaces</p>
+
+<p>-Chaque épisode téléchargé et renseigné automatiquement avec la langue téléchargée pour savoir ou en en est.</p>
+
+<p>-Pour chaque épisode possédé on peut sélectionner sa langue au cas ou elle a pas été renseigné automatiquement ou si l'épisode a été téléchargé manuellement. Lors d'une première install, sickbeard ne peut pas deviner en quel langue sont les épisodes, il faut donc penser a le faire pour les épisodes déjà possédées (on peut selectionner plusieurs épisodes pour le faire)</p>
+
+<p>-Logo pour les chaines</p>
+
+<p>-Gestion de trakt et import auto des Watchlist (avec possibilité de dire skip, prendre touts les épisodes, seulement le premier ou les 3 premiers)</p>
+
+<p>-Rajout the pirate bay (toujours en beta)</p>
+
+<p>-Rajout de Kick ass torrent (beta)</p>
+
+<p>-Rajout de la possibilité d'avoir les sous titre sans language code</p>
+
+<p>-Rajout de la notion de preferred torrent preferred newsgroup</p>
+
+<p>-Rajout de la gestion des failed (une recherche relancé ne prendra pas les liens déjà téléchargés et non post processés de cet épsiode (on peut remettre la liste des liens à jour))</p>
+
+<p>-Nettoyage récursif des repertoires dans le cas ou on utilise pas le move associated files</p>
+
+<p>-Rajout d'un repertoire a part pour les torrents pour le post processing</p>
+
+<p>Installation :</p>
+
+<p>Rien de plus simple, il faut installer le spk git fourni par synocommunity puis utiliser le spk sickbeard custom distribué par synocommunity et utiliser ces infos à l'installation :</p>
+
+<p>adresse git : git://github.com/sarakha63/Sick-Beard.git</p>
+
+<p>branche : master</p>
+
+<p>De nombreuses personnes, tombent sur ce sujet en cherchant sur google, donc je précise que l'installation décrite ci dessus est pour les nas synology, il n'existe pas de spk custom pour windows. La solution pour windows est d'installer python et cheetah et de télécharger les sources. Une version compilée arrivera quand elle sera dispo je mettrais le lien sur le sujet.</p>
+
+<p>Fonctionnalités à venir :</p>
+
+<p>-Rajout de tous providers utiles et efficaces</p>
+
+<p>-Permettre une gestion automatique des langues à la manière des qualités dans couchpotato</p>
+
+<pre><code>    J'entends par la dire a sickbeard cherche le français mais si tu trouves pas je t'autorises a prendre l'anglais mais dans ce cas continue à chercher le français.
+</code></pre>
+
+<p>A l'heure actuelle il faut manuellement changer le language désiré si on veut par exemple récupérer la dernière saison en anglais et rebasculé en fr pour cette saison 6 mois après. Mais c'est deja très bien comme ca.</p>
+
+<p>-Correction de bug</p>
+
+<p>-Gestion des mangas avec leur numérotation</p>
+
+<p>Screenshots :</p>
+
+<p>Ecran d'accueil avec poster activé, logo des chaines et colonne pour connaitre la langue audio en cours:</p>
+
+<p>Ecran d'une série avec poster et toutes options :</p>
+
+<p>Ecran d'edit:</p>
+
+<p>Ecran de configuration des sous titre:</p>
+
+<p>Ecran de configuration du downloader torrent:</p>
+
+<p>Ecran de providers :</p>
+
+<p>Information importante, ce sujet est juste là pour vous présenter le git, aucune demande de fonctionnalités et de retours de bugs ne sera accepté ici. Pour cela utiliser le git il ya une section issue faites pour. J'insiste sur ce point</p>
+
+<p>N'hésitez pas à suivre les git en mettant STAR pour que l'on puisse voir l'évolution du nombre de personne intéréssé : <a href="https://github.com/s...ha63/Sick-Beard">https://github.com/s...ha63/Sick-Beard</a></p>
+
+<p>Bon voilà tout est dit, de nombreuses personnes se servent déjà de cette version mais grâce à Diaoul, vouas avez maintenant une psossibilité de l'installer simplement. Il mérite un merci pour cela.</p>
+
+<p>Nous avons aussi une version de Couchpotatoserver aussi qui rajoute les mêmes providers et une meilleure gestion du fr. Je ferais un sujet pour elle aussi car Diaoul va aussi permettre une installation aisée de celle ci.</p>
+
+<p>PS: si vous voulez faire des dons c'est votre choix voici le lien</p>
+
+<p><a href="https://www.paypal.c...d=L2EWZMTRPW2SE">https://www.paypal.c...d=L2EWZMTRPW2SE</a></p>
+      </section>
+    </div>
+
+    
+  </body>
+</html>
