@@ -68,7 +68,7 @@ img {
     border: 3px solid #FFFFFF;
     box-shadow: 1px 1px 2px 0 #555555;
     float: left;
-    height: 48px;
+    min-height: 48px;
     overflow: hidden;
 }
 
@@ -89,7 +89,8 @@ img {
     border-radius: 8px;
     vertical-align: top;
     height: auto;
-    width: 270px;
+    min-width: 270px;
+    width : 100%;
     border-radius: 8px;
 }
 .imgHomeWrapperbig {
