@@ -42,6 +42,7 @@ $(document).ready(function(){
             $('#t_blackhole_settings').show();
             $('#torrent_settings').hide();
             $('#ftp_blackhole_settings').hide();
+            $('#desc_torrent_dir').text('TORRENT Black Hole');
         } else if (selectedProvider == "utorrent") {
             $('#t_blackhole_settings').hide();
             $('#torrent_settings').show();
@@ -98,6 +99,7 @@ $(document).ready(function(){
             $('#t_blackhole_settings').show();
             $('#torrent_settings').hide();
             $('#ftp_blackhole_settings').show();
+            $('#desc_torrent_dir').text('FTP blackhole directory');
         }
     }
 
