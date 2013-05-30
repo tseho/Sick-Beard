@@ -143,10 +143,22 @@ def processDir (dirName, nzbName=None, recurse=False):
             # as long as the postprocessing was successful delete the old folder unless the config wants us not to
             if process_result:
     
-                if len(videoFiles) == 1 \
-                    and ( ( not sickbeard.KEEP_PROCESSED_DIR and ek.ek(os.path.normpath, dirName) != ek.ek(os.path.normpath, sickbeard.TV_DOWNLOAD_DIR) ) \
-                    or ( sickbeard.PROCESS_METHOD == "move" and ek.ek(os.path.normpath, dirName) != ek.ek(os.path.normpath, sickbeard.TORRENT_DOWNLOAD_DIR) ) ) \
-                    and  len(remainingFolders) == 0:
+#                if len(videoFiles) == 1 \
+#                    and ( ( not sickbeard.KEEP_PROCESSED_DIR and ek.ek(os.path.normpath, dirName) != ek.ek(os.path.normpath, sickbeard.TV_DOWNLOAD_DIR) ) \
+#                    or ( sickbeard.PROCESS_METHOD == "move" and ek.ek(os.path.normpath, dirName) != ek.ek(os.path.normpath, sickbeard.TORRENT_DOWNLOAD_DIR) ) ) \
+#                    and  len(remainingFolders) == 0:
+                
+                delete = False
+                if len(videoFiles) == 1 and  len(remainingFolders) == 0:
+                    if  ek.ek(os.path.normpath, dirName) != ek.ek(os.path.normpath, sickbeard.TORRENT_DOWNLOAD_DIR) and \
+                        ek.ek(os.path.normpath, dirName) != ek.ek(os.path.normpath, sickbeard.TV_DOWNLOAD_DIR):
+                        
+                        if sickbeard.PROCESS_METHOD == "move" and ek.ek(os.path.normpath, dirName) != ek.ek(os.path.normpath, sickbeard.TORRENT_DOWNLOAD_DIR):
+                            delete = True
+                        if not sickbeard.KEEP_PROCESSED_DIR and ek.ek(os.path.normpath, dirName) != ek.ek(os.path.normpath, sickbeard.TV_DOWNLOAD_DIR):
+                            delete = True
+                
+                if delete:    
     
                     returnStr += logHelper(u"Deleting folder " + dirName, logger.DEBUG)
     

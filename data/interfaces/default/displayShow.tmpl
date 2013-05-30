@@ -158,7 +158,14 @@
 <div id="summary" class="align-left">
 <table class="infoTable" cellspacing="0" border="0" cellpadding="0">
 <tr>
-<td  width="75%">
+<td width="25%">
+<div class="tvshowImgsubs">
+	<a href="$sbRoot/showPoster/?show=$show.tvdbid&amp;which=poster" rel="dialog" title="$show.name">
+		<img src="$sbRoot/showPoster/?show=$show.tvdbid&amp;which=poster" class="posterThumb" alt="$show.tvdbid&amp"/>
+	</a>
+</div>
+</td>
+<td  width="50%">
 <table>
 #if $show.network and $show.airs:
     <tr><td class="showLegend">Airs: </td><td>$show.airs on $show.network</td></tr>
@@ -200,7 +207,7 @@
 	#end if
     </td></tr>
     </table>
-    <td style="float: right;">
+    <td width="25%">
     <table>
     <tr><td class="showLegend">Flat Folders: </td><td><img src="$sbRoot/images/#if $show.flatten_folders == 1 or $sickbeard.NAMING_FORCE_FOLDERS then "yes16.png\" alt=\"Y" else "no16.png\" alt=\"N"#" width="16" height="16" /></td></tr>
     <tr><td class="showLegend">Paused: </td><td><img src="$sbRoot/images/#if int($show.paused) == 1 then "yes16.png\" alt=\"Y" else "no16.png\" alt=\"N"#" width="16" height="16" /></td></tr>
@@ -222,12 +229,6 @@
 </table>
 
 </div>
-</div>
-#if $sickbeard.USE_SUBTITLES
-<div class="tvshowImgsubs"><a href="$sbRoot/showPoster/?show=$show.tvdbid&amp;which=poster" rel="dialog" title="$show.name"><img src="$sbRoot/showPoster/?show=$show.tvdbid&amp;which=poster" class="posterThumb" alt="$show.tvdbid&amp"/></a>
-#else
-<div class="tvshowImg"><a href="$sbRoot/showPoster/?show=$show.tvdbid&amp;which=poster" rel="dialog" title="$show.name"><img src="$sbRoot/showPoster/?show=$show.tvdbid&amp;which=poster" class="posterThumb" alt="$show.tvdbid&amp"/></a>
-#end if
 </div>
 #set $curSeason = -1
 #set $odd = 0
