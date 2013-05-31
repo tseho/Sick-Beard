@@ -285,7 +285,7 @@ def pickBestResult(results, quality_list=None, episode=None, season=None):
             logger.log(eplink +" was already downloaded so let's skip it assuming the download failed, you can erase the downloaded links for that episode if you want", logger.DEBUG)
             continue
         
-        if ((not bestResult or bestResult.quality < cur_result.quality and cur_result.quality != Quality.UNKNOWN)) or (bestmethod != sickbeard.PREFERED_METHOD and curmethod ==  sickbeard.PREFERED_METHOD and cur_result.quality != Quality.UNKNOWN):
+        if ((not bestResult or bestResult.quality < cur_result.quality)) or (bestmethod != sickbeard.PREFERED_METHOD and curmethod ==  sickbeard.PREFERED_METHOD):
             bestResult = cur_result
             
         elif bestResult.quality == cur_result.quality:
