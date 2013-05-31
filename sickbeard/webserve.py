@@ -895,7 +895,7 @@ class ConfigGeneral:
     @cherrypy.expose
     def saveGeneral(self, log_dir=None, web_port=None, web_log=None, web_ipv6=None,
                     update_shows_on_start=None,launch_browser=None, web_username=None, use_api=None, api_key=None,
-                    web_password=None, version_notify=None, enable_https=None, https_cert=None, https_key=None, sort_article=None):
+                    web_password=None, version_notify=None, enable_https=None, https_cert=None, https_key=None, sort_article=None, french_column=None):
 
         results = []
 
@@ -922,7 +922,12 @@ class ConfigGeneral:
         if sort_article == "on":
             sort_article = 1
         else:
-            sort_article = 0            
+            sort_article = 0 
+        
+        if french_column == "on":
+            french_column = 1
+        else:
+            french_column= 0            
 
         if version_notify == "on":
             version_notify = 1
@@ -935,6 +940,7 @@ class ConfigGeneral:
         sickbeard.UPDATE_SHOWS_ON_START = update_shows_on_start
         sickbeard.LAUNCH_BROWSER = launch_browser
         sickbeard.SORT_ARTICLE = sort_article
+        sickbeard.FRENCH_COLUMN = french_column
         
         sickbeard.WEB_PORT = int(web_port)
         sickbeard.WEB_IPV6 = web_ipv6
