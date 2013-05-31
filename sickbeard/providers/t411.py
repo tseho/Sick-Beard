@@ -130,7 +130,9 @@ class T411Provider(generic.TorrentProvider):
                 downloadURL = ('http://www.t411.me/torrents/download/?id=%s' % id)
                 
                 quality = Quality.nameQuality( title )
-
+                if quality==Quality.UNKNOWN and title:
+                    if '720p' not in title.lower() and '1080p' not in title.lower():
+                        quality=Quality.SDTV
                 if show:
                     results.append( T411SearchResult( self.opener, link['title'], downloadURL, quality, str(show.audio_lang) ) )
                 else:
