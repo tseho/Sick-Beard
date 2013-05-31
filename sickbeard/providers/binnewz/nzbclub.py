@@ -50,9 +50,10 @@ class NZBClub(NZBDownloader):
         for suffixURL in nzbClubURLs:
 
             nzbClubURL = "http://www.nzbclub.com/search.aspx?" + suffixURL
-            
-            nzbClubSoup = BeautifulSoup( self.open(nzbClubURL).read().decode('utf-8','ignore'))
-            
+            try:
+                nzbClubSoup = BeautifulSoup( self.open(nzbClubURL).read().decode('utf-8','ignore'))
+            except:
+                nzbClubSoup = BeautifulSoup( self.open(nzbClubURL).read().decode('latin-1','ignore'))
             if nzbClubSoup:
                 sizeInMegs = None
                 for row in nzbClubSoup.findAll(isResultRow):
