@@ -109,26 +109,51 @@
     });
 
     \$("#showListTable:has(tbody tr)").tablesorter({
-			#if ($layout == 'poster'):
-	        	sortList: [[7,1],[2,0]],
-	       	#else:
-	       		sortList: [[6,1],[1,0]],
-	       	#end if
+			#if $sickbeard.FRENCH_COLUMN:
+				#if ($layout == 'poster'):
+		        	sortList: [[7,1],[2,0]],
+		       	#else:
+		       		sortList: [[6,1],[1,0]],
+		       	#end if
+		    #else:
+		    	#if ($layout == 'poster'):
+		        	sortList: [[6,1],[2,0]],
+		       	#else:
+		       		sortList: [[5,1],[1,0]],
+		       	#end if
+		    #end if
 	        textExtraction: {
-	        #if ( $layout == 'poster'):
-		        1: function(node) { return \$(node).find("img").attr("alt"); },
-		        3: function(node) { return \$(node).find("img").attr("alt"); },
-		        4: function(node) { return \$(node).find("span").text(); },
-	            7: function(node) { return \$(node).find("img").attr("alt"); },	            
-	            8: function(node) { return \$(node).find("img").attr("alt"); }
-	        #else:
-	        	#if ( $layout != 'simple'):
-		        2: function(node) { return \$(node).find("img").attr("alt"); },
-	        	#end if
-	            3: function(node) { return \$(node).find("span").text(); },
-	            6: function(node) { return \$(node).find("img").attr("alt"); },	            
-	            7: function(node) { return \$(node).find("img").attr("alt"); }
-	        #end if
+	        #if $sickbeard.FRENCH_COLUMN:
+		        #if ( $layout == 'poster'):
+			        1: function(node) { return \$(node).find("img").attr("alt"); },
+			        3: function(node) { return \$(node).find("img").attr("alt"); },
+			        4: function(node) { return \$(node).find("span").text(); },
+		            7: function(node) { return \$(node).find("img").attr("alt"); },	            
+		            8: function(node) { return \$(node).find("img").attr("alt"); }
+		        #else:
+		        	#if ( $layout != 'simple'):
+			        2: function(node) { return \$(node).find("img").attr("alt"); },
+		        	#end if
+		            3: function(node) { return \$(node).find("span").text(); },
+		            6: function(node) { return \$(node).find("img").attr("alt"); },	            
+		            7: function(node) { return \$(node).find("img").attr("alt"); }
+		        #end if
+		    #else:
+		    	#if ( $layout == 'poster'):
+			        1: function(node) { return \$(node).find("img").attr("alt"); },
+			        3: function(node) { return \$(node).find("img").attr("alt"); },
+			        4: function(node) { return \$(node).find("span").text(); },
+		            6: function(node) { return \$(node).find("img").attr("alt"); },	            
+		            7: function(node) { return \$(node).find("img").attr("alt"); }
+		        #else:
+		        	#if ( $layout != 'simple'):
+			        2: function(node) { return \$(node).find("img").attr("alt"); },
+		        	#end if
+		            3: function(node) { return \$(node).find("span").text(); },
+		            5: function(node) { return \$(node).find("img").attr("alt"); },	            
+		            6: function(node) { return \$(node).find("img").attr("alt"); }
+		        #end if
+		    #end if
 	        },
 	        #if sickbeard.TOGGLE_SEARCH=='True':
 	        widgets: ['zebra', 'stickyHeaders', 'filter'],
@@ -137,26 +162,48 @@
 	        #end if
 	        headers: {
 	            0: {filter : false ,sorter: 'isoDate' },
-	         #if ($layout == 'poster'):
-	            1: {filter : false ,sorter: 'loadingNames'},
-	            2: {sorter: 'loadingNames'},
-	            3: { filter: false},
-	            4: { filter : false ,sorter: 'quality' },
-	            5: { filter : false ,sorter: 'eps' },
-	            6: { filter : false ,sorter: 'eps' },
-	            7: { filter: false},
-	            8: { filter: false},
-	            9: { filter: false},
-	         #else:
-	            1: {sorter: 'loadingNames'},
-	            2: { filter: false},
-	            3: { filter : false ,sorter: 'quality' },
-	            4: { filter : false ,sorter: 'eps' },
-	            5: { filter : false ,sorter: 'eps' },
-	            6: { filter: false},
-	            7: { filter: false},
-	            8: { filter: false},
-	          #end if
+	         #if $sickbeard.FRENCH_COLUMN:
+		         #if ($layout == 'poster'):
+		            1: {filter : false ,sorter: 'loadingNames'},
+		            2: {sorter: 'loadingNames'},
+		            3: { filter: false},
+		            4: { filter : false ,sorter: 'quality' },
+		            5: { filter : false ,sorter: 'eps' },
+		            6: { filter : false ,sorter: 'eps' },
+		            7: { filter: false},
+		            8: { filter: false},
+		            9: { filter: false},
+		         #else:
+		            1: {sorter: 'loadingNames'},
+		            2: { filter: false},
+		            3: { filter : false ,sorter: 'quality' },
+		            4: { filter : false ,sorter: 'eps' },
+		            5: { filter : false ,sorter: 'eps' },
+		            6: { filter: false},
+		            7: { filter: false},
+		            8: { filter: false},
+		          #end if
+		      #else:
+			      #if ($layout == 'poster'):
+			            1: {filter : false ,sorter: 'loadingNames'},
+			            2: {sorter: 'loadingNames'},
+			            3: { filter: false},
+			            4: { filter : false ,sorter: 'quality' },
+			            5: { filter : false ,sorter: 'eps' },
+			            6: { filter: false},
+			            7: { filter: false},
+			            8: { filter: false},
+			         #else:
+			            1: {sorter: 'loadingNames'},
+			            2: { filter: false},
+			            3: { filter : false ,sorter: 'quality' },
+			            4: { filter : false ,sorter: 'eps' },
+			            5: { filter: false},
+			            6: { filter: false},
+			            7: { filter: false},
+			          #end if
+		       #end if
+		      
 	        }
     });
 
@@ -189,15 +236,23 @@
 
 <table id="showListTable" class="sickbeardTable tablesorter" cellspacing="1" border="0" cellpadding="0">
 
-  <thead><tr><th class="nowrap">Next Ep</th>#if $layout=="poster" then "<th>Poster</th>" else ""#<th>Show</th><th>Network</th><th>Quality</th><th>Downloads</th><th>French Ep</th><th>Active</th><th>Audio</th><th>Status</th></tr></thead>
+  <thead><tr><th class="nowrap">Next Ep</th>#if $layout=="poster" then "<th>Poster</th>" else ""#<th>Show</th><th>Network</th><th>Quality</th><th>Downloads</th>#if $sickbeard.FRENCH_COLUMN then "<th>French Ep</th>" else ""#<th>Active</th><th>Audio</th><th>Status</th></tr></thead>
   <tfoot>
     <tr>
       <th rowspan="1" colspan="1" align="center"><a href="$sbRoot/home/addShows/">&nbsp Add Show</a></th>
-      #if ($layout == 'poster'):
-      <th rowspan="1" colspan="9"></th>
-      #else:
-      <th rowspan="1" colspan="8"></th>
-      #end if      
+      #if sickbeard.FRENCH_COLUMN:
+      	#if ($layout == 'poster'):
+      		<th rowspan="1" colspan="9"></th>
+      	#else:
+      		<th rowspan="1" colspan="8"></th>
+      	#end if
+     #else:
+        #if ($layout == 'poster'):
+      		<th rowspan="1" colspan="8"></th>
+      	#else:
+      		<th rowspan="1" colspan="7"></th>
+      	#end if
+      #end if
     </tr>
   </tfoot>
   <tbody>
@@ -223,7 +278,9 @@
     <td></td>
     <td></td>
     <td></td>
+    #if $sickbeard.FRENCH_COLUMN:
     <td></td>
+    #end if
     #if ($layout == 'poster'):
     <td></td>
     #end if
@@ -341,6 +398,7 @@ $myShowList.sort(lambda x, y: cmp(x.name, y.name))
         </script>
     	
     </td>
+    #if $sickbeard.FRENCH_COLUMN:
 	<td align="center"><span style="display: none;">$frStat</span>
       
        <div class="progress" id="new_progressbar2$curShow.tvdbid" style="position:relative;">
@@ -362,7 +420,7 @@ $myShowList.sort(lambda x, y: cmp(x.name, y.name))
             });
         //-->
         </script>
-        
+    #end if
         
     </td>
     <td align="center"><img src="$sbRoot/images/#if int($curShow.paused) == 0 and $curShow.status != "Ended" then "yes16.png\" alt=\"Y\"" else "no16.png\" alt=\"N\""# width="16" height="16" /></td>
