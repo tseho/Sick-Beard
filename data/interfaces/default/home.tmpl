@@ -15,6 +15,7 @@
 #set $myDB = $db.DBConnection()
 #set $today = str($datetime.date.today().toordinal())
 #set $downloadedEps = $myDB.select("SELECT showid, COUNT(*) FROM tv_episodes WHERE (status IN ("+",".join([str(x) for x in $Quality.DOWNLOADED + [$ARCHIVED]])+") OR (status IN ("+",".join([str(x) for x in $Quality.SNATCHED + $Quality.SNATCHED_PROPER])+") AND location != '')) AND season != 0 and episode != 0 AND airdate <= "+$today+" GROUP BY showid")
+#set $snatchedEps = $myDB.select("SELECT showid, COUNT(*) FROM tv_episodes WHERE (status IN ("+",".join([str(x) for x in $Quality.SNATCHED + [$ARCHIVED]])+") OR (status IN ("+",".join([str(x) for x in $Quality.SNATCHED + $Quality.SNATCHED_PROPER])+") AND location != '')) AND season != 0 and episode != 0 AND airdate <= "+$today+" GROUP BY showid")
 #set $allEps = $myDB.select("SELECT showid, COUNT(*) FROM tv_episodes WHERE season != 0 and episode != 0 AND (airdate != 1 OR status IN ("+",".join([str(x) for x in ($Quality.DOWNLOADED + $Quality.SNATCHED + $Quality.SNATCHED_PROPER) + [$ARCHIVED]])+")) AND airdate <= "+$today+" AND status != "+str($IGNORED)+" GROUP BY showid")
 #set $fr = $myDB.select("SELECT showid, COUNT(*) FROM tv_episodes WHERE audio_langs = 'fr' AND location != '' AND season != 0 and episode != 0 AND airdate <= "+$today+" GROUP BY showid")
 #set $layout = $sickbeard.HOME_LAYOUT
@@ -235,6 +236,7 @@ $myShowList.sort(lambda x, y: cmp(x.name, y.name))
 #set $curEp = $curShow.nextEpisode()
 
 #set $curShowDownloads = [x[1] for x in $downloadedEps if int(x[0]) == $curShow.tvdbid]
+#set $curShowSnatched = [x[1] for x in $snatchedEps if int(x[0]) == $curShow.tvdbid]
 #set $curfr = [x[1] for x in $fr if int(x[0]) == $curShow.tvdbid]
 #set $curShowAll = [x[1] for x in $allEps if int(x[0]) == $curShow.tvdbid]
 #if len($curShowAll) != 0:
@@ -266,6 +268,12 @@ $myShowList.sort(lambda x, y: cmp(x.name, y.name))
   #set $frStat = "0 / 0"
   #set $nomfr = 0
   #set $denfr = 1
+#end if
+
+#if len($curShowSnatched) != 0:
+    #set $nomSna = $curShowSnatched[0]
+#else:
+    #set $nomSna = 0
 #end if
 
 #set $which_thumb = $layout+"_thumb" 
@@ -310,32 +318,52 @@ $myShowList.sort(lambda x, y: cmp(x.name, y.name))
 #else:
     <td align="center"><span class="quality Custom">Custom</span></td>
 #end if
-    <td align="center"><span style="display: none;">$dlStat</span><div id="progressbar$curShow.tvdbid" style="position:relative;"></div>
-        <script type="text/javascript">
+    <td align="center"><span style="display: none;">$dlStat</span>
+
+        <div class="progress" id="new_progressbar$curShow.tvdbid" style="position:relative;">
+    		<div class="bar bar-success" ></div>
+    		<div class="bar bar-warning" ></div>
+    		<div class="bar bar-danger" ></div>
+    	</div>
+    	
+    	<script type="text/javascript">
         <!--
             \$(function() {
-               \$("\#progressbar$curShow.tvdbid").progressbar({
-       			value: parseInt($nom) * 100 / parseInt($den) / 1000 });
-               \$("\#progressbar$curShow.tvdbid").append( "<div class='progressbarText'>$dlStat</div>" )
-				var progressBarWidth = parseInt($nom) * 100 / parseInt($den) + "%"
-               \$("\#progressbar$curShow.tvdbid > .ui-progressbar-value").animate({ width: progressBarWidth }, 1000);
+                var progressBarWidthDL = (parseInt($nom) * 100) / parseInt($den) + "%"
+               \$("\#new_progressbar$curShow.tvdbid > .bar-success").animate({ width: progressBarWidthDL }, 1000);
+                var progressBarWidthSN = (parseInt($nomSna) * 100) / parseInt($den) + "%"
+               \$("\#new_progressbar$curShow.tvdbid > .bar-warning").animate({ width: progressBarWidthSN }, 1000);
+                var progressBarWidthNO = ((parseInt($den) - (parseInt($nomSna) + parseInt($nom))) * 100) / parseInt($den) + "%"
+               \$("\#new_progressbar$curShow.tvdbid > .bar-danger").animate({ width: progressBarWidthNO }, 1000);
+               \$("\#new_progressbar$curShow.tvdbid").append( "<div class='progressbarText'>$dlStat</div>" );
             });
         //-->
         </script>
+    	
     </td>
-	<td align="center"><span style="display: none;">$frStat</span><div id="progressbar2$curShow.tvdbid" style="position:relative;"></div>
+	<td align="center"><span style="display: none;">$frStat</span>
+      
+       <div class="progress" id="new_progressbar2$curShow.tvdbid" style="position:relative;">
+            <div class="bar bar-success" ></div>
+            <div class="bar bar-warning" ></div>
+            <div class="bar bar-danger" ></div>
+        </div>
+        
         <script type="text/javascript">
         <!--
             \$(function() {
-               \$("\#progressbar2$curShow.tvdbid").progressbar({
-                   value: parseInt($nomfr) * 100 / parseInt($denfr)/1000
-               });
-               \$("\#progressbar2$curShow.tvdbid").append( "<div class='progressbarText'>$frStat</div>" )
-            	var progressBar2Width = parseInt($nomfr) * 100 / parseInt($denfr) + "%"
-               \$("\#progressbar2$curShow.tvdbid > .ui-progressbar-value").animate({ width: progressBar2Width }, 1000);
+                var progressBarWidthDL = parseInt($nomfr) * 100 / parseInt($denfr) + "%"
+               \$("\#new_progressbar2$curShow.tvdbid > .bar-success").animate({ width: progressBarWidthDL }, 1000);
+                var progressBarWidthSN = "0%"
+               \$("\#new_progressbar2$curShow.tvdbid > .bar-warning").animate({ width: progressBarWidthSN }, 1000);
+                var progressBarWidthNO = (parseInt($denfr) - parseInt($nomfr)) * 100 / parseInt($denfr) + "%"
+               \$("\#new_progressbar2$curShow.tvdbid > .bar-danger").animate({ width: progressBarWidthNO }, 1000);
+               \$("\#new_progressbar2$curShow.tvdbid").append( "<div class='progressbarText'>$frStat</div>" )
             });
         //-->
         </script>
+        
+        
     </td>
     <td align="center"><img src="$sbRoot/images/#if int($curShow.paused) == 0 and $curShow.status != "Ended" then "yes16.png\" alt=\"Y\"" else "no16.png\" alt=\"N\""# width="16" height="16" /></td>
     <td align="center">        
