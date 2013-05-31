@@ -99,7 +99,10 @@ class DBConnection:
                         attempt += 1
                         time.sleep(1)
                     else:
-                        logger.log(u"DB error: " + ex(e), logger.ERROR)
+                        if "no such table: db_version" in e.message:
+                            logger.log(u"DB error: " + ex(e), logger.WARNING)
+                        else:
+                            logger.log(u"DB error: " + ex(e), logger.ERROR)
                         raise
                 except sqlite3.DatabaseError, e:
                     sqlResult = []
@@ -137,7 +140,10 @@ class DBConnection:
                         attempt += 1
                         time.sleep(1)
                     else:
-                        logger.log(u"DB error: "+ex(e), logger.ERROR)
+                        if "no such table: db_version" in e.message:
+                            logger.log(u"DB error: " + ex(e), logger.WARNING)
+                        else:
+                            logger.log(u"DB error: " + ex(e), logger.ERROR)
                         raise
                 except sqlite3.DatabaseError, e:
                     logger.log(u"Fatal error executing query: " + ex(e), logger.ERROR)

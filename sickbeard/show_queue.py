@@ -353,7 +353,7 @@ class QueueItemAdd(ShowQueueItem):
         sickbeard.traktWatchListCheckerSchedular.action.manageNewShow(self.show)
 
         # if there is any episode we must upload to FTP
-        sickbeard.SentFTPSchedular.action.Send()
+        sickbeard.sentFTPSchedular.action.Send()
 
         self.finish()
 
