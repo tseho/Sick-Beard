@@ -103,7 +103,7 @@ class InitialSchema (db.SchemaUpgrade):
             "CREATE TABLE history (action NUMERIC, date NUMERIC, showid NUMERIC, season NUMERIC, episode NUMERIC, quality NUMERIC, resource TEXT, provider NUMERIC);",
             "CREATE TABLE episode_links (episode_id INTEGER, link TEXT);",
             "CREATE TABLE imdb_info (tvdb_id INTEGER PRIMARY KEY, imdb_id TEXT, title TEXT, year NUMERIC, akas TEXT, runtimes NUMERIC, genres TEXT, countries TEXT, country_codes TEXT, certificates TEXT, rating TEXT, votes INTEGER, last_update NUMERIC);",
-            "CREATE TABLE processed_files (episode_id INTEGER, filename TEXT, md5 TEXT)"
+            "CREATE TABLE processed_files (episode_id INTEGER, filename TEXT, md5 TEXT);"
         ]
         for query in queries:
             self.connection.action(query)
@@ -152,10 +152,10 @@ class NumericProviders (AddAirdateIndex):
                 6: 'tvnzb',
                 7: 'ezrss',
                 8: 'thepiratebay',
-                9: 'kat'},
+                9: 'kat'}
 
     def execute(self):
-        self.connection.action("ALTER TABLE history RENAME TO history_old")
+        self.connection.action("ALTER TABLE history RENAME TO history_old;")
         self.connection.action("CREATE TABLE history (action NUMERIC, date NUMERIC, showid NUMERIC, season NUMERIC, episode NUMERIC, quality NUMERIC, resource TEXT, provider TEXT);")
 
         for x in self.histMap.keys():
