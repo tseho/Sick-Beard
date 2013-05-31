@@ -2413,8 +2413,8 @@ class NewHomeAddShows:
         for cur_show in tvdb_id_given:
             show_dir, tvdb_id, show_name = cur_show
 
-            # add the show
-            sickbeard.showQueueScheduler.action.addShow(tvdb_id, show_dir, SKIPPED, sickbeard.QUALITY_DEFAULT, sickbeard.FLATTEN_FOLDERS_DEFAULT, sickbeard.SUBTITLES_DEFAULT) #@UndefinedVariable
+            # add the show  
+            sickbeard.showQueueScheduler.action.addShow(tvdb_id, show_dir, int(sickbeard.STATUS_DEFAULT), sickbeard.QUALITY_DEFAULT, sickbeard.FLATTEN_FOLDERS_DEFAULT,"fr", sickbeard.SUBTITLES_DEFAULT, sickbeard.AUDIO_SHOW_DEFAULT) #@UndefinedVariable
             num_added += 1
 
         if num_added:
