@@ -15,6 +15,7 @@
 #set $myDB = $db.DBConnection()
 #set $today = str($datetime.date.today().toordinal())
 #set $downloadedEps = $myDB.select("SELECT showid, COUNT(*) FROM tv_episodes WHERE (status IN ("+",".join([str(x) for x in $Quality.DOWNLOADED + [$ARCHIVED]])+") OR (status IN ("+",".join([str(x) for x in $Quality.SNATCHED + $Quality.SNATCHED_PROPER])+") AND location != '')) AND season != 0 and episode != 0 AND airdate <= "+$today+" GROUP BY showid")
+#set $snatchedEps = $myDB.select("SELECT showid, COUNT(*) FROM tv_episodes WHERE (status IN ("+",".join([str(x) for x in $Quality.DOWNLOADED + [$ARCHIVED]])+") OR (status IN ("+",".join([str(x) for x in $Quality.SNATCHED + $Quality.SNATCHED_PROPER])+") AND location != '')) AND season != 0 and episode != 0 AND airdate <= "+$today+" GROUP BY showid")
 #set $allEps = $myDB.select("SELECT showid, COUNT(*) FROM tv_episodes WHERE season != 0 and episode != 0 AND (airdate != 1 OR status IN ("+",".join([str(x) for x in ($Quality.DOWNLOADED + $Quality.SNATCHED + $Quality.SNATCHED_PROPER) + [$ARCHIVED]])+")) AND airdate <= "+$today+" AND status != "+str($IGNORED)+" GROUP BY showid")
 #set $fr = $myDB.select("SELECT showid, COUNT(*) FROM tv_episodes WHERE audio_langs = 'fr' AND location != '' AND season != 0 and episode != 0 AND airdate <= "+$today+" GROUP BY showid")
 #set $layout = $sickbeard.HOME_LAYOUT
@@ -235,6 +236,7 @@ $myShowList.sort(lambda x, y: cmp(x.name, y.name))
 #set $curEp = $curShow.nextEpisode()
 
 #set $curShowDownloads = [x[1] for x in $downloadedEps if int(x[0]) == $curShow.tvdbid]
+#set $curShowSnatched = [x[1] for x in $snatchedEps if int(x[0]) == $curShow.tvdbid]
 #set $curfr = [x[1] for x in $fr if int(x[0]) == $curShow.tvdbid]
 #set $curShowAll = [x[1] for x in $allEps if int(x[0]) == $curShow.tvdbid]
 #if len($curShowAll) != 0:
@@ -310,7 +312,8 @@ $myShowList.sort(lambda x, y: cmp(x.name, y.name))
 #else:
     <td align="center"><span class="quality Custom">Custom</span></td>
 #end if
-    <td align="center"><span style="display: none;">$dlStat</span><div id="progressbar$curShow.tvdbid" style="position:relative;"></div>
+    <td align="center"><span style="display: none;">$dlStat</span>
+    <div id="progressbar$curShow.tvdbid" style="position:relative;"></div>
         <script type="text/javascript">
         <!--
             \$(function() {
@@ -322,6 +325,12 @@ $myShowList.sort(lambda x, y: cmp(x.name, y.name))
             });
         //-->
         </script>
+        
+        <div class="progress">
+    		<div class="bar bar-success" style="width: # (parseInt($curShowDownloads) * 100) / parseInt($curShowAll) #%;"></div>
+    		<div class="bar bar-warning" style="width: # (parseInt($curShowSnatched) * 100) / parseInt($curShowAll) #%;"></div>
+    		<div class="bar bar-danger" style="width: 100%;"></div>
+    	</div>
     </td>
 	<td align="center"><span style="display: none;">$frStat</span><div id="progressbar2$curShow.tvdbid" style="position:relative;"></div>
         <script type="text/javascript">
