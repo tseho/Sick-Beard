@@ -835,7 +835,7 @@ class ConfigGeneral:
         sickbeard.ROOT_DIRS = rootDirString
         sickbeard.save_config()
     @cherrypy.expose
-    def saveAddShowDefaults(self, defaultFlattenFolders, defaultStatus, anyQualities, bestQualities, audio_lang, subtitles):
+    def saveAddShowDefaults(self, defaultFlattenFolders, defaultStatus, anyQualities, bestQualities, audio_lang, subtitles=None):
 
         if anyQualities:
             anyQualities = anyQualities.split(',')
