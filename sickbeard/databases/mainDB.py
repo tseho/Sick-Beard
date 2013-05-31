@@ -102,7 +102,7 @@ class InitialSchema (db.SchemaUpgrade):
             "CREATE TABLE info (last_backlog NUMERIC, last_tvdb NUMERIC);",
             "CREATE TABLE history (action NUMERIC, date NUMERIC, showid NUMERIC, season NUMERIC, episode NUMERIC, quality NUMERIC, resource TEXT, provider NUMERIC);",
             "CREATE TABLE episode_links (episode_id INTEGER, link TEXT);",
-            "CREATE TABLE imdb_info (tvdb_id INTEGER PRIMARY KEY, imdb_id TEXT, title TEXT, year NUMERIC, akas TEXT, runtimes NUMERIC, genres TEXT, countries TEXT, country_codes TEXT, certificates TEXT, rating TEXT, votes INTEGER, last_update NUMERIC);"
+            "CREATE TABLE imdb_info (tvdb_id INTEGER PRIMARY KEY, imdb_id TEXT, title TEXT, year NUMERIC, akas TEXT, runtimes NUMERIC, genres TEXT, countries TEXT, country_codes TEXT, certificates TEXT, rating TEXT, votes INTEGER, last_update NUMERIC);",
             "CREATE TABLE processed_files (episode_id INTEGER, filename TEXT, md5 TEXT)"
         ]
         for query in queries:
