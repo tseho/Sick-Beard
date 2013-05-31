@@ -69,7 +69,11 @@ def filterBadReleases(name,showLang=u"en"):
         check_string = name
 
     # if any of the bad strings are in the name then say no
-    for x in resultFilters + sickbeard.IGNORE_WORDS.split(',') + additionalFilters:
+    if sickbeard.IGNORE_WORDS == "":
+        ignore_words="ztreyfgut"
+    else:
+        ignore_words=sickbeard.IGNORE_WORDS
+    for x in resultFilters + ignore_words.split(',') + additionalFilters:
         if x == showLanguages.get(showLang):
             continue
         if re.search('(^|[\W_])'+x+'($|[\W_])', check_string, re.I):
