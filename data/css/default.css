@@ -703,11 +703,11 @@ span.qual b {
 }
 tr.wanted,
 span.wanted {
-  background-color: #FDEBF3;
+  background-color: #f4a8a8;
   padding: 5px;
   font-size: 13px;
   font-weight: bold;
-  color: #F49AC1;
+  color: #f76f6f;
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px;
   border-radius: 5px;
