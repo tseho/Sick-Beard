@@ -18,6 +18,7 @@
 #set $snatchedEps = $myDB.select("SELECT showid, COUNT(*) FROM tv_episodes WHERE (status IN ("+",".join([str(x) for x in $Quality.SNATCHED + [$ARCHIVED]])+") OR (status IN ("+",".join([str(x) for x in $Quality.SNATCHED + $Quality.SNATCHED_PROPER])+") AND location != '')) AND season != 0 and episode != 0 AND airdate <= "+$today+" GROUP BY showid")
 #set $allEps = $myDB.select("SELECT showid, COUNT(*) FROM tv_episodes WHERE season != 0 and episode != 0 AND (airdate != 1 OR status IN ("+",".join([str(x) for x in ($Quality.DOWNLOADED + $Quality.SNATCHED + $Quality.SNATCHED_PROPER) + [$ARCHIVED]])+")) AND airdate <= "+$today+" AND status != "+str($IGNORED)+" GROUP BY showid")
 #set $fr = $myDB.select("SELECT showid, COUNT(*) FROM tv_episodes WHERE audio_langs = 'fr' AND location != '' AND season != 0 and episode != 0 AND airdate <= "+$today+" GROUP BY showid")
+#set $subfr = $myDB.select("SELECT showid, COUNT(*) FROM tv_episodes WHERE audio_langs <> 'fr' AND subtitles like '%fr%' AND location != '' AND season != 0 and episode != 0 AND airdate <= "+$today+" GROUP BY showid")
 #set $layout = $sickbeard.HOME_LAYOUT
 #set $search = $sickbeard.TOGGLE_SEARCH
 #set $sort = $sickbeard.SORT_ARTICLE
@@ -291,7 +292,7 @@
 $myShowList.sort(lambda x, y: cmp(x.name, y.name))
 #for $curShow in $myShowList:
 #set $curEp = $curShow.nextEpisode()
-
+#set $curShowSubsfr = [x[1] for x in $subfr if int(x[0]) == $curShow.tvdbid]
 #set $curShowDownloads = [x[1] for x in $downloadedEps if int(x[0]) == $curShow.tvdbid]
 #set $curShowSnatched = [x[1] for x in $snatchedEps if int(x[0]) == $curShow.tvdbid]
 #set $curfr = [x[1] for x in $fr if int(x[0]) == $curShow.tvdbid]
@@ -332,7 +333,11 @@ $myShowList.sort(lambda x, y: cmp(x.name, y.name))
 #else:
     #set $nomSna = 0
 #end if
-
+#if len($curShowSubsfr) != 0:
+    #set $nomSub = $curShowSubsfr[0]
+#else:
+    #set $nomSub = 0
+#end if
 #set $which_thumb = $layout+"_thumb" 
 
   <tr>
@@ -412,8 +417,8 @@ $myShowList.sort(lambda x, y: cmp(x.name, y.name))
             \$(function() {
                 var progressBarWidthDL = parseInt($nomfr) * 100 / parseInt($denfr) + "%"
                \$("\#new_progressbar2$curShow.tvdbid > .bar-success").animate({ width: progressBarWidthDL }, 1000);
-                var progressBarWidthSN = "0%"
-               \$("\#new_progressbar2$curShow.tvdbid > .bar-warning").animate({ width: progressBarWidthSN }, 1000);
+                var progressBarWidthSub = (parseInt($nomSub) * 100) / parseInt($den) + "%"
+               \$("\#new_progressbar2$curShow.tvdbid > .bar-warning").animate({ width: progressBarWidthSub }, 1000);
                 var progressBarWidthNO = "0%"
                \$("\#new_progressbar2$curShow.tvdbid > .bar-danger").animate({ width: progressBarWidthNO }, 1000);
                \$("\#new_progressbar2$curShow.tvdbid").append( "<div class='progressbarText'>$frStat</div>" )
