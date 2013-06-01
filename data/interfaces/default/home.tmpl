@@ -390,7 +390,7 @@ $myShowList.sort(lambda x, y: cmp(x.name, y.name))
                \$("\#new_progressbar$curShow.tvdbid > .bar-success").animate({ width: progressBarWidthDL }, 1000);
                 var progressBarWidthSN = (parseInt($nomSna) * 100) / parseInt($den) + "%"
                \$("\#new_progressbar$curShow.tvdbid > .bar-warning").animate({ width: progressBarWidthSN }, 1000);
-                var progressBarWidthNO = ((parseInt($den) - (parseInt($nomSna) + parseInt($nom))) * 100) / parseInt($den) + "%"
+                var progressBarWidthNO = "0%"
                \$("\#new_progressbar$curShow.tvdbid > .bar-danger").animate({ width: progressBarWidthNO }, 1000);
                \$("\#new_progressbar$curShow.tvdbid").append( "<div class='progressbarText'>$dlStat</div>" );
             });
@@ -414,7 +414,7 @@ $myShowList.sort(lambda x, y: cmp(x.name, y.name))
                \$("\#new_progressbar2$curShow.tvdbid > .bar-success").animate({ width: progressBarWidthDL }, 1000);
                 var progressBarWidthSN = "0%"
                \$("\#new_progressbar2$curShow.tvdbid > .bar-warning").animate({ width: progressBarWidthSN }, 1000);
-                var progressBarWidthNO = (parseInt($denfr) - parseInt($nomfr)) * 100 / parseInt($denfr) + "%"
+                var progressBarWidthNO = "0%"
                \$("\#new_progressbar2$curShow.tvdbid > .bar-danger").animate({ width: progressBarWidthNO }, 1000);
                \$("\#new_progressbar2$curShow.tvdbid").append( "<div class='progressbarText'>$frStat</div>" )
             });
