@@ -1967,14 +1967,14 @@ class TVEpisode(object):
             return
 
         related_files = postProcessor.PostProcessor(self.location)._list_associated_files(self.location)
-
+                   
         if self.show.subtitles and sickbeard.SUBTITLES_DIR != '':
             related_subs = postProcessor.PostProcessor(self.location)._list_associated_files(sickbeard.SUBTITLES_DIR, subtitles_only=True)
             absolute_proper_subs_path = ek.ek(os.path.join, sickbeard.SUBTITLES_DIR, self.formatted_filename())
             
         if self.show.subtitles and sickbeard.SUBTITLES_DIR_SUB:
-            related_subs = postProcessor.PostProcessor(self.location)._list_associated_files(os.path.dirname(self.location)+"\\Subs", subtitles_only=True)
-            absolute_proper_subs_path = ek.ek(os.path.join, os.path.dirname(self.location)+"\\Subs", self.formatted_filename())
+            related_subs = postProcessor.PostProcessor(self.location)._list_associated_files(os.path.join(os.path.dirname(self.location),"Subs"), subtitles_only=True)
+            absolute_proper_subs_path = ek.ek(os.path.join, os.path.join(os.path.dirname(self.location),"Subs"), self.formatted_filename())
             
         logger.log(u"Files associated to " + self.location + ": " + str(related_files), logger.DEBUG)
 
