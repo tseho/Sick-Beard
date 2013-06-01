@@ -72,8 +72,8 @@ class T411Provider(generic.TorrentProvider):
             #results.append( self.getSearchParams(showName + " S%02d" % season, show.audio_lang, 433 )) TOO MANY ERRORS
             #results.append( self.getSearchParams(showName + " S%02d" % season, show.audio_lang, 637 ))
             #results.append( self.getSearchParams(showName + " S%02d" % season, show.audio_lang, 634 ))
-            results.append( self.getSearchParams(showName + " saison %02d" % season, show.audio_lang, 433 ))
-            results.append( self.getSearchParams(showName + " saison %02d" % season, show.audio_lang, 637 ))
+            #results.append( self.getSearchParams(showName + " saison %02d" % season, show.audio_lang, 433 ))
+            #results.append( self.getSearchParams(showName + " saison %02d" % season, show.audio_lang, 637 ))
             results.append( self.getSearchParams(showName + " saison %02d" % season, show.audio_lang, 634 ))
         return results
 
