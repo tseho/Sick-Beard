@@ -17,7 +17,8 @@
 # along with Sick Beard.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
-
+import os
+import sickbeard
 from sickbeard import helpers
 from sickbeard import name_cache
 from sickbeard import logger
@@ -69,19 +70,22 @@ def retrieve_exceptions():
 
     # exceptions are stored on github pages
     url = 'http://midgetspy.github.com/sb_tvdb_scene_exceptions/exceptions.txt'
-
-    logger.log(u"Check scene exceptions update")
-    url_data = helpers.getURL(url)
-
-    if url_data is None:
+    excepfile= os.path.join(os.path.join(sickbeard.PROG_DIR,'Used_Files'),'exceptions.txt')
+    logger.log(u"Check scene exceptions file to update db")
+    f=open(excepfile,"r")
+    data = f.read()
+    if data is None:
         # When urlData is None, trouble connecting to github
-        logger.log(u"Check scene exceptions update failed. Unable to get URL: " + url, logger.ERROR)
+        logger.log(u"Check scene exceptions update failed. Unable to get file: " + excepfile, logger.ERROR)
         return
 
     else:
         # each exception is on one line with the format tvdb_id: 'show name 1', 'show name 2', etc
-        for cur_line in url_data.splitlines():
-            cur_line = cur_line.decode('utf-8')
+        for cur_line in data.splitlines():
+            try:
+                cur_line = cur_line.decode('utf-8')
+            except:
+                cur_line = cur_line.decode('latin-1')
             tvdb_id, sep, aliases = cur_line.partition(':') #@UnusedVariable
 
             if not aliases:
@@ -114,5 +118,7 @@ def retrieve_exceptions():
         if changed_exceptions:
             logger.log(u"Updated scene exceptions")
             name_cache.clearCache()
+            f.close()
         else:
             logger.log(u"No scene exceptions update needed")
+            f.close()
