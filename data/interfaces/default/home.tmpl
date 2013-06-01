@@ -377,7 +377,7 @@ $myShowList.sort(lambda x, y: cmp(x.name, y.name))
 #end if
     <td align="center"><span style="display: none;">$dlStat</span>
 
-        <div class="progress" id="new_progressbar$curShow.tvdbid" style="position:relative;">
+        <div class="progress ui-progressbar ui-widget-header" id="new_progressbar$curShow.tvdbid" style="position:relative;">
     		<div class="bar bar-success" ></div>
     		<div class="bar bar-warning" ></div>
     		<div class="bar bar-danger" ></div>
@@ -401,7 +401,7 @@ $myShowList.sort(lambda x, y: cmp(x.name, y.name))
     #if $sickbeard.FRENCH_COLUMN:
 	<td align="center"><span style="display: none;">$frStat</span>
       
-       <div class="progress" id="new_progressbar2$curShow.tvdbid" style="position:relative;">
+       <div class="progress ui-progressbar ui-widget-header" id="new_progressbar2$curShow.tvdbid" style="position:relative;">
             <div class="bar bar-success" ></div>
             <div class="bar bar-warning" ></div>
             <div class="bar bar-danger" ></div>
