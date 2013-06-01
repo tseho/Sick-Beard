@@ -38,7 +38,6 @@ class PodnapisiWeb(ServiceBase):
     user_agent = 'Subliminal/0.6'
     videos = [Episode, Movie]
     require_video = False
-    required_features = ['xml']
     languages = language_set(['Albanian', 'Arabic', 'Spanish (Argentina)', 'Belarusian', 'Bosnian', 'Portuguese (Brazil)', 'Bulgarian', 'Catalan',
                               'Chinese', 'Croatian', 'Czech', 'Danish', 'Dutch', 'English', 'Estonian', 'Persian',
                               'Finnish', 'French', 'German', 'gre', 'Kalaallisut', 'Hebrew', 'Hindi', 'Hungarian',
@@ -101,7 +100,7 @@ class PodnapisiWeb(ServiceBase):
             if 'n' in sub.flags:
                 logger.debug(u'Skipping hearing impaired')
                 continue
-            language = self.get_language(sub.languageId.text)
+            language = l
             confidence = float(sub.rating.text) / 5.0
             sub_keywords = set()
             for release in sub.release.text.split():
