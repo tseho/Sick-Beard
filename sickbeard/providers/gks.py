@@ -45,18 +45,24 @@ class GksProvider(generic.TorrentProvider):
     def imageName(self):
         return 'gks.png'
     
-    def getSearchParams(self, searchString, audio_lang):
+    def getSearchParams(self, searchString, audio_lang, season=None):
         results = []
-        if audio_lang == "en":
-            results.append( urllib.urlencode( {'q': searchString, 'category' : 22, 'ak' : sickbeard.GKS_KEY} ) + "&order=desc&sort=normal&exact" )
-            if sickbeard.USE_SUBTITLES :
-                results.append( urllib.urlencode( {'q': searchString, 'category' : 11, 'ak' : sickbeard.GKS_KEY} ) + "&order=desc&sort=normal&exact" )
-                results.append( urllib.urlencode( {'q': searchString, 'category' : 13, 'ak' : sickbeard.GKS_KEY} ) + "&order=desc&sort=normal&exact" )
-        elif audio_lang == "fr":
-            results.append( urllib.urlencode( {'q': searchString, 'category' : 12, 'ak' : sickbeard.GKS_KEY} ) + "&order=desc&sort=normal&exact" )
-            results.append( urllib.urlencode( {'q': searchString, 'category' : 14, 'ak' : sickbeard.GKS_KEY} ) + "&order=desc&sort=normal&exact" )
+        if season:
+            if audio_lang == "en":
+                results.append( urllib.urlencode( {'q': searchString, 'category' : 10, 'ak' : sickbeard.GKS_KEY} ) + "&order=desc&sort=normal&exact" )
+            else:
+                results.append( urllib.urlencode( {'q': searchString + ' french', 'category' : 10, 'ak' : sickbeard.GKS_KEY} ) + "&order=desc&sort=normal&exact" )
         else:
-            results.append( urllib.urlencode( {'q': searchString, 'ak' : sickbeard.GKS_KEY} ) + "&order=desc&sort=normal&exact" )
+            if audio_lang == "en":
+                results.append( urllib.urlencode( {'q': searchString, 'category' : 22, 'ak' : sickbeard.GKS_KEY} ) + "&order=desc&sort=normal&exact" )
+                if sickbeard.USE_SUBTITLES :
+                    results.append( urllib.urlencode( {'q': searchString, 'category' : 11, 'ak' : sickbeard.GKS_KEY} ) + "&order=desc&sort=normal&exact" )
+                    results.append( urllib.urlencode( {'q': searchString, 'category' : 13, 'ak' : sickbeard.GKS_KEY} ) + "&order=desc&sort=normal&exact" )
+            elif audio_lang == "fr":
+                results.append( urllib.urlencode( {'q': searchString, 'category' : 12, 'ak' : sickbeard.GKS_KEY} ) + "&order=desc&sort=normal&exact" )
+                results.append( urllib.urlencode( {'q': searchString, 'category' : 14, 'ak' : sickbeard.GKS_KEY} ) + "&order=desc&sort=normal&exact" )
+            else:
+                results.append( urllib.urlencode( {'q': searchString, 'ak' : sickbeard.GKS_KEY} ) + "&order=desc&sort=normal&exact" )
         return results
 
     def _get_season_search_strings(self, show, season):
@@ -64,9 +70,9 @@ class GksProvider(generic.TorrentProvider):
         showNames = show_name_helpers.allPossibleShowNames(show)
         results = []
         for showName in showNames:
-            for result in self.getSearchParams(showName + "+S%02d" % season, show.audio_lang) :
+            for result in self.getSearchParams(showName + "+S%02d" % season, show.audio_lang, season) :
                 results.append(result)
-            for result in self.getSearchParams(showName + "+saison+%02d" % season, show.audio_lang):
+            for result in self.getSearchParams(showName + "+saison+%02d" % season, show.audio_lang, season):
                 results.append(result)
         return results
 
