@@ -626,7 +626,7 @@ class Manage:
 
             exceptions_list = []
             
-            curErrors += Home().editShow(curShow, new_show_dir, anyQualities, bestQualities, exceptions_list, new_flatten_folders, new_paused, subtitles=new_subtitles, tvdbLang=new_lang, audio_lang=new_audio_lang, custom_search_names=showObj.custom_search_names, directCall=True)
+            curErrors += Home().editShow(curShow, new_show_dir, anyQualities, bestQualities, exceptions_list, new_flatten_folders, new_paused, subtitles=new_subtitles, tvdbLang=new_lang, audio_lang=new_audio_lang, directCall=True)
 
             if curErrors:
                 logger.log(u"Errors: "+str(curErrors), logger.ERROR)
@@ -2805,6 +2805,7 @@ class Home:
 
             if showObj == None:
                 return _genericMessage("Error", "Show not in show list")
+        showObj.exceptions = scene_exceptions.get_scene_exceptions(showObj.tvdbid)
 
         myDB = db.DBConnection()
 
@@ -2900,7 +2901,7 @@ class Home:
         return result['description'] if result else 'Episode not found.'
 
     @cherrypy.expose
-    def editShow(self, show=None, location=None, anyQualities=[], bestQualities=[], exceptions_list=[], flatten_folders=None, paused=None, directCall=False, air_by_date=None, tvdbLang=None, audio_lang=None, custom_search_names=None, subtitles=None):
+    def editShow(self, show=None, location=None, anyQualities=[], bestQualities=[], exceptions_list=[], flatten_folders=None, paused=None, directCall=False, air_by_date=None, tvdbLang=None, audio_lang=None, subtitles=None):
 
         if show == None:
             errString = "Invalid show ID: "+str(show)
@@ -2970,7 +2971,16 @@ class Home:
             bestQualities = [bestQualities]
             
         if type(exceptions_list) != list:
-            exceptions_list = [exceptions_list]            
+            exceptions_list = [exceptions_list]
+        
+        #If directCall from mass_edit_update no scene exceptions handling
+        if directCall:            
+            do_update_exceptions = False
+        else:
+            if set(exceptions_list) == set(showObj.exceptions):
+                do_update_exceptions = False
+            else:
+                do_update_exceptions = True           
 
         errors = []
         with showObj.lock:
@@ -2990,7 +3000,6 @@ class Home:
             showObj.subtitles = subtitles
             showObj.lang = tvdb_lang
             showObj.audio_lang = audio_lang
-            showObj.custom_search_names = custom_search_names
 
             # if we change location clear the db of episodes, change it, write to db, and rescan
             if os.path.normpath(showObj._location) != os.path.normpath(location):
@@ -3024,6 +3033,13 @@ class Home:
             except exceptions.CantUpdateException, e:
                 errors.append("Unable to force an update on the show.")
         
+        if do_update_exceptions:
+            try:
+                scene_exceptions.update_scene_exceptions(showObj.tvdbid, exceptions_list) #@UndefinedVariable
+                time.sleep(1)
+            except exceptions.CantUpdateException, e:
+                errors.append("Unable to force an update on scene exceptions of the show.")
+
         if directCall:
             return errors
 

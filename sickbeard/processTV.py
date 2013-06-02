@@ -109,20 +109,31 @@ def processDir (dirName, nzbName=None, recurse=False):
         
         myDB = db.DBConnection()
 
-        with open(cur_video_file_path, 'rb') as fh:
-            m = hashlib.md5()
-            while True:
-                data = fh.read(8192)
-                if not data:
-                    break
-                m.update(data)
-            MD5 = m.hexdigest()
+#        with open(cur_video_file_path, 'rb') as fh:
+#            m = hashlib.md5()
+#            while True:
+#                data = fh.read(8192)
+#                if not data:
+#                    break
+#                m.update(data)
+#            MD5 = m.hexdigest()
+        m = hashlib.md5()
+        m.update(cur_video_file_path)
+        MD5 = m.hexdigest()
 
         logger.log("MD5 search : " + MD5, logger.DEBUG)
 
         sqlResults = myDB.select("select * from processed_files where md5 = \"" + MD5 + "\"")
 
         process_file = True
+
+        ##
+        #    IF file is already a simlinks process = false
+        ##
+        if os.path.realpath(cur_video_file_path) != cur_video_file_path:
+            logger.log("File " + cur_video_file_path + " is a symlink ")
+            process_file = False
+
 
         for sqlProcess in sqlResults:
             if sqlProcess["md5"] == MD5:

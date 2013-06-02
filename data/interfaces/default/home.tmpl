@@ -28,7 +28,7 @@
 	#set $showObj = helpers.findCertainShow(sickbeard.showList, show[0])
 	#if $showObj:
 		#if sickbeard.showQueueScheduler.action.isInUpdateQueue($showObj):
-			#set $show_message = 'Objects are being refreshed. When finished, all images and imdb infos will be available. '
+			#set $show_message = 'Objects are being refreshed.'
 			#break
 		#end if
 	#end if
@@ -388,6 +388,22 @@ $myShowList.sort(lambda x, y: cmp(x.name, y.name))
     		<div class="bar bar-danger" ></div>
     	</div>
     	
+    	<div id="tipnew_progressbar$curShow.tvdbid" style="display:none">
+    		<div style="width:100px;">
+	    		<table style="font-size:10px;">
+		    		<tr>
+		    			<td>Downloaded</td><td> : $nom</td>
+		    		</tr>
+		    		<tr>
+		    			<td>Snatched</td><td> : $nomSna</td>
+		    		</tr>
+		    		<tr>
+		    			<td>Total</td><td> : $den</td>
+		    		</tr>
+				</table>
+    		</div>
+    	</div>
+    	
     	<script type="text/javascript">
         <!--
             \$(function() {
@@ -398,6 +414,32 @@ $myShowList.sort(lambda x, y: cmp(x.name, y.name))
                 var progressBarWidthNO = "0%"
                \$("\#new_progressbar$curShow.tvdbid > .bar-danger").animate({ width: progressBarWidthNO }, 1000);
                \$("\#new_progressbar$curShow.tvdbid").append( "<div class='progressbarText'>$dlStat</div>" );
+               
+                if (progressBarWidthDL != "0%"  && progressBarWidthSN != "0%") {
+                	\$("\#new_progressbar$curShow.tvdbid > .bar-warning").css("-moz-border-radius" , "0px 10px 10px 0px");
+                	\$("\#new_progressbar$curShow.tvdbid > .bar-warning").css("-webkit-border-radius","0px 10px 10px 0px");
+                	\$("\#new_progressbar$curShow.tvdbid > .bar-warning").css("border-radius","0px 10px 10px 0px");
+                	\$("\#new_progressbar$curShow.tvdbid > .bar-success").css("-moz-border-radius" , "10px 0px 0px 10px");
+                	\$("\#new_progressbar$curShow.tvdbid > .bar-success").css("-webkit-border-radius","10px 0px 0px 10px");
+                	\$("\#new_progressbar$curShow.tvdbid > .bar-success").css("border-radius","10px 0px 0px 10px");
+                }
+               
+               
+               \$("\#new_progressbar$curShow.tvdbid").qtip({
+               		content : \$("\#tipnew_progressbar$curShow.tvdbid").html(),
+               		position : {
+               			at : "top center",
+               			my : "bottom center"
+               		},
+               		style : {
+               			classes : 'ui-tooltip-jtools',
+               			tip : {
+               				corner : false,
+               				width : 24
+               			}
+               		}
+               	});
+               		
             });
         //-->
         </script>
@@ -411,17 +453,56 @@ $myShowList.sort(lambda x, y: cmp(x.name, y.name))
             <div class="bar bar-warning" ></div>
             <div class="bar bar-danger" ></div>
         </div>
-        
+        <div id="tipnew_progressbar2$curShow.tvdbid" style="display:none">
+    		<div style="width:115px;">
+	    		<table style="font-size:10px;">
+		    		<tr>
+		    			<td>Audio FR</td><td> : $nomfr</td>
+		    		</tr>
+		    		<tr>
+		    			<td>Only Sub FR</td><td> : $nomSub</td>
+		    		</tr>
+		    		<tr>
+		    			<td>Total Downloaded</td><td> : $denfr</td>
+		    		</tr>
+				</table>
+    		</div>
+    	</div>
         <script type="text/javascript">
         <!--
             \$(function() {
                 var progressBarWidthDL = parseInt($nomfr) * 100 / parseInt($denfr) + "%"
                \$("\#new_progressbar2$curShow.tvdbid > .bar-success").animate({ width: progressBarWidthDL }, 1000);
                 var progressBarWidthSub = (parseInt($nomSub) * 100) / parseInt($den) + "%"
+                
                \$("\#new_progressbar2$curShow.tvdbid > .bar-warning").animate({ width: progressBarWidthSub }, 1000);
                 var progressBarWidthNO = "0%"
                \$("\#new_progressbar2$curShow.tvdbid > .bar-danger").animate({ width: progressBarWidthNO }, 1000);
-               \$("\#new_progressbar2$curShow.tvdbid").append( "<div class='progressbarText'>$frStat</div>" )
+               \$("\#new_progressbar2$curShow.tvdbid").append( "<div class='progressbarText'>$frStat</div>" );
+               
+               if (progressBarWidthDL != "0%"  && progressBarWidthSub != "0%") {
+                	\$("\#new_progressbar2$curShow.tvdbid > .bar-warning").css("-moz-border-radius" , "0px 10px 10px 0px");
+                	\$("\#new_progressbar2$curShow.tvdbid > .bar-warning").css("-webkit-border-radius","0px 10px 10px 0px");
+                	\$("\#new_progressbar2$curShow.tvdbid > .bar-warning").css("border-radius","0px 10px 10px 0px");
+                	\$("\#new_progressbar2$curShow.tvdbid > .bar-success").css("-moz-border-radius" , "10px 0px 0px 10px");
+                	\$("\#new_progressbar2$curShow.tvdbid > .bar-success").css("-webkit-border-radius","10px 0px 0px 10px");
+                	\$("\#new_progressbar2$curShow.tvdbid > .bar-success").css("border-radius","10px 0px 0px 10px");
+                }
+               
+               \$("\#new_progressbar2$curShow.tvdbid").qtip({
+               		content : \$("\#tipnew_progressbar2$curShow.tvdbid").html(),
+               		position : {
+               			at : "top center",
+               			my : "bottom center"
+               		},
+               		style : {
+               			classes : 'ui-tooltip-jtools',
+               			tip : {
+               				corner : false,
+               				width : 24
+               			}
+               		}
+               	});
             });
         //-->
         </script>

@@ -56,7 +56,9 @@
 
 
 <form action="editShow" method="post">
+<a href="$sbRoot/home/displayShow?show=$show.tvdbid">
 <img src="$sbRoot/showPoster/?show=$show.tvdbid&amp;which=banner" class="imgHomeWrapperbig imgHomeWrapperRoundedbig bannerbig" alt="$show.name" title="$show.name"/>
+</a>
 <br />
 <br />
 <br />
@@ -90,8 +92,33 @@ selected
 </select>
 <br />
 <br />
-<b>Custom Search Names:</b> <input type="text" name="custom_search_names" id="custom_search_names" value="$show.custom_search_names" size="50" /><br />
-<strong>Note:</strong>Define some custom names if show can't be found. Comma separated by ",".<br/> Keep empty to use default show name (based on metadata language)<br />
+<b>Custom Names:</b>
+<input type="text" id="SceneName"> 
+<input class="btn" type="button" value="Add" id="addSceneName"><br />
+
+<div id="SceneException" >
+
+	<div class="component-group-desc" style="width:75%; float:right;" >
+		<p>This will <b>affect the episode show search/post processing</b> on nzb and torrent provider.<br />
+		This list overrides the original name, it doesn't append to it. So if you add an exception always add the show name as it is showed on
+		 sickbeard. Automatic update is handled so existing and needed names may reappear if you delete them. But you can add/remove your own names<br />
+		</p>
+	</div>		
+	
+	<div class="float-left" style="padding-bottom: 40px; text-align:center;">
+		<h4>Exceptions List</h4>
+		<select id="exceptions_list" name="exceptions_list" multiple="multiple" style="min-width:10em;" >
+				#for $cur_exception in $show.exceptions:
+					<option value="$cur_exception">$cur_exception</option>
+				#end for
+		</select>
+	<div>	
+		<input id="removeSceneName" value="Remove" class="btn float-left" type="button" style="margin-top: 10px;"/>
+	</div>	
+<br />
+</div>	
+</div>
+<br />
 <br />
 </table>
 <td style="float: right;">
