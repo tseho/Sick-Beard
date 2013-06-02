@@ -390,9 +390,9 @@ $myShowList.sort(lambda x, y: cmp(x.name, y.name))
     	
     	<div id="tipnew_progressbar$curShow.tvdbid" style="display:none">
     		<div style="width:250px;">
-	    		<h1><center>$curShow.name</center></h1>
-	    		<hr /><br />
-	    		<table style="font-size:14px;">
+	    		<h1 style="font-size:14px;"><b><center>$curShow.name</center></b></h1>
+	    		<hr />
+	    		<table style="font-size:12px;">
 		    		<tr>
 		    			<td>Downloaded</td><td> : $nom</td>
 		    		</tr>
@@ -423,7 +423,7 @@ $myShowList.sort(lambda x, y: cmp(x.name, y.name))
                			my : "bottom center"
                		},
                		style : {
-               			classes : "ui-tooltip-dark",
+               			
                			tip : {
                				corner : true,
                				width : 24
