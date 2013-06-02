@@ -25,6 +25,7 @@ import re
 import glob
 import traceback
 import hashlib
+from sickbeard import common
 
 import sickbeard
 
@@ -81,7 +82,6 @@ class TVShow(object):
         self.subtitles = int(sickbeard.SUBTITLES_DEFAULT if sickbeard.SUBTITLES_DEFAULT else 0)
         self.lang = lang
         self.audio_lang = audio_lang
-        self.custom_search_names = ""
 
         self.lock = threading.Lock()
         self._isDirGood = False
@@ -644,9 +644,6 @@ class TVShow(object):
             if self.audio_lang == "":
                 self.audio_lang = sqlResults[0]["audio_lang"]                
 
-            if self.custom_search_names == "":
-                self.custom_search_names = sqlResults[0]["custom_search_names"]                
-            
             if self.imdbid == "":
                 self.imdbid = sqlResults[0]["imdb_id"]                    
 
@@ -962,8 +959,7 @@ class TVShow(object):
                         "tvr_name": self.tvrname,
                         "lang": self.lang,
                         "imdb_id": self.imdbid,
-                        "audio_lang": self.audio_lang,
-                        "custom_search_names": self.custom_search_names
+                        "audio_lang": self.audio_lang
                         }
 
         myDB.upsert("tv_shows", newValueDict, controlValueDict)
@@ -1969,11 +1965,11 @@ class TVEpisode(object):
         related_files = postProcessor.PostProcessor(self.location)._list_associated_files(self.location)
                    
         if self.show.subtitles and sickbeard.SUBTITLES_DIR != '':
-            related_subs = postProcessor.PostProcessor(self.location)._list_associated_files(sickbeard.SUBTITLES_DIR, subtitles_only=True)
+            related_subs = postProcessor.PostProcessor(self.location)._list_associated_files(sickbeard.SUBTITLES_DIR, subtitles_only=self.location)
             absolute_proper_subs_path = ek.ek(os.path.join, sickbeard.SUBTITLES_DIR, self.formatted_filename())
             
         if self.show.subtitles and sickbeard.SUBTITLES_DIR_SUB:
-            related_subs = postProcessor.PostProcessor(self.location)._list_associated_files(os.path.join(os.path.dirname(self.location),"Subs"), subtitles_only=True)
+            related_subs = postProcessor.PostProcessor(self.location)._list_associated_files(os.path.join(os.path.dirname(self.location),"Subs"), subtitles_only=self.location)
             absolute_proper_subs_path = ek.ek(os.path.join, os.path.join(os.path.dirname(self.location),"Subs"), self.formatted_filename())
             
         logger.log(u"Files associated to " + self.location + ": " + str(related_files), logger.DEBUG)

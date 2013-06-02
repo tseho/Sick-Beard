@@ -251,5 +251,6 @@
 72449: 'Stargate SG1',
 264030: 'Avengers Assemble',
 269552: 'Harry (2013)',
-71663: 'Les Simpson','The Simpsons','Les Simpsons','Simpsons, The',
+71663: 'Les Simpson','The Simpsons','Les Simpsons'
 121361: 'Le trône de fer','Game of thrones',
+73141: 'American Dad',
