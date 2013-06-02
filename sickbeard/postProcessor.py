@@ -940,14 +940,17 @@ class PostProcessor(object):
             new_base_name = None
             new_file_name = self.file_name
 
-        with open(self.file_path, 'rb') as fh:
-            m = hashlib.md5()
-            while True:
-                data = fh.read(8192)
-                if not data:
-                    break
-                m.update(data)
-            MD5 = m.hexdigest()
+#        with open(self.file_path, 'rb') as fh:
+#            m = hashlib.md5()
+#            while True:
+#                data = fh.read(8192)
+#                if not data:
+#                    break
+#                m.update(data)
+#            MD5 = m.hexdigest()
+        m = hashlib.md5()
+        m.update(self.file_path)
+        MD5 = m.hexdigest()
        
         try:
             
