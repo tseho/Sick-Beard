@@ -254,10 +254,6 @@ def allPossibleShowNames(show):
     if show.tvrname != "" and show.tvrname != None:
         showNames.append(show.tvrname)
 
-    if show.custom_search_names != "" and show.custom_search_names != None :
-        for custom_name in show.custom_search_names.split(','):
-            showNames.append(custom_name)
-
     newShowNames = []
 
     country_list = countryList

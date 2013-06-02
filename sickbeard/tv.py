@@ -82,7 +82,6 @@ class TVShow(object):
         self.subtitles = int(sickbeard.SUBTITLES_DEFAULT if sickbeard.SUBTITLES_DEFAULT else 0)
         self.lang = lang
         self.audio_lang = audio_lang
-        self.custom_search_names = ""
 
         self.lock = threading.Lock()
         self._isDirGood = False
@@ -645,9 +644,6 @@ class TVShow(object):
             if self.audio_lang == "":
                 self.audio_lang = sqlResults[0]["audio_lang"]                
 
-            if self.custom_search_names == "":
-                self.custom_search_names = sqlResults[0]["custom_search_names"]                
-            
             if self.imdbid == "":
                 self.imdbid = sqlResults[0]["imdb_id"]                    
 
@@ -963,8 +959,7 @@ class TVShow(object):
                         "tvr_name": self.tvrname,
                         "lang": self.lang,
                         "imdb_id": self.imdbid,
-                        "audio_lang": self.audio_lang,
-                        "custom_search_names": self.custom_search_names
+                        "audio_lang": self.audio_lang
                         }
 
         myDB.upsert("tv_shows", newValueDict, controlValueDict)
