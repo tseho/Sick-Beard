@@ -7,6 +7,7 @@
 #from sickbeard import common
 #import os.path, os
 #import datetime
+#set $exceptions_string = "|".join($show.exceptions)
 #set global $title=$show.name
 #set $myDB = $db.DBConnection()
 #set $today = str($datetime.date.today().toordinal())
@@ -195,7 +196,7 @@
 
 	<tr><td class="showLegend">Info Language:</td><td><img src="$sbRoot/images/flags/${show.lang}.png" width="16" height="11" alt="$show.lang" title="$show.lang" /></td></tr>
     <tr><td class="showLegend">Audio Language:</td><td><img src="$sbRoot/images/flags/${show.audio_lang}.png" width="16" height="11" alt="$show.audio_lang" title="$show.lang" /></td></tr>
-	<tr><td class="showLegend">Custom Names :</td><td>$show.custom_search_names</td></tr>
+	<tr><td class="showLegend">Custom Names :</td><td>#if $show.exceptions then $exceptions_string else $show.name#</td></tr>
 	#if $show.imdbid:
 	#if $show.imdb_info['rating'] !='':
 	<tr><td class="showLegend">Rating :</td><td>$show.imdb_info['rating']</td></tr>
