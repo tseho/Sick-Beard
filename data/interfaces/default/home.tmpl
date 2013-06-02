@@ -442,7 +442,21 @@ $myShowList.sort(lambda x, y: cmp(x.name, y.name))
             <div class="bar bar-warning" ></div>
             <div class="bar bar-danger" ></div>
         </div>
-        
+        <div id="tipnew_progressbar2$curShow.tvdbid" style="display:none">
+    		<div style="width:90px;">
+	    		<table style="font-size:9px;">
+		    		<tr>
+		    			<td>Audio FR</td><td> : $nomfr</td>
+		    		</tr>
+		    		<tr>
+		    			<td>Only Sub FR</td><td> : $nomSub</td>
+		    		</tr>
+		    		<tr>
+		    			<td>Total</td><td> : $denfr</td>
+		    		</tr>
+				</table>
+    		</div>
+    	</div>
         <script type="text/javascript">
         <!--
             \$(function() {
@@ -452,7 +466,21 @@ $myShowList.sort(lambda x, y: cmp(x.name, y.name))
                \$("\#new_progressbar2$curShow.tvdbid > .bar-warning").animate({ width: progressBarWidthSub }, 1000);
                 var progressBarWidthNO = "0%"
                \$("\#new_progressbar2$curShow.tvdbid > .bar-danger").animate({ width: progressBarWidthNO }, 1000);
-               \$("\#new_progressbar2$curShow.tvdbid").append( "<div class='progressbarText'>$frStat</div>" )
+               \$("\#new_progressbar2$curShow.tvdbid").append( "<div class='progressbarText'>$frStat</div>" );
+               \$("\#new_progressbar2$curShow.tvdbid").qtip({
+               		content : \$("\#tipnew_progressbar2$curShow.tvdbid").html(),
+               		position : {
+               			at : "top center",
+               			my : "bottom center"
+               		},
+               		style : {
+               			
+               			tip : {
+               				corner : true,
+               				width : 24
+               			}
+               		}
+               	});
             });
         //-->
         </script>
