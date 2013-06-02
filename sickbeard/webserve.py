@@ -2805,6 +2805,7 @@ class Home:
 
             if showObj == None:
                 return _genericMessage("Error", "Show not in show list")
+        showObj.exceptions = scene_exceptions.get_scene_exceptions(showObj.tvdbid)
 
         myDB = db.DBConnection()
 

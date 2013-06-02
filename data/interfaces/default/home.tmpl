@@ -28,7 +28,7 @@
 	#set $showObj = helpers.findCertainShow(sickbeard.showList, show[0])
 	#if $showObj:
 		#if sickbeard.showQueueScheduler.action.isInUpdateQueue($showObj):
-			#set $show_message = 'Objects are being refreshed. When finished, all images and imdb infos will be available. '
+			#set $show_message = 'Objects are being refreshed.'
 			#break
 		#end if
 	#end if
