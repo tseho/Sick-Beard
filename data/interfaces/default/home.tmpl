@@ -388,6 +388,24 @@ $myShowList.sort(lambda x, y: cmp(x.name, y.name))
     		<div class="bar bar-danger" ></div>
     	</div>
     	
+    	<div id="tipnew_progressbar$curShow.tvdbid" style="display:none">
+    		<div style="width:250px;">
+	    		<h1><center>$curShow.name</center></h1>
+	    		<hr /><br />
+	    		<table style="font-size:14px;">
+		    		<tr>
+		    			<td>Downloaded</td><td> : $nom</td>
+		    		</tr>
+		    		<tr>
+		    			<td>Snatched</td><td> : $nomSna</td>
+		    		</tr>
+		    		<tr>
+		    			<td>Total</td><td> : $den</td>
+		    		</tr>
+				</table>
+    		</div>
+    	</div>
+    	
     	<script type="text/javascript">
         <!--
             \$(function() {
@@ -398,6 +416,21 @@ $myShowList.sort(lambda x, y: cmp(x.name, y.name))
                 var progressBarWidthNO = "0%"
                \$("\#new_progressbar$curShow.tvdbid > .bar-danger").animate({ width: progressBarWidthNO }, 1000);
                \$("\#new_progressbar$curShow.tvdbid").append( "<div class='progressbarText'>$dlStat</div>" );
+               \$("\#new_progressbar$curShow.tvdbid").qtip({
+               		content : \$("\#tipnew_progressbar$curShow.tvdbid").html(),
+               		position : {
+               			at : "top center",
+               			my : "bottom center"
+               		},
+               		style : {
+               			classes : "ui-tooltip-dark",
+               			tip : {
+               				corner : true,
+               				width : 24
+               			}
+               		}
+               	});
+               		
             });
         //-->
         </script>
