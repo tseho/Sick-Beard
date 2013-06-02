@@ -130,7 +130,6 @@ def processDir (dirName, nzbName=None, recurse=False):
         ##
         #    IF file is already a simlinks process = false
         ##
-        logger.log("File " + cur_video_file_path + " sym : " + os.path.realpath(cur_video_file_path))
         if os.path.realpath(cur_video_file_path) != cur_video_file_path:
             logger.log("File " + cur_video_file_path + " is a symlink ")
             process_file = False
