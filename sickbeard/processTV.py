@@ -127,6 +127,15 @@ def processDir (dirName, nzbName=None, recurse=False):
 
         process_file = True
 
+        ##
+        #    IF file is already a simlinks process = false
+        ##
+        logger.log("File " + cur_video_file_path + " sym : " + os.path.realpath(cur_video_file_path))
+        if os.path.realpath(cur_video_file_path) != cur_video_file_path:
+            logger.log("File " + cur_video_file_path + " is a symlink ")
+            process_file = False
+
+
         for sqlProcess in sqlResults:
             if sqlProcess["md5"] == MD5:
                 logger.log("File " + cur_video_file_path + " already processed for ")
