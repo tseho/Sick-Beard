@@ -163,47 +163,47 @@
 	        #end if
 	        headers: {
 	            0: {filter : false ,sorter: 'isoDate' },
-	         #if $sickbeard.FRENCH_COLUMN:
-		         #if ($layout == 'poster'):
-		            1: {filter : false ,sorter: 'loadingNames'},
-		            2: {sorter: 'loadingNames'},
-		            3: { filter: false},
-		            4: { filter : false ,sorter: 'quality' },
-		            5: { filter : false ,sorter: 'eps' },
-		            6: { filter : false ,sorter: 'eps' },
-		            7: { filter: false},
-		            8: { filter: false},
-		            9: { filter: false},
-		         #else:
-		            1: {sorter: 'loadingNames'},
-		            2: { filter: false},
-		            3: { filter : false ,sorter: 'quality' },
-		            4: { filter : false ,sorter: 'eps' },
-		            5: { filter : false ,sorter: 'eps' },
-		            6: { filter: false},
-		            7: { filter: false},
-		            8: { filter: false},
-		          #end if
-		      #else:
-			      #if ($layout == 'poster'):
-			            1: {filter : false ,sorter: 'loadingNames'},
-			            2: {sorter: 'loadingNames'},
-			            3: { filter: false},
-			            4: { filter : false ,sorter: 'quality' },
-			            5: { filter : false ,sorter: 'eps' },
-			            6: { filter: false},
-			            7: { filter: false},
-			            8: { filter: false},
-			         #else:
-			            1: {sorter: 'loadingNames'},
-			            2: { filter: false},
-			            3: { filter : false ,sorter: 'quality' },
-			            4: { filter : false ,sorter: 'eps' },
-			            5: { filter: false},
-			            6: { filter: false},
-			            7: { filter: false},
-			          #end if
-		       #end if
+			#if $sickbeard.FRENCH_COLUMN:
+				#if ($layout == 'poster'):
+				    1: {filter : false ,sorter: 'loadingNames'},
+				    2: {sorter: 'loadingNames'},
+				    3: { filter: false},
+				    4: { filter : false ,sorter: 'quality' },
+				    5: { filter : false ,sorter: 'eps' },
+				    6: { filter : false ,sorter: 'eps' },
+				    7: { filter: false},
+				    8: { filter: false},
+				    9: { filter: false},
+				#else:
+				    1: {sorter: 'loadingNames'},
+				    2: { filter: false},
+				    3: { filter : false ,sorter: 'quality' },
+				    4: { filter : false ,sorter: 'eps' },
+				    5: { filter : false ,sorter: 'eps' },
+				    6: { filter: false},
+				    7: { filter: false},
+				    8: { filter: false},
+				 #end if
+			#else:
+				#if ($layout == 'poster'):
+				    1: {filter : false ,sorter: 'loadingNames'},
+				    2: {sorter: 'loadingNames'},
+				    3: { filter: false},
+				    4: { filter : false ,sorter: 'quality' },
+				    5: { filter : false ,sorter: 'eps' },
+				    6: { filter: false},
+				    7: { filter: false},
+				    8: { filter: false},
+				 #else:
+				    1: {sorter: 'loadingNames'},
+				    2: { filter: false},
+				    3: { filter : false ,sorter: 'quality' },
+				    4: { filter : false ,sorter: 'eps' },
+				    5: { filter: false},
+				    6: { filter: false},
+				    7: { filter: false},
+				  #end if
+			#end if
 		      
 	        }
     });
@@ -356,7 +356,8 @@ $myShowList.sort(lambda x, y: cmp(x.name, y.name))
 	    	<span style="display: none;">$curShow.name</span>
 	    	<div class="imgHomeWrapper imgHomeWrapperRounded $layout">
 	    		<a href="$sbRoot/home/displayShow?show=$curShow.tvdbid">
-	    		<img src="$sbRoot/showPoster/?show=$curShow.tvdbid&amp;which=$layout" class="$layout" alt="$curShow.name" title="$curShow.name"/>
+	    			<img src="$sbRoot/showPoster/?show=$curShow.tvdbid&amp;which=$layout" class="$layout" alt="$curShow.name" title="$curShow.name"/>
+	    		</a>
 	    	</div>
 	    </td>
 	#else if $layout == 'simple':
@@ -389,18 +390,18 @@ $myShowList.sort(lambda x, y: cmp(x.name, y.name))
     	</div>
     	
     	<div id="tipnew_progressbar$curShow.tvdbid" style="display:none">
-    		<div style="width:100px;">
-	    		<table style="font-size:10px;">
-		    		<tr>
-		    			<td>Downloaded</td><td> : $nom</td>
-		    		</tr>
-		    		<tr>
-		    			<td>Snatched</td><td> : $nomSna</td>
-		    		</tr>
-		    		<tr>
-		    			<td>Total</td><td> : $den</td>
-		    		</tr>
-				</table>
+    		<div style="width:115px;">
+	    		<div style="font-size:10px;">
+		    		<div>
+		    			<span>Downloaded</span><span style="float:right;"> $nom</span>
+		    		</div>
+		    		<div>
+		    			<span>Snatched</span><span style="float:right;"> $nomSna</span>
+		    		</div>
+		    		<div>
+		    			<span>Total</span><span style="float:right;"> $den</span>
+		    		</div>
+				</div>
     		</div>
     	</div>
     	
@@ -454,20 +455,21 @@ $myShowList.sort(lambda x, y: cmp(x.name, y.name))
             <div class="bar bar-danger" ></div>
         </div>
         <div id="tipnew_progressbar2$curShow.tvdbid" style="display:none">
-    		<div style="width:100px;">
-	    		<table style="font-size:10px;">
-		    		<tr>
-		    			<td>Audio FR</td><td> : $nomfr</td>
-		    		</tr>
-		    		<tr>
-		    			<td>Only Sub FR</td><td> : $nomSub</td>
-		    		</tr>
-		    		<tr>
-		    			<td>Total</td><td> : $denfr</td>
-		    		</tr>
-				</table>
+    		<div style="width:115px;">
+	    		<div style="font-size:10px;">
+		    		<div>
+		    			<span>Audio FR</span><span style="float:right;"> $nomfr</span>
+		    		</div>
+		    		<div>
+		    			<span>Only Sub FR</span><span style="float:right;"> $nomSub</span>
+		    		</div>
+		    		<div>
+		    			<span>Total Downloaded</span><span style="float:right;"> $denfr</span>
+		    		</div>
+				</div>
     		</div>
     	</div>
+    	
         <script type="text/javascript">
         <!--
             \$(function() {
@@ -506,9 +508,10 @@ $myShowList.sort(lambda x, y: cmp(x.name, y.name))
             });
         //-->
         </script>
+    </td>
     #end if
         
-    </td>
+    
     <td align="center"><img src="$sbRoot/images/#if int($curShow.paused) == 0 and $curShow.status != "Ended" then "yes16.png\" alt=\"Y\"" else "no16.png\" alt=\"N\""# width="16" height="16" /></td>
     <td align="center">        
             <img src="$sbRoot/images/flags/${curShow.audio_lang}.png" alt="$curShow.audio_lang" width="16" />
