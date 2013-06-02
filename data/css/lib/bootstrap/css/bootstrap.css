@@ -158,6 +158,9 @@
   background-image: linear-gradient(#bbea6b, #90CC2A) !important;
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffbbea6b', endColorstr='#90CC2A', GradientType=0);
+	-webkit-border-radius: 10px 10px 10px 10px;
+	 -moz-border-radius: 10px 10px 10px 10px;
+	      border-radius: 10px 10px 10px 10px;
 }
 
 .progress-success.progress-striped .bar,
@@ -202,6 +205,9 @@
   background-image: linear-gradient(to bottom, #e8b46a, #f89406);
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffe8b46a', endColorstr='#fff89406', GradientType=0);
+  	-webkit-border-radius: 10px 10px 10px 10px;
+	 -moz-border-radius: 10px 10px 10px 10px;
+	      border-radius: 10px 10px 10px 10px;
 }
 
 .progress-warning.progress-striped .bar,
