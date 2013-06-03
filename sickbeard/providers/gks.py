@@ -48,10 +48,7 @@ class GksProvider(generic.TorrentProvider):
     def getSearchParams(self, searchString, audio_lang, season=None):
         results = []
         if season:
-            if audio_lang == "en":
-                results.append( urllib.urlencode( {'q': searchString, 'category' : 10, 'ak' : sickbeard.GKS_KEY} ) + "&order=desc&sort=normal&exact" )
-            else:
-                results.append( urllib.urlencode( {'q': searchString + ' french', 'category' : 10, 'ak' : sickbeard.GKS_KEY} ) + "&order=desc&sort=normal&exact" )
+            results.append( urllib.urlencode( {'q': searchString, 'category' : 10, 'ak' : sickbeard.GKS_KEY} ) + "&order=desc&sort=normal&exact" )
         else:
             if audio_lang == "en":
                 results.append( urllib.urlencode( {'q': searchString, 'category' : 22, 'ak' : sickbeard.GKS_KEY} ) + "&order=desc&sort=normal&exact" )
@@ -113,9 +110,26 @@ class GksProvider(generic.TorrentProvider):
                 if "aucun resultat" in title.lower() :
                     logger.log(u"No results found in " + searchUrl, logger.DEBUG)
                     return []
+                count=1
+                if season:
+                    count=0
+                    if show:
+                        if show.audio_lang=='fr':
+                            for frword in['french', 'truefrench', 'multi']:
+                                if frword in title.lower():
+                                    count+=1
+                        else:
+                            count +=1
+                    else:
+                        count +=1
+                if count==0:
+                    continue                                
                 else :
                     downloadURL = helpers.get_xml_text(item.getElementsByTagName('link')[0])
                     quality = Quality.nameQuality(title)
+                    if quality==Quality.UNKNOWN and title:
+                        if '720p' not in title.lower() and '1080p' not in title.lower():
+                            quality=Quality.SDTV
                     if show:
                         results.append( GksSearchResult( self.opener, title, downloadURL, quality, str(show.audio_lang) ) )
                     else:
