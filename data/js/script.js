@@ -5,20 +5,24 @@ function initHeader() {
 	
 	 var topDistance = $(header).offset().top;
 	
+	var fadeSpeed = 100, fadeTo = 1;
+	var topbarME = function() { $(header).fadeTo(fadeSpeed,1); }, topbarML = function() { $(header).fadeTo(fadeSpeed,fadeTo); };
+	var inside = false;
+	 
 	//do
 	$(window).scroll(function() {
 		position = $(window).scrollTop();
 		if(position > topDistance && !inside) {
 			//add events
-			//topbarML();
-			//$(header).bind('mouseenter',topbarME);
-			//$(header).bind('mouseleave',topbarML);
+			topbarML();
+			$(header).bind('mouseenter',topbarME);
+			$(header).bind('mouseleave',topbarML);
 			inside = true;
 		}
 		else if (position < topDistance){
 			//topbarME();
-			//$(header).unbind('mouseenter',topbarME);
-			//$(header).unbind('mouseleave',topbarML);
+			$(header).unbind('mouseenter',topbarME);
+			$(header).unbind('mouseleave',topbarML);
 			inside = false;
 		}
 	});
