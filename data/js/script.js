@@ -2,6 +2,13 @@ function initHeader() {
 	//settings
 	var header = $("#header");
 	var inside = false;
+	
+	var topDistance = $(header).offset().top;
+	
+	var fadeSpeed = 100, fadeTo = 1;
+	var topbarME = function() { $(header).fadeTo(fadeSpeed,1); }, topbarML = function() { $(header).fadeTo(fadeSpeed,fadeTo); };
+	var inside = false;
+	 
 	//do
 	$(window).scroll(function() {
 		position = $(window).scrollTop();
