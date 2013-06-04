@@ -2,20 +2,23 @@ function initHeader() {
 	//settings
 	var header = $("#header");
 	var inside = false;
+	
+	 var topDistance = $(header).offset().top;
+	
 	//do
 	$(window).scroll(function() {
 		position = $(window).scrollTop();
 		if(position > topDistance && !inside) {
 			//add events
-			topbarML();
-			$(header).bind('mouseenter',topbarME);
-			$(header).bind('mouseleave',topbarML);
+			//topbarML();
+			//$(header).bind('mouseenter',topbarME);
+			//$(header).bind('mouseleave',topbarML);
 			inside = true;
 		}
 		else if (position < topDistance){
-			topbarME();
-			$(header).unbind('mouseenter',topbarME);
-			$(header).unbind('mouseleave',topbarML);
+			//topbarME();
+			//$(header).unbind('mouseenter',topbarME);
+			//$(header).unbind('mouseleave',topbarML);
 			inside = false;
 		}
 	});
