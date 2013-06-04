@@ -21,6 +21,17 @@ from sickbeard.common import showLanguages
 
 ep_regexes = [
                                    
+              ('season only_year',
+               # Show.Name.2010.S01.Source.Quality.Etc-Group
+                '''
+               ^((?P<series_name>.+?)[. _-]+)?             # Show_Name and separator
+                (?P<air_year>\d{4})[. _-]+                  # 2010 and separator
+               s((ea|ai)son[. _-])?                        # S01/Season 01
+               (?P<season_num>\d+)[. _-]*                  # S01 and optional separator
+               [. _-]*((?P<extra_info>.+?)                 # Source_Quality_Etc-
+               ((?<![. _-])(?<!WEB)                        # Make sure this is really the release group
+               -(?P<release_group>[^- ]+))?)?$              # Group
+               '''),
               ('standard_repeat',
                # Show.Name.S01E02.S01E03.Source.Quality.Etc-Group
                # Show Name - S01E02 - S01E03 - S01E04 - Ep Name
@@ -164,6 +175,7 @@ ep_regexes = [
                (?P<extra_info>.+)$                         # Source_Quality_Etc-
                '''),
               
+                            
               ('season_only',
                # Show.Name.S01.Source.Quality.Etc-Group
                '''
