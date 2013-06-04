@@ -3,7 +3,7 @@ function initHeader() {
 	var header = $("#header");
 	var inside = false;
 	
-	 var topDistance = $(header).offset().top;
+	var topDistance = $(header).offset().top;
 	
 	var fadeSpeed = 100, fadeTo = 1;
 	var topbarME = function() { $(header).fadeTo(fadeSpeed,1); }, topbarML = function() { $(header).fadeTo(fadeSpeed,fadeTo); };
@@ -20,7 +20,7 @@ function initHeader() {
 			inside = true;
 		}
 		else if (position < topDistance){
-			//topbarME();
+			topbarME();
 			$(header).unbind('mouseenter',topbarME);
 			$(header).unbind('mouseleave',topbarML);
 			inside = false;
