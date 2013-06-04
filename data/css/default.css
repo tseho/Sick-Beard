@@ -606,9 +606,9 @@ width: 30%;
   background-image: -o-linear-gradient(#a3e532, #90cc2a) !important;
   filter: progid:dximagetransform.microsoft.gradient(startColorstr=#fdf0d5, endColorstr=#fff9ee) !important;
   -ms-filter: progid:dximagetransform.microsoft.gradient(startColorstr=#fdf0d5, endColorstr=#fff9ee) !important;
-  -moz-border-radius: 3px;
-  -webkit-border-radius: 3px;
-  border-radius: 3px;
+  -moz-border-radius: 10px;
+  -webkit-border-radius: 10px;
+  border-radius: 10px;
 }
 tr.seasonheader {
   background-color: #FFFFFF;
