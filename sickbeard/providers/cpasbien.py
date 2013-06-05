@@ -97,11 +97,12 @@ class CpasbienProvider(generic.TorrentProvider):
             torrentPage = self.opener.open( pageURL )
             torrentSoup = BeautifulSoup( torrentPage )
 
-            downloadTorrentLink = torrentSoup.find("a", title.startswith('Cliquer'))
-            
+            #downloadTorrentLink = torrentSoup.find("a", title.startswith('Cliquer'))
+            tmp = pageURL.split('/')[6].replace('.html','.torrent')
+            downloadTorrentLink = ('http://www.cpasbien.me/_torrents/%s' % tmp)
             if downloadTorrentLink:
                 
-                downloadURL = downloadTorrentLink['href']
+                downloadURL = downloadTorrentLink
 
                 if "720p" in title:
                     if "bluray" in title:
