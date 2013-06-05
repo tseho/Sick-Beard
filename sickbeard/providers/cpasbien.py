@@ -74,6 +74,7 @@ class CpasbienProvider(generic.TorrentProvider):
 
         results = []
         searchUrl = self.url + '/recherche/'
+        
 
         data = urllib.urlencode({'champ_recherche': searchString})
 
@@ -96,7 +97,8 @@ class CpasbienProvider(generic.TorrentProvider):
             torrentPage = self.opener.open( pageURL )
             torrentSoup = BeautifulSoup( torrentPage )
 
-            downloadTorrentLink = torrentSoup.find("a", title=u"Cliquer ici pour télécharger ce torrent")
+            downloadTorrentLink = torrentSoup.find("a", title.startswith('Cliquer'))
+            
             if downloadTorrentLink:
                 
                 downloadURL = downloadTorrentLink['href']
