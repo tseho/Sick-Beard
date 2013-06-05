@@ -239,7 +239,7 @@
 <div class="float-left">
 	Change episodes to 
 	<select id="statusSelect">
-		#for $curStatus in [$WANTED, $SKIPPED, $ARCHIVED, $IGNORED] + sorted($Quality.DOWNLOADED):
+		#for $curStatus in [$WANTED, $SKIPPED, $ARCHIVED, $IGNORED, $SNATCHED] + sorted($Quality.DOWNLOADED):
 		#if $curStatus == $DOWNLOADED:
 		#continue
 		#end if
