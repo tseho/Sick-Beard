@@ -2753,7 +2753,20 @@ class Home:
             return "Test NMA notice failed"
 
     @cherrypy.expose
+    def testPushalot(self, authorizationToken=None):
+        cherrypy.response.headers['Cache-Control'] = "max-age=0,no-cache,no-store"
+
+
+        result = notifiers.pushalot_notifier.test_notify(authorizationToken)
+        if result:
+            return "Pushalot notification succeeded. Check your Pushalot clients to make sure it worked"
+        else:
+            return "Error sending Pushalot notification"
+
+
+    @cherrypy.expose
     def shutdown(self, pid=None):
+
 
         if str(pid) != str(sickbeard.PID):
             redirect("/home")
