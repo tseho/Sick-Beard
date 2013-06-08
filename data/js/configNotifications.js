@@ -202,4 +202,12 @@ $(document).ready(function () {
             function (data) { $('#testMail-result').html(data); });
     });
     
+     $('#testPushalot').click(function () {
+        $('#testPushalot-result').html(loading);
+        var pushalot_authorizationtoken = $("pushalot_authorizationtoken").val();
+        $.get(sbRoot + "/home/testPushalot", {'authorizationToken': pushalot_authorizationtoken},
+            function (data) { $('#testPushalot-result').html(data); });
+    });
+    
+    
 });
