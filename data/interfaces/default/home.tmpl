@@ -49,184 +49,37 @@
 <script type="text/javascript" charset="utf-8">
 <!--
 
-\$.tablesorter.addParser({
-    id: 'loadingNames',
-    is: function(s) {
-        return false;
-    },
-    format: function(s) {
-        if (s.indexOf('Loading...') == 0)
-            return s.replace('Loading...','000');
-        #if $sort != 1:  
-        	return (s || '').replace(/^(The|A|An|Un|Une|Le|La|Les)\s/i,'');
-       	#else:
-       		return (s || '');
-       	#end if
-    },
-    type: 'text'
-});
-
-\$.tablesorter.addParser({
-    id: 'quality',
-    is: function(s) {
-        return false;
-    },
-    format: function(s) { 
-        return s.replace('HD1080p',5).replace('HD720p',4).replace('HD',3).replace('SD',2).replace('Any',1).replace('Best',0).replace('Custom',7);
-    },
-    type: 'numeric'
-});
-
-\$.tablesorter.addParser({ 
-    id: 'eps',
-    is: function(s) {
-        return false; 
-    },
-    format: function(s) {
-        match = s.match(/^(.*)/);
-
-        if (match == null || match[1] == "?")
-            return -10;
-
-        var nums = match[1].split(" / ");
-        
-        if (parseInt(nums[0]) === 0)
-        	return parseInt(nums[1]);
-
-        var finalNum = parseInt((nums[0]/nums[1])*1000)*100;
-        if (finalNum > 0)
-            finalNum += parseInt(nums[0]);
-
-        return finalNum;
-    },
-    type: 'numeric'
-});
-
 \$(document).ready(function(){ 
 
-    \$("img#network").on('error', function(){
-    	\$(this).parent().text(\$(this).attr('alt'));
-    	\$(this).remove();
-    });
+	/*
+	var mygrid = tableToGrid("#showListTable");
 
-    \$("#showListTable:has(tbody tr)").tablesorter({
-			#if $sickbeard.FRENCH_COLUMN:
-				#if ($layout == 'poster'):
-		        	sortList: [[7,1],[2,0]],
-		       	#else:
-		       		sortList: [[6,1],[1,0]],
-		       	#end if
-		    #else:
-		    	#if ($layout == 'poster'):
-		        	sortList: [[6,1],[2,0]],
-		       	#else:
-		       		sortList: [[5,1],[1,0]],
-		       	#end if
-		    #end if
-	        textExtraction: {
-	        #if $sickbeard.FRENCH_COLUMN:
-		        #if ( $layout == 'poster'):
-			        1: function(node) { return \$(node).find("img").attr("alt"); },
-			        3: function(node) { return \$(node).find("img").attr("alt"); },
-			        4: function(node) { return \$(node).find("span").text(); },
-		            7: function(node) { return \$(node).find("img").attr("alt"); },	            
-		            8: function(node) { return \$(node).find("img").attr("alt"); }
-		        #else:
-		        	#if ( $layout != 'simple'):
-			        2: function(node) { return \$(node).find("img").attr("alt"); },
-		        	#end if
-		            3: function(node) { return \$(node).find("span").text(); },
-		            6: function(node) { return \$(node).find("img").attr("alt"); },	            
-		            7: function(node) { return \$(node).find("img").attr("alt"); }
-		        #end if
-		    #else:
-		    	#if ( $layout == 'poster'):
-			        1: function(node) { return \$(node).find("img").attr("alt"); },
-			        3: function(node) { return \$(node).find("img").attr("alt"); },
-			        4: function(node) { return \$(node).find("span").text(); },
-		            6: function(node) { return \$(node).find("img").attr("alt"); },	            
-		            7: function(node) { return \$(node).find("img").attr("alt"); }
-		        #else:
-		        	#if ( $layout != 'simple'):
-			        2: function(node) { return \$(node).find("img").attr("alt"); },
-		        	#end if
-		            3: function(node) { return \$(node).find("span").text(); },
-		            5: function(node) { return \$(node).find("img").attr("alt"); },	            
-		            6: function(node) { return \$(node).find("img").attr("alt"); }
-		        #end if
-		    #end if
-	        },
-	        #if sickbeard.TOGGLE_SEARCH=='True':
-	        widgets: ['zebra', 'stickyHeaders', 'filter'],
-	        #else:
-	        widgets: ['zebra', 'stickyHeaders'],	        
-	        #end if
-	        headers: {
-	            0: {filter : false ,sorter: 'isoDate' },
-			#if $sickbeard.FRENCH_COLUMN:
-				#if ($layout == 'poster'):
-				    1: {filter : false ,sorter: 'loadingNames'},
-				    2: {sorter: 'loadingNames'},
-				    3: { filter: false},
-				    4: { filter : false ,sorter: 'quality' },
-				    5: { filter : false ,sorter: 'eps' },
-				    6: { filter : false ,sorter: 'eps' },
-				    7: { filter: false},
-				    8: { filter: false},
-				    9: { filter: false},
-				#else:
-				    1: {sorter: 'loadingNames'},
-				    2: { filter: false},
-				    3: { filter : false ,sorter: 'quality' },
-				    4: { filter : false ,sorter: 'eps' },
-				    5: { filter : false ,sorter: 'eps' },
-				    6: { filter: false},
-				    7: { filter: false},
-				    8: { filter: false},
-				 #end if
-			#else:
-				#if ($layout == 'poster'):
-				    1: {filter : false ,sorter: 'loadingNames'},
-				    2: {sorter: 'loadingNames'},
-				    3: { filter: false},
-				    4: { filter : false ,sorter: 'quality' },
-				    5: { filter : false ,sorter: 'eps' },
-				    6: { filter: false},
-				    7: { filter: false},
-				    8: { filter: false},
-				 #else:
-				    1: {sorter: 'loadingNames'},
-				    2: { filter: false},
-				    3: { filter : false ,sorter: 'quality' },
-				    4: { filter : false ,sorter: 'eps' },
-				    5: { filter: false},
-				    6: { filter: false},
-				    7: { filter: false},
-				  #end if
-			#end if
-		      
-	        }
-    });
-
+	jQuery("#showListTable").jqGrid();
+	jQuery("#showListTable").jqGrid('navGrid','#pcolch',{add:false,edit:false,del:false,search:false,refresh:false});
+	jQuery("#showListTable").jqGrid('navButtonAdd',
+		'#ptoolbar',
+		{ caption: "Columns",
+		  title: "Reorder Columns", 
+		  onClickButton : function (){
+		  	jQuery("#showListTable").jqGrid('columnChooser'); 
+		  } 
+		});
+	jQuery("#showListTable").jqGrid('setGridHeight',"100%");
+	jQuery("#showListTable").jqGrid('setGridWidth',"100%");
+	jQuery("#showListTable").jqGrid('navGrid','#ptoolbar',{del:false,add:false,edit:false,search:false}); 
+	jQuery("#showListTable").jqGrid('filterToolbar',{stringResult: true,searchOnEnter : false});
+	*/
+	
 });
 
 //-->
 </script>
-
+<div id="pcolch"></div>
 #if $varExists('header') 
 	<h1 class="headershow">$header</h1>
 #else 
 	<h1 class="titleshow">$title</h1>
 #end if
-<div id="HomeLayout" style="float: left; margin-top: -18px;">
-#if sickbeard.TOGGLE_SEARCH=='True':
-		<a class="btn btn-mini" href="$sbRoot/setHomeSearch/?search=False">
-		<i class="icon-search icon-black"></i>Toggle search</a> 
-		#else:
-		<a class="btn btn-mini" href="$sbRoot/setHomeSearch/?search=True">
-		<i class="icon-search icon-black"></i>Toggle search</a> 
-		#end if	
-</div>
 <div id="HomeLayout" style="float: right; margin-top: -18px;">
 	<span><b>Layout:</b>
 		<a class="inner" href="$sbRoot/setHomeLayout/?layout=poster" style="font-size: 12px;">Poster</a> &middot;
@@ -235,29 +88,172 @@
 	</span>
 </div>
 
-<table id="showListTable" class="sickbeardTable tablesorter" cellspacing="1" border="0" cellpadding="0">
 
-  <thead><tr><th class="nowrap">Next Ep</th>#if $layout=="poster" then "<th>Poster</th>" else ""#<th>Show</th><th>Network</th><th>Quality</th><th>Downloads</th>#if $sickbeard.FRENCH_COLUMN then "<th>French Ep</th>" else ""#<th>Active</th><th>Audio</th><th>Status</th></tr></thead>
-  <tfoot>
-    <tr>
-      <th rowspan="1" colspan="1" align="center"><a href="$sbRoot/home/addShows/">&nbsp Add Show</a></th>
-      #if sickbeard.FRENCH_COLUMN:
-      	#if ($layout == 'poster'):
-      		<th rowspan="1" colspan="9"></th>
-      	#else:
-      		<th rowspan="1" colspan="8"></th>
-      	#end if
-     #else:
-        #if ($layout == 'poster'):
-      		<th rowspan="1" colspan="8"></th>
-      	#else:
-      		<th rowspan="1" colspan="7"></th>
-      	#end if
-      #end if
-    </tr>
-  </tfoot>
+#set $myShowList = $list($sickbeard.showList)
+$myShowList.sort(lambda x, y: cmp(x.name, y.name))
+<div> <span id="toggleSearch">Toggle</span></div>
+<table id="EpisodeListe"></table>
+<div id="EpisodeListePager"></div>
+<script type="text/javascript">
+
+function setPbDl(download, snatch, total){
+	return download + " / " + snatch + " / " + total
+}
+function setPbFr(fr, st, total){
+	return fr + " / " + st + " / " + total
+}
+
+
+	var dataTable = [
+#for $curShow in $myShowList:
+
+#set $curEp = $curShow.nextEpisode()
+#set $curShowSubsfr = [x[1] for x in $subfr if int(x[0]) == $curShow.tvdbid]
+#set $curShowDownloads = [x[1] for x in $downloadedEps if int(x[0]) == $curShow.tvdbid]
+#set $curShowSnatched = [x[1] for x in $snatchedEps if int(x[0]) == $curShow.tvdbid]
+#set $curfr = [x[1] for x in $fr if int(x[0]) == $curShow.tvdbid]
+#set $curShowAll = [x[1] for x in $allEps if int(x[0]) == $curShow.tvdbid]
+#set $which_thumb = $layout+"_thumb" 
+
+#if len($curShowAll) != 0:
+  #if len($curShowDownloads) != 0:
+    #set $dlStat = str($curShowDownloads[0])+" / "+str($curShowAll[0])
+    #set $nom = $curShowDownloads[0]
+    #set $den = $curShowAll[0]
+  #else
+    #set $dlStat = "0 / "+str($curShowAll[0])
+    #set $nom = 0
+    #set $den = $curShowAll[0]
+  #end if
+#else
+  #set $dlStat = "?"
+  #set $nom = 0
+  #set $den = 1
+#end if
+#if len($curShowDownloads) != 0:
+  #if len($curfr) != 0:
+    #set $frStat = str($curfr[0])+" / "+str($curShowDownloads[0])
+    #set $nomfr = $curfr[0]
+    #set $denfr = $curShowDownloads[0]
+  #else
+    #set $frStat = "0 / "+str($curShowDownloads[0])
+    #set $nomfr = 0
+    #set $denfr = $curShowDownloads[0]
+  #end if
+#else
+  #set $frStat = "0 / 0"
+  #set $nomfr = 0
+  #set $denfr = 1
+#end if
+
+#if len($curShowSnatched) != 0:
+    #set $nomSna = $curShowSnatched[0]
+#else:
+    #set $nomSna = 0
+#end if
+#if len($curShowSubsfr) != 0:
+    #set $nomSub = $curShowSubsfr[0]
+#else:
+    #set $nomSub = 0
+#end if
+
+#set $airdate = ""
+#if len($curEp) != 0 :
+#set $airdate = curEp[0].airdate
+#end if
+
+#set $network = $curShow.network
+#if $layout != 'simple':	
+	#if $curShow.network:
+		#set $network = "<img id='network' width='60' height='30' src='" + $sbRoot + "/images/network/" + $curShow.network.lower() + ".png' alt='" + $curShow.network + "' title='" + $curShow.network + "' />"
+	#else:
+		#set $network = "<img id='network' width='60' height='30' src='" + $sbRoot + "/images/network/nonetwork.png' alt='No Network' title='No Network' />"
+	#end if
+#end if	
+
+#set $quality = "<span class='quality Custom'>Custom</span>"
+#if $curShow.quality in $qualityPresets:
+	#set $quality = "<span class='quality " + $qualityPresetStrings[$curShow.quality] +"'>" + $qualityPresetStrings[$curShow.quality] + "</span>"
+#end if
+
+#set $active = "<img src='" + $sbRoot + "/images/no16.png' alt='N' width='16' height='16' />"
+#if int($curShow.paused) == 0 and $curShow.status != "Ended":
+	#set $active = "<img src='" + $sbRoot + "/images/yes16.png' alt='Y' width='16' height='16' />"
+#end if
+
+	{
+		nextep : "$airdate",
+		show : 	"<div class=\"imgHomeWrapper imgHomeWrapperRounded $layout\"><span >$curShow.name</span> <a href=\"$sbRoot/showPoster/?show=$curShow.tvdbid&amp;which=$layout\" rel=\"dialog\" title=\"$curShow.name\"><img src=\"$sbRoot/showPoster/?show=$curShow.tvdbid&amp;which=$which_thumb\" class=\"$layout\" alt=\"$curShow.name\"/></a>",
+		network : "$network", 
+		quality : "$quality", 
+		downloads : setPbDl($nom,$nomSna,$den), 
+		frenchep : setPbFr($nomfr,$nomSub,$denfr), 
+		active : "$active", 
+		audio : "<img src=\"$sbRoot/images/flags/${curShow.audio_lang}.png\" alt=\"$curShow.audio_lang\" width=\"16\" />", 
+		status : "$curShow.status"  		
+	},
+#end for
+
+	];
+	
+	
+	var grid = jQuery("#EpisodeListe").jqGrid(
+							{ 
+							datatype: "local", 
+							height: '100%',
+							colNames:[
+								'Next Ep',
+								'Show',
+								'Network', 
+								'Quality', 
+								'Downloads',
+								'French Ep',
+								'Active',
+								'Audio',
+								'Status'], 
+							colModel:
+								[{name:'nextep',index:'nextep',width:86,align:"center",search:false},
+								{name:'show',index:'show', width:317,align:"center"}, 
+								{name:'network',index:'network', width:70,align:"center",searchoptions:{sopt:['cn']},searchhidden:true}, 
+								{name:'quality',index:'quality', width:56,align:"center"}, 
+								{name:'downloads',index:'downloads', width:89, align:"right",sorttype:"int",align:"center"}, 
+								{name:'frenchep',index:'frenchep', width:89, align:"right",sorttype:"int",align:"center"}, 
+								{name:'active',index:'active', width:51,align:"right",align:"center"}, 
+								{name:'audio',index:'audio', width:47, sortable:false,align:"center"},
+								{name:'status',index:'status', width:89, sortable:false,align:"center"} ],
+							autowidth: true,
+							});
+							
+	for(var i=0;i<=dataTable.length;i++) 
+		jQuery("#EpisodeListe").jqGrid('addRowData',i+1,dataTable[i]);
+		
+	jQuery("#EpisodeListe").jqGrid('filterToolbar',{stringResult: true,searchOnEnter : false});
+	grid[0].toggleToolbar();
+	\$("#toggleSearch").click(function(){
+		grid[0].toggleToolbar()
+	});
+	
+</script>
+
+<table id="showListTable" class="sickbeardTable" cellspacing="1" border="0" cellpadding="0">
+
+  <thead class="tablesorter-header">
+  	<tr>
+  		<th class="nowrap">Next Ep</th>
+  		#if $layout=="poster" then "<th>Poster</th>" else ""#<th>Show</th>
+  		<th>Network</th>
+  		<th>Quality</th>
+  		<th>Downloads</th>
+  		<th>French Ep</th>
+  		<th>Active</th>
+  		<th>Audio</th>
+  		<th>Status</th>
+  	</tr>
+  </thead>
   <tbody>
 
+
+	
 #for $curLoadingShow in $sickbeard.showQueueScheduler.action.loadingShowList:
 
   #if $curLoadingShow.show != None and $curLoadingShow.show in $sickbeard.showList:
@@ -279,17 +275,13 @@
     <td></td>
     <td></td>
     <td></td>
-    #if $sickbeard.FRENCH_COLUMN:
     <td></td>
-    #end if
     #if ($layout == 'poster'):
     <td></td>
     #end if
   </tr>
 #end for
 
-#set $myShowList = $list($sickbeard.showList)
-$myShowList.sort(lambda x, y: cmp(x.name, y.name))
 #for $curShow in $myShowList:
 #set $curEp = $curShow.nextEpisode()
 #set $curShowSubsfr = [x[1] for x in $subfr if int(x[0]) == $curShow.tvdbid]
@@ -446,7 +438,7 @@ $myShowList.sort(lambda x, y: cmp(x.name, y.name))
         </script>
     	
     </td>
-    #if $sickbeard.FRENCH_COLUMN:
+
 	<td align="center"><span style="display: none;">$frStat</span>
       
        <div class="progress ui-progressbar ui-widget-header" id="new_progressbar2$curShow.tvdbid" style="position:relative;">
@@ -510,7 +502,6 @@ $myShowList.sort(lambda x, y: cmp(x.name, y.name))
         //-->
         </script>
     </td>
-    #end if
         
     
     <td align="center"><img src="$sbRoot/images/#if int($curShow.paused) == 0 and $curShow.status != "Ended" then "yes16.png\" alt=\"Y\"" else "no16.png\" alt=\"N\""# width="16" height="16" /></td>
@@ -524,6 +515,7 @@ $myShowList.sort(lambda x, y: cmp(x.name, y.name))
 #end for
 </tbody>
 </table>
+<div id="ptoolbar" ></div>
 
 <script type="text/javascript" src="$sbRoot/js/tableClick.js?$sbPID"></script>
 #include $os.path.join($sickbeard.PROG_DIR, "data/interfaces/default/inc_bottom.tmpl")
