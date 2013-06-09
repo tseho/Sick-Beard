@@ -212,8 +212,6 @@ class PostProcessor(object):
         for dummy_file_path in dum_files:
             if os.path.isdir(dummy_file_path):
                 self._list_dummy_files(dummy_file_path, base_name,"d")
-                print sickbeard.TORRENT_DOWNLOAD_DIR
-                print cur_dir
             elif dummy_file_path==self.file_path or dummy_file_path[len(dummy_file_path)-3:] in common.mediaExtensions or sickbeard.MOVE_ASSOCIATED_FILES or (sickbeard.TORRENT_DOWNLOAD_DIR in cur_dir and sickbeard.PROCESS_METHOD in ['copy','hardlink','symlink']):
                 continue
             else:
@@ -960,7 +958,7 @@ class PostProcessor(object):
             
             path,file=os.path.split(self.file_path)
             
-            if sickbeard.TORRENT_DOWNLOAD_DIR == path:
+            if sickbeard.TORRENT_DOWNLOAD_DIR in path:
                 #Action possible pour les torrent
                 if sickbeard.PROCESS_METHOD == "copy":
                     self._copy(self.file_path, dest_path, new_base_name, sickbeard.MOVE_ASSOCIATED_FILES)
