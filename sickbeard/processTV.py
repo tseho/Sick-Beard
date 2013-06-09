@@ -164,9 +164,10 @@ def processDir (dirName, nzbName=None, recurse=False):
                     if  ek.ek(os.path.normpath, dirName) != ek.ek(os.path.normpath, sickbeard.TORRENT_DOWNLOAD_DIR) and \
                         ek.ek(os.path.normpath, dirName) != ek.ek(os.path.normpath, sickbeard.TV_DOWNLOAD_DIR):
                         
-                        if sickbeard.PROCESS_METHOD == "move" and ek.ek(os.path.normpath, dirName) != ek.ek(os.path.normpath, sickbeard.TORRENT_DOWNLOAD_DIR):
-                            delete = True
-                        if not sickbeard.KEEP_PROCESSED_DIR and ek.ek(os.path.normpath, dirName) != ek.ek(os.path.normpath, sickbeard.TV_DOWNLOAD_DIR):
+                        if sickbeard.TORRENT_DOWNLOAD_DIR in dirName:
+                            if sickbeard.PROCESS_METHOD == "move" and ek.ek(os.path.normpath, dirName) != ek.ek(os.path.normpath, sickbeard.TORRENT_DOWNLOAD_DIR):
+                                delete = True
+                        elif not sickbeard.KEEP_PROCESSED_DIR and ek.ek(os.path.normpath, dirName) != ek.ek(os.path.normpath, sickbeard.TV_DOWNLOAD_DIR):
                             delete = True
                 
                 if delete:    
