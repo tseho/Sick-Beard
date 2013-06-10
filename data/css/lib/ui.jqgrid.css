@@ -29,9 +29,14 @@
     border-collapse: collapse;
     color: #FFFFFF;
     text-align: center;
-    text-shadow: -1px -1px 0 rgba(0, 0, 0, 0.3);
+    
 }
-.ui-jqgrid .ui-jqgrid-htable th div {overflow: hidden; position:relative; height:17px;}
+.ui-jqgrid .ui-jqgrid-htable th div {
+	overflow: hidden; 
+	position:relative; 
+	height:24px;
+	margin:5px;
+}
 .ui-th-column, .ui-jqgrid .ui-jqgrid-htable th.ui-th-column {overflow: hidden;white-space: nowrap;text-align:center;border-top : 0 none;border-bottom : 0 none;}
 .ui-th-ltr, .ui-jqgrid .ui-jqgrid-htable th.ui-th-ltr {border-left : 0 none;}
 .ui-th-rtl, .ui-jqgrid .ui-jqgrid-htable th.ui-th-rtl {border-right : 0 none;}

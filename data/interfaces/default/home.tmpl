@@ -91,7 +91,6 @@
 
 #set $myShowList = $list($sickbeard.showList)
 $myShowList.sort(lambda x, y: cmp(x.name, y.name))
-<div> <span id="toggleSearch">Toggle</span></div>
 <table id="EpisodeListe"></table>
 <div id="EpisodeListePager"></div>
 <script type="text/javascript">
@@ -183,7 +182,7 @@ function setPbFr(fr, st, total){
 
 	{
 		nextep : "$airdate",
-		show : 	"<div class=\"imgHomeWrapper imgHomeWrapperRounded $layout\"><span >$curShow.name</span> <a href=\"$sbRoot/showPoster/?show=$curShow.tvdbid&amp;which=$layout\" rel=\"dialog\" title=\"$curShow.name\"><img src=\"$sbRoot/showPoster/?show=$curShow.tvdbid&amp;which=$which_thumb\" class=\"$layout\" alt=\"$curShow.name\"/></a>",
+		show : 	"<div class=\"imgHomeWrapper imgHomeWrapperRounded $layout\"><a href=\"$sbRoot/showPoster/?show=$curShow.tvdbid&amp;which=$layout\" rel=\"dialog\" title=\"$curShow.name\" search=\"$curShow.name.lower()\"><img src=\"$sbRoot/showPoster/?show=$curShow.tvdbid&amp;which=$which_thumb\" class=\"$layout\" alt=\"$curShow.name\"/></a>",
 		network : "$network", 
 		quality : "$quality", 
 		downloads : setPbDl($nom,$nomSna,$den), 
@@ -213,23 +212,23 @@ function setPbFr(fr, st, total){
 								'Status'], 
 							colModel:
 								[{name:'nextep',index:'nextep',width:86,align:"center",search:false},
-								{name:'show',index:'show', width:317,align:"center"}, 
-								{name:'network',index:'network', width:70,align:"center",searchoptions:{sopt:['cn']},searchhidden:true}, 
-								{name:'quality',index:'quality', width:56,align:"center"}, 
-								{name:'downloads',index:'downloads', width:89, align:"right",sorttype:"int",align:"center"}, 
-								{name:'frenchep',index:'frenchep', width:89, align:"right",sorttype:"int",align:"center"}, 
-								{name:'active',index:'active', width:51,align:"right",align:"center"}, 
-								{name:'audio',index:'audio', width:47, sortable:false,align:"center"},
-								{name:'status',index:'status', width:89, sortable:false,align:"center"} ],
+								{name:'show',index:'show', width:317,align:"center",stype:"text",searchoptions:{sopt:['cn','is']}}, 
+								{name:'network',index:'network', width:70,align:"center",sorttype:"text",stype:"text",search:false}, 
+								{name:'quality',index:'quality', width:56,align:"center",search:false}, 
+								{name:'downloads',index:'downloads', width:89, align:"right",sorttype:"int",align:"center",search:false}, 
+								{name:'frenchep',index:'frenchep', width:89, align:"right",sorttype:"int",align:"center",search:false}, 
+								{name:'active',index:'active', width:51,align:"right",align:"center",search:false}, 
+								{name:'audio',index:'audio', width:47, sortable:false,align:"center",search:false},
+								{name:'status',index:'status', width:89, sortable:false,align:"center",search:false} ],
 							autowidth: true,
 							});
 							
 	for(var i=0;i<=dataTable.length;i++) 
 		jQuery("#EpisodeListe").jqGrid('addRowData',i+1,dataTable[i]);
 		
-	jQuery("#EpisodeListe").jqGrid('filterToolbar',{stringResult: true,searchOnEnter : false});
-	grid[0].toggleToolbar();
-	\$("#toggleSearch").click(function(){
+	jQuery("#EpisodeListe").jqGrid('filterToolbar',{searchOnEnter : false});	
+	\$("#jqgh_EpisodeListe_show").append("<span id=\"toggleSearchIn\" style=\"margin-left:20px;width:16px;height:16px;\"><img src=\"$sbRoot/images/info.png\" style=\"width:16px;height:16px;\" /></span>");
+	\$("#toggleSearchIn").click(function(){
 		grid[0].toggleToolbar()
 	});
 	
@@ -282,6 +281,7 @@ function setPbFr(fr, st, total){
   </tr>
 #end for
 
+#if 0==1:
 #for $curShow in $myShowList:
 #set $curEp = $curShow.nextEpisode()
 #set $curShowSubsfr = [x[1] for x in $subfr if int(x[0]) == $curShow.tvdbid]
@@ -513,6 +513,7 @@ function setPbFr(fr, st, total){
 
 
 #end for
+#end if
 </tbody>
 </table>
 <div id="ptoolbar" ></div>
