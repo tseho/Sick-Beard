@@ -91,7 +91,7 @@ class CpasbienProvider(generic.TorrentProvider):
             title = str(link.text).lower().strip()  
             pageURL = link['href']
 
-            if "vostfr" in title and (not show.subtitles) and show.audio_lang == "fr":
+            if "vostfr" in title and ((not show.subtitles) or show.audio_lang == "fr"):
                 continue
 
             torrentPage = self.opener.open( pageURL )
