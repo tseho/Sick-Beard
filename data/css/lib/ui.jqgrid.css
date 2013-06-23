@@ -56,13 +56,34 @@ tr.ui-search-toolbar select {margin: 1px 0 0 0}
 /* body */ 
 .ui-jqgrid .ui-jqgrid-bdiv {position: relative; margin: 0; padding:0; overflow: auto; text-align:left;}
 .ui-jqgrid .ui-jqgrid-btable {table-layout:fixed; margin:0; outline-style: none; }
-.ui-jqgrid tr.jqgrow { outline-style: none; }
+.ui-jqgrid tr.jqgrow { 
+	outline-style: none; 
+}
+.ui-jqgrid table.ui-jqgrid-btable tr.jqgrow.ui-widget-content.ui-row-ltr{
+	border:none;
+}
+.ui-jqgrid table.ui-jqgrid-btable tr.jqgrow.ui-widget-content.ui-row-ltr td{ 
+	outline-style: none; 
+	background-color:#FBF9F3;
+	border : none;
+	
+}
+.ui-jqgrid table.ui-jqgrid-btable tr.jqgrow.ui-widget-content.ui-row-ltr.odd td{ 
+	outline-style: none; 
+	background-color:#F5F1E4;
+	border:none;
+}
+
 .ui-jqgrid tr.jqgroup { outline-style: none; }
 .ui-jqgrid tr.jqgrow td {font-weight: normal; overflow: hidden; white-space: pre; height: 22px;padding: 0 2px 0 2px;border-bottom-width: 1px; border-bottom-color: inherit; border-bottom-style: solid;}
 .ui-jqgrid tr.jqgfirstrow td {padding: 0 2px 0 2px;border-right-width: 1px; border-right-style: solid;}
 .ui-jqgrid tr.jqgroup td {font-weight: normal; overflow: hidden; white-space: pre; height: 22px;padding: 0 2px 0 2px;border-bottom-width: 1px; border-bottom-color: inherit; border-bottom-style: solid;}
 .ui-jqgrid tr.jqfoot td {font-weight: bold; overflow: hidden; white-space: pre; height: 22px;padding: 0 2px 0 2px;border-bottom-width: 1px; border-bottom-color: inherit; border-bottom-style: solid;}
-.ui-jqgrid tr.ui-row-ltr td {text-align:left;border-right-width: 1px; border-right-color: inherit; border-right-style: solid;}
+.ui-jqgrid tr.ui-row-ltr td {
+	text-align:left;
+	margin-top:10px;
+	margin-bottom:10px;
+}
 .ui-jqgrid tr.ui-row-rtl td {text-align:right;border-left-width: 1px; border-left-color: inherit; border-left-style: solid;}
 .ui-jqgrid td.jqgrid-rownum { padding: 0 2px 0 2px; margin: 0; border: 0 none;}
 .ui-jqgrid .ui-jqgrid-resize-mark { width:2px; left:0; background-color:#777; cursor: e-resize; cursor: col-resize; position:absolute; top:0; height:100px; overflow:hidden; display:none; border:0 none; z-index: 99999;}

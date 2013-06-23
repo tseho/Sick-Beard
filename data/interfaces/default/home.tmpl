@@ -48,6 +48,7 @@
 
 <script type="text/javascript" charset="utf-8">
 <!--
+	
 
 \$(document).ready(function(){ 
 
@@ -80,6 +81,13 @@
 #else 
 	<h1 class="titleshow">$title</h1>
 #end if
+
+<div style="float: left; margin-top: -18px;" id="HomeLayout">
+	<a href="#" class="btn btn-mini" id="Search_btn">
+		<i class="icon-search icon-black"></i>Toggle search
+	</a> 
+</div>
+
 <div id="HomeLayout" style="float: right; margin-top: -18px;">
 	<span><b>Layout:</b>
 		<a class="inner" href="$sbRoot/setHomeLayout/?layout=poster" style="font-size: 12px;">Poster</a> &middot;
@@ -91,7 +99,9 @@
 
 #set $myShowList = $list($sickbeard.showList)
 $myShowList.sort(lambda x, y: cmp(x.name, y.name))
-<table id="EpisodeListe"></table>
+<div style="clear:left;padding-top:5px;">
+	<table id="EpisodeListe" ></table>
+</div>
 <div id="EpisodeListePager"></div>
 <script type="text/javascript">
 
@@ -186,6 +196,12 @@ function setPbFr(fr, st, total){
 		show : "$curShow.name",
 		network : "$network", 
 		quality : "$quality", 
+		nombre: $nom,
+		nombresnatch : $nomSna,
+		nombredownload : $den,
+		nombrefrancais : $nomfr,
+		nombresubfr : $nomSub,
+		nombrefr : $denfr,
 		downloads : setPbDl($nom,$nomSna,$den), 
 		frenchep : setPbFr($nomfr,$nomSub,$denfr), 
 		active : "$active", 
@@ -198,8 +214,10 @@ function setPbFr(fr, st, total){
 	
 	
 	var grid = jQuery("#EpisodeListe").jqGrid(
-							{ 
+						{ 
 							datatype: "local", 
+							altRows: true,
+							altclass: 'odd',
 							height: '100%',
 							colNames:[
 								'Next Ep',
@@ -231,18 +249,54 @@ function setPbFr(fr, st, total){
 								{name:'status',index:'status', width:89, sortable:false,align:"center",search:false} ],
 							autowidth: true,
 							ignoreCase:true,
-							});
+						    stateOptions: {
+						         cookieName: "ListeEpGridStateCookie",
+						         columns: true,
+						         filters: true,
+						         selection: true,
+						         pager: false,
+						         order: true
+						    }
+						});
 							
 	for(var i=0;i<=dataTable.length;i++) 
 		jQuery("#EpisodeListe").jqGrid('addRowData',i+1,dataTable[i]);
 		
-	jQuery("#EpisodeListe").jqGrid('filterToolbar',{searchOnEnter : false,closeOnEscape: true,});	
-	\$("#jqgh_EpisodeListe_show").append("<span id=\"toggleSearchIn\" style=\"margin-left:20px;width:16px;height:16px;\"><img src=\"$sbRoot/images/info.png\" style=\"width:16px;height:16px;\" /></span>");
-	\$("#toggleSearchIn").click(function(){
+	jQuery("#EpisodeListe").jqGrid('filterToolbar',{searchOnEnter : false,closeOnEscape: true,});
+	\$("#Search_btn").click(function(){
 		grid[0].clearToolbar();
 		grid[0].toggleToolbar();
 	});
 	grid[0].toggleToolbar();
+	
+	
+	
+	function saveGridToCookie(name) {
+	
+		var grid = jQuery("#" + name);
+		var gridInfo = new Object();
+		name = name + window.location.pathname;
+		gridInfo.sortname = grid.jqGrid('getGridParam', 'sortname');
+		gridInfo.sortorder = grid.jqGrid('getGridParam', 'sortorder');
+		$.cookie(name, $.toJSON(gridInfo));
+	}
+	function loadGridFromCookie(name) {
+		var c = $.cookie(name + window.location.pathname);
+		if (c == null)
+		return;
+		var gridInfo = $.parseJSON(c);
+		var grid = jQuery("#" + name);
+		grid.jqGrid('setGridParam', { sortorder: gridInfo.sortorder });
+		grid.sortGrid(gridInfo.sortname,true);
+		grid.trigger("reloadGrid");
+	}
+	
+	\$(window).unload(function() {
+		saveGridToCookie("EpisodeListe");
+	});
+	
+	loadGridFromCookie("EpisodeListe");
+	
 	
 </script>
 
@@ -528,7 +582,6 @@ function setPbFr(fr, st, total){
 #end if
 </tbody>
 </table>
-<div id="ptoolbar" ></div>
 
 <script type="text/javascript" src="$sbRoot/js/tableClick.js?$sbPID"></script>
 #include $os.path.join($sickbeard.PROG_DIR, "data/interfaces/default/inc_bottom.tmpl")

@@ -63,14 +63,23 @@ img {
     padding-right: 2px;
 }
 
-.imgHomeWrapper {
-    background: url("../images/loading.gif") no-repeat scroll center center #FFFFFF;
-    border: 3px solid #FFFFFF;
+.imageHomeWrapper.banner{
+	background: url("../images/loading.gif") no-repeat scroll center center #FFFFFF;
+	border: 3px solid #FFFFFF;
     box-shadow: 1px 1px 2px 0 #555555;
+}
+.imageHomeWrapper.poster{
+	background: url("../images/loading.gif") no-repeat scroll center center #FFFFFF;
+	border: 3px solid #FFFFFF;
+    box-shadow: 1px 1px 2px 0 #555555;
+}
+.imgHomeWrapper {
     text-align: center;
-    min-height: 48px;
+    min-height: 52px;
     overflow: hidden;
     margin : auto;
+    padding-top:5px;
+    padding-bottom:5px;
 }
 
 .imgHomeWrapperRounded{
