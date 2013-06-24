@@ -332,26 +332,26 @@ function createFRBar(tvID,audio,st,total){
 								{name:'total',index:'total',hidden:true,align:"center",search:false},
 								{name:'fr',index:'fr',hidden:true,align:"center",search:false},
 								{name:'subfr',index:'subfr',hidden:true,align:"center",search:false},
-								{name:'show',index:'show', width:317,align:"center",stype:"text",searchoptions:{sopt:['cn']},
+								{name:'show',index:'show', width:320,align:"center",stype:"text",searchoptions:{sopt:['cn']},
 									formatter:function (cellvalue, options,rowObject){
 										return "<div class=\"imgHomeWrapper imgHomeWrapperRounded $layout\"><a href=\"displayShow?show="+rowObject.imdb+"\" rel=\"dialog\" title=\""+rowObject.name+"\"><img src=\"$sbRoot/showPoster/?show="+rowObject.imdb+"&amp;which=$which_thumb\" class=\"$layout\" alt=\""+rowObject.name+"\"/></a>" ;
 									}
 								}, 
 								{name:'network',index:'network', width:75,align:"center",sorttype:"text",stype:"text",search:false}, 
-								{name:'quality',index:'quality', width:56,align:"center",search:false}, 
-								{name:'downloads',index:'downloads', width:89, align:"right",sorttype:"int",align:"center",search:false,title:false,
+								{name:'quality',index:'quality', width:60,align:"center",search:false}, 
+								{name:'downloads',index:'downloads', width:90, align:"right",sorttype:"int",align:"center",search:false,title:false,
 									formatter:function(cellvalue,option,rowObject){
 										return createDownloadBar(rowObject.imdb,rowObject.download,rowObject.snatched,rowObject.wanted,rowObject.total);
 									}
 								}, 
-								{name:'frenchep',index:'frenchep', width:89, align:"right",sorttype:"int",align:"center",search:false,title:false,
+								{name:'frenchep',index:'frenchep', width:90, align:"right",sorttype:"int",align:"center",search:false,title:false,
 									formatter:function(cellvalue,option,rowObject){
 										return createFRBar(rowObject.imdb,rowObject.fr,rowObject.subfr,rowObject.download);
 									}
 								}, 
-								{name:'active',index:'active', width:51,align:"right",align:"center",search:false}, 
-								{name:'audio',index:'audio', width:47, sortable:true,align:"center",search:false},
-								{name:'status',index:'status', width:89, sortable:true,align:"center",search:false} ],
+								{name:'active',index:'active', width:55,align:"right",align:"center",search:false}, 
+								{name:'audio',index:'audio', width:50, sortable:true,align:"center",search:false},
+								{name:'status',index:'status', width:90, sortable:true,align:"center",search:false} ],
 							autowidth: true,
 							ignoreCase:true,
 							rowNum:10000,
@@ -368,6 +368,11 @@ function createFRBar(tvID,audio,st,total){
 	});
 	grid[0].toggleToolbar();
 	
+#if ($sickbeard.FRENCH_COLUMN):
+	jQuery("#EpisodeListe").jqGrid('showCol',["frenchep"]);
+#else:
+	jQuery("#EpisodeListe").jqGrid('hideCol',["frenchep"]);
+#end if
 	
 	jQuery("#EpisodeListe").stickyTableHeaders();
 	
@@ -428,11 +433,15 @@ function createFRBar(tvID,audio,st,total){
 	       
 	       if ((scrollTop > offset.top) && (scrollTop < offset.top + el.height())) {
 	           floatingHeader.css({
-	            "visibility": "visible"
+	            "visibility": "visible",
+	            "top" : "0px",
+	            "z-index" : "1000"
 	           });
 	       } else {
 	           floatingHeader.css({
-	            "visibility": "hidden"
+	           	"top" : offset.top - scrollTop + "px",
+	            "visibility": "visible",
+	            "z-index" : "2"
 	           });      
 	       };
 	   });
