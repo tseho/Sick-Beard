@@ -16,6 +16,7 @@
 #set $today = str($datetime.date.today().toordinal())
 #set $downloadedEps = $myDB.select("SELECT showid, COUNT(*) FROM tv_episodes WHERE (status IN ("+",".join([str(x) for x in $Quality.DOWNLOADED + [$ARCHIVED]])+") OR (status IN ("+",".join([str(x) for x in $Quality.SNATCHED + $Quality.SNATCHED_PROPER])+") AND location != '')) AND season != 0 and episode != 0 AND airdate <= "+$today+" GROUP BY showid")
 #set $snatchedEps = $myDB.select("SELECT showid, COUNT(*) FROM tv_episodes WHERE (status IN ("+",".join([str(x) for x in $Quality.SNATCHED + [$ARCHIVED]])+") OR (status IN ("+",".join([str(x) for x in $Quality.SNATCHED + $Quality.SNATCHED_PROPER])+") AND location != '')) AND season != 0 and episode != 0 AND airdate <= "+$today+" GROUP BY showid")
+#set $wantedEps = $myDB.select("SELECT showid, COUNT(*) FROM tv_episodes WHERE (status IN ("+",".join([str(x) for x in $Quality.WANTED + [$ARCHIVED]])+") OR (status IN ("+",".join([str(x) for x in $Quality.SNATCHED + $Quality.SNATCHED_PROPER])+") AND location != '')) AND season != 0 and episode != 0 AND airdate <= "+$today+" GROUP BY showid")
 #set $allEps = $myDB.select("SELECT showid, COUNT(*) FROM tv_episodes WHERE season != 0 and episode != 0 AND (airdate != 1 OR status IN ("+",".join([str(x) for x in ($Quality.DOWNLOADED + $Quality.SNATCHED + $Quality.SNATCHED_PROPER) + [$ARCHIVED]])+")) AND airdate <= "+$today+" AND status != "+str($IGNORED)+" GROUP BY showid")
 #set $fr = $myDB.select("SELECT showid, COUNT(*) FROM tv_episodes WHERE audio_langs = 'fr' AND location != '' AND season != 0 and episode != 0 AND airdate <= "+$today+" GROUP BY showid")
 #set $subfr = $myDB.select("SELECT showid, COUNT(*) FROM tv_episodes WHERE audio_langs <> 'fr' AND subtitles like '%fr%' AND location != '' AND season != 0 and episode != 0 AND airdate <= "+$today+" GROUP BY showid")
@@ -52,24 +53,7 @@
 
 \$(document).ready(function(){ 
 
-	/*
-	var mygrid = tableToGrid("#showListTable");
 
-	jQuery("#showListTable").jqGrid();
-	jQuery("#showListTable").jqGrid('navGrid','#pcolch',{add:false,edit:false,del:false,search:false,refresh:false});
-	jQuery("#showListTable").jqGrid('navButtonAdd',
-		'#ptoolbar',
-		{ caption: "Columns",
-		  title: "Reorder Columns", 
-		  onClickButton : function (){
-		  	jQuery("#showListTable").jqGrid('columnChooser'); 
-		  } 
-		});
-	jQuery("#showListTable").jqGrid('setGridHeight',"100%");
-	jQuery("#showListTable").jqGrid('setGridWidth',"100%");
-	jQuery("#showListTable").jqGrid('navGrid','#ptoolbar',{del:false,add:false,edit:false,search:false}); 
-	jQuery("#showListTable").jqGrid('filterToolbar',{stringResult: true,searchOnEnter : false});
-	*/
 	
 });
 
@@ -100,18 +84,111 @@
 #set $myShowList = $list($sickbeard.showList)
 $myShowList.sort(lambda x, y: cmp(x.name, y.name))
 <div style="clear:left;padding-top:5px;">
-	<table id="EpisodeListe" ></table>
+	<table id="EpisodeListe" class="stickyTable"></table>
 </div>
 <div id="EpisodeListePager"></div>
 <script type="text/javascript">
 
 function setPbDl(download, snatch, total){
-	return download + " / " + snatch + " / " + total
+	return download + "/" + total + "";
 }
 function setPbFr(fr, st, total){
-	return fr + " / " + st + " / " + total
+	return fr + " / " + total
 }
 
+function createDownloadBar(tvID,download,snatched, wanted,total){
+
+	var pourcDownload = (parseInt(download) * 100) / parseInt(total) +"%;";
+	var pourcSnatched = (parseInt(snatched) * 100) / parseInt(total) +"%;";
+	var pourcWanted   = (parseInt(wanted  ) * 100) / parseInt(total) +"%;";
+
+
+	var AddStyleWarning = "";
+	var AddStyleSuccess = "";
+	var AddStyleError   = "";
+	
+	
+	if ((parseInt(snatched)+parseInt(wanted)) != 0) {
+		AddStyleSuccess = "-moz-border-radius:10px 0px 0px 10px;-webkit-border-radius:10px 0px 0px 10px;border-radius:10px 0px 0px 10px;";
+    }
+	if (parseInt(download) != 0 && parseInt(wanted) != 0 ) {
+		AddStyleWarning = "-moz-border-radius:0px 0px 0px 0px;-webkit-border-radius:0px 0px 0px 0px;border-radius:0px 0px 0px 0px;";
+    }
+	if (parseInt(download) != 0 && parseInt(wanted) == 0 ) {
+			AddStyleWarning = "-moz-border-radius:0px 10px 10px 0px;-webkit-border-radius:0px 10px 10px 0px;border-radius:0px 10px 10px 0px;";
+    }
+	if (parseInt(download) == 0 && parseInt(wanted) != 0 ) {
+			AddStyleWarning = "-moz-border-radius:10px 0px 0px 10px;-webkit-border-radius:10px 0px 0px 10px;border-radius:10px 0px 0px 10px;";
+    }
+	if ((parseInt(snatched)+parseInt(download)) != 0) {
+		AddStyleError = "-moz-border-radius:0px 10px 10px 0px;-webkit-border-radius:0px 10px 10px 0px;border-radius:0px 10px 10px 0px;";
+    }
+
+	return "<div class=\"progress ui-progressbar ui-widget-header qTip\" tvId=\"show_"+ tvID +"\" id=\"new_progressbar"+ tvID +"\" style=\"position:relative;\">" +
+    	   "<div class=\"bar bar-success\" style=\"width:"+ pourcDownload +AddStyleSuccess+"\" ></div>"+
+    		"<div class=\"bar bar-warning\" style=\"width:"+ pourcSnatched +AddStyleWarning+"\" ></div>"+
+    		"<div class=\"bar bar-danger\" style=\"width:"+ pourcWanted +AddStyleError+"\" ></div>"+
+    		"<div class=\"progressbarText\">" + download +" / " + total +"</div>"+
+    	"</div>"+
+    	"<div id=\"tipnew_progressbarshow_"+ tvID +"\" style=\"display:none\" >"+
+    		"<div style=\"width:115px;\">"+
+	    		"<div style=\"font-size:10px;\">"+
+		    		"<div>"+
+		    			"<span>Downloaded</span><span style=\"float:right;\"> "+ download +"</span>"+
+		    		"</div>"+
+		    		"<div>"+
+		    			"<span>Snatched</span><span style=\"float:right;\"> "+ snatched +"</span>"+
+		    		"</div>"+
+		    		"<div>"+
+		    			"<span>Wanted</span><span style=\"float:right;\"> "+ wanted +"</span>"+
+		    		"</div>"+
+		    		"<div>"+
+		    			"<span>Total</span><span style=\"float:right;\"> "+ total +"</span>"+
+		    		"</div>"+
+				"</div>"+
+    		"</div>"+
+    	"</div>";
+}
+
+
+function createFRBar(tvID,audio,st,total){
+
+	var pourcAudio = (parseInt(audio) * 100) / parseInt(total) +"%;";
+	var pourcST = (parseInt(st) * 100) / parseInt(total) +"%;";
+
+
+	var AddStyleWarning = "";
+	var AddStyleSuccess = "";
+	var AddStyleError   = "";
+	if (pourcAudio != "0%"  && pourcST != "0%") {
+		AddStyleWarning = "-moz-border-radius:0px 10px 10px 0px;-webkit-border-radius:0px 10px 10px 0px;border-radius:0px 10px 10px 0px;";
+		AddStyleSuccess = "-moz-border-radius:10px 0px 0px 10px;-webkit-border-radius:10px 0px 0px 10px;border-radius:10px 0px 0px 10px;";
+    }
+
+
+
+	return "<div class=\"progress ui-progressbar ui-widget-header qTip\" tvId=\"lang_"+ tvID +"\" id=\"new_progressbar"+ tvID +"\" style=\"position:relative;\">" +
+    	   "<div class=\"bar bar-success\" style=\"width:"+ pourcAudio +AddStyleSuccess+"\" ></div>"+
+    		"<div class=\"bar bar-warning\" style=\"width:"+ pourcST +AddStyleWarning+"\" ></div>"+
+    		"<div class=\"bar bar-danger\" style=\"width:"+ "0%;" +"\" ></div>"+
+    		"<div class=\"progressbarText\">" + audio +" / " + total +"</div>"+
+    	"</div>"+
+    	"<div id=\"tipnew_progressbarlang_"+ tvID +"\" style=\"display:none\" >"+
+    		"<div style=\"width:115px;\">"+
+	    		"<div style=\"font-size:10px;\">"+
+		    		"<div>"+
+		    			"<span>Audio FR</span><span style=\"float:right;\"> "+ audio +"</span>"+
+		    		"</div>"+
+		    		"<div>"+
+		    			"<span>Only Sub FR</span><span style=\"float:right;\"> "+ st +"</span>"+
+		    		"</div>"+
+		    		"<div>"+
+		    			"<span>Total Downloaded</span><span style=\"float:right;\"> "+ total +"</span>"+
+		    		"</div>"+
+				"</div>"+
+    		"</div>"+
+    	"</div>";
+}
 
 	var dataTable = [
 #for $curShow in $myShowList:
@@ -120,6 +197,7 @@ function setPbFr(fr, st, total){
 #set $curShowSubsfr = [x[1] for x in $subfr if int(x[0]) == $curShow.tvdbid]
 #set $curShowDownloads = [x[1] for x in $downloadedEps if int(x[0]) == $curShow.tvdbid]
 #set $curShowSnatched = [x[1] for x in $snatchedEps if int(x[0]) == $curShow.tvdbid]
+#set $curShowWanted = [x[1] for x in $wantedEps if int(x[0]) == $curShow.tvdbid]
 #set $curfr = [x[1] for x in $fr if int(x[0]) == $curShow.tvdbid]
 #set $curShowAll = [x[1] for x in $allEps if int(x[0]) == $curShow.tvdbid]
 #set $which_thumb = $layout+"_thumb" 
@@ -139,6 +217,7 @@ function setPbFr(fr, st, total){
   #set $nom = 0
   #set $den = 1
 #end if
+
 #if len($curShowDownloads) != 0:
   #if len($curfr) != 0:
     #set $frStat = str($curfr[0])+" / "+str($curShowDownloads[0])
@@ -160,6 +239,12 @@ function setPbFr(fr, st, total){
 #else:
     #set $nomSna = 0
 #end if
+#if len($curShowWanted) != 0:
+    #set $nomWan = $curShowWanted[0]
+#else:
+    #set $nomWan = 0
+#end if
+
 #if len($curShowSubsfr) != 0:
     #set $nomSub = $curShowSubsfr[0]
 #else:
@@ -189,6 +274,7 @@ function setPbFr(fr, st, total){
 #if int($curShow.paused) == 0 and $curShow.status != "Ended":
 	#set $active = "<img src='" + $sbRoot + "/images/yes16.png' alt='Y' width='16' height='16' />"
 #end if
+
 	{
 		nextep : "$airdate",
 		imdb : $curShow.tvdbid,
@@ -196,12 +282,12 @@ function setPbFr(fr, st, total){
 		show : "$curShow.name",
 		network : "$network", 
 		quality : "$quality", 
-		nombre: $nom,
-		nombresnatch : $nomSna,
-		nombredownload : $den,
-		nombrefrancais : $nomfr,
-		nombresubfr : $nomSub,
-		nombrefr : $denfr,
+		download : $nom,
+		snatched : $nomSna,
+		wanted : $nomWan,
+		total : $den,
+		fr : $denfr,
+		subfr : $nomSub,
 		downloads : setPbDl($nom,$nomSna,$den), 
 		frenchep : setPbFr($nomfr,$nomSub,$denfr), 
 		active : "$active", 
@@ -211,7 +297,6 @@ function setPbFr(fr, st, total){
 #end for
 
 	];
-	
 	
 	var grid = jQuery("#EpisodeListe").jqGrid(
 						{ 
@@ -223,6 +308,12 @@ function setPbFr(fr, st, total){
 								'Next Ep',
 								'imdb',
 								'Name',
+								'Download',
+								'Snatched',
+								'Wanted',
+								'Total',
+								'FR',
+								'Sub FR',
 								'Show',
 								'Network', 
 								'Quality', 
@@ -235,33 +326,41 @@ function setPbFr(fr, st, total){
 								[{name:'nextep',index:'nextep',width:86,align:"center",search:false},
 								{name:'imdb',index:'imdb',hidden:true,align:"center",search:false},
 								{name:'name',index:'name',hidden:true,align:"center",search:false},
+								{name:'download',index:'download',hidden:true,align:"center",search:false},
+								{name:'snatched',index:'snatched',hidden:true,align:"center",search:false},
+								{name:'wanted',index:'wanted',hidden:true,align:"center",search:false},
+								{name:'total',index:'total',hidden:true,align:"center",search:false},
+								{name:'fr',index:'fr',hidden:true,align:"center",search:false},
+								{name:'subfr',index:'subfr',hidden:true,align:"center",search:false},
 								{name:'show',index:'show', width:317,align:"center",stype:"text",searchoptions:{sopt:['cn']},
 									formatter:function (cellvalue, options,rowObject){
 										return "<div class=\"imgHomeWrapper imgHomeWrapperRounded $layout\"><a href=\"displayShow?show="+rowObject.imdb+"\" rel=\"dialog\" title=\""+rowObject.name+"\"><img src=\"$sbRoot/showPoster/?show="+rowObject.imdb+"&amp;which=$which_thumb\" class=\"$layout\" alt=\""+rowObject.name+"\"/></a>" ;
 									}
 								}, 
-								{name:'network',index:'network', width:70,align:"center",sorttype:"text",stype:"text",search:false}, 
+								{name:'network',index:'network', width:75,align:"center",sorttype:"text",stype:"text",search:false}, 
 								{name:'quality',index:'quality', width:56,align:"center",search:false}, 
-								{name:'downloads',index:'downloads', width:89, align:"right",sorttype:"int",align:"center",search:false}, 
-								{name:'frenchep',index:'frenchep', width:89, align:"right",sorttype:"int",align:"center",search:false}, 
+								{name:'downloads',index:'downloads', width:89, align:"right",sorttype:"int",align:"center",search:false,title:false,
+									formatter:function(cellvalue,option,rowObject){
+										return createDownloadBar(rowObject.imdb,rowObject.download,rowObject.snatched,rowObject.wanted,rowObject.total);
+									}
+								}, 
+								{name:'frenchep',index:'frenchep', width:89, align:"right",sorttype:"int",align:"center",search:false,title:false,
+									formatter:function(cellvalue,option,rowObject){
+										return createFRBar(rowObject.imdb,rowObject.fr,rowObject.subfr,rowObject.download);
+									}
+								}, 
 								{name:'active',index:'active', width:51,align:"right",align:"center",search:false}, 
-								{name:'audio',index:'audio', width:47, sortable:false,align:"center",search:false},
-								{name:'status',index:'status', width:89, sortable:false,align:"center",search:false} ],
+								{name:'audio',index:'audio', width:47, sortable:true,align:"center",search:false},
+								{name:'status',index:'status', width:89, sortable:true,align:"center",search:false} ],
 							autowidth: true,
 							ignoreCase:true,
-						    stateOptions: {
-						         cookieName: "ListeEpGridStateCookie",
-						         columns: true,
-						         filters: true,
-						         selection: true,
-						         pager: false,
-						         order: true
-						    }
+							rowNum:10000,
 						});
 							
-	for(var i=0;i<=dataTable.length;i++) 
+	for(var i=0;i<=dataTable.length;i++){
 		jQuery("#EpisodeListe").jqGrid('addRowData',i+1,dataTable[i]);
-		
+	}
+			
 	jQuery("#EpisodeListe").jqGrid('filterToolbar',{searchOnEnter : false,closeOnEscape: true,});
 	\$("#Search_btn").click(function(){
 		grid[0].clearToolbar();
@@ -270,6 +369,7 @@ function setPbFr(fr, st, total){
 	grid[0].toggleToolbar();
 	
 	
+	jQuery("#EpisodeListe").stickyTableHeaders();
 	
 	function saveGridToCookie(name) {
 	
@@ -298,290 +398,71 @@ function setPbFr(fr, st, total){
 	loadGridFromCookie("EpisodeListe");
 	
 	
+	\$(".qTip").each(function(){
+		\$(this).qtip({
+	   		content : \$("#tipnew_progressbar"+\$(this).attr("tvID")).html(),
+	   		position : {
+	   			at : "top center",
+	   			my : "bottom center"
+	   		},
+	   		style : {
+	   			classes : 'ui-tooltip-jtools',
+	   			tip : {
+	   				corner : false,
+	   				width : 24
+	   			}
+	   		}
+	   	});
+	});
+	
+	
+	
+	
+	function UpdateTableHeaders() {
+	   \$(".ui-jqgrid.ui-widget.ui-widget-content").each(function() {
+	   
+	       var el             = \$(this),
+	           offset         = el.offset(),
+	           scrollTop      = \$(window).scrollTop(),
+	           floatingHeader = \$(".floatingHeader", this)
+	       
+	       if ((scrollTop > offset.top) && (scrollTop < offset.top + el.height())) {
+	           floatingHeader.css({
+	            "visibility": "visible"
+	           });
+	       } else {
+	           floatingHeader.css({
+	            "visibility": "hidden"
+	           });      
+	       };
+	   });
+	}
+
+	// DOM Ready      
+	\$(function() {
+	
+	   var clonedHeaderRow;
+	
+	   \$(".ui-jqgrid.ui-widget.ui-widget-content").each(function() {
+	       clonedHeaderRow = \$(".ui-state-default.ui-jqgrid-hdiv", this);
+	       clonedHeaderRow
+	         .before(clonedHeaderRow.clone())
+	         .css("width", clonedHeaderRow.width())
+	         .addClass("floatingHeader");
+	         
+	   });
+	   
+	   \$(window)
+	    .scroll(UpdateTableHeaders)
+	    .trigger("scroll");
+	   
+	});
+	
+	
+	
+	
 </script>
 
-<table id="showListTable" class="sickbeardTable" cellspacing="1" border="0" cellpadding="0">
-
-  <thead class="tablesorter-header">
-  	<tr>
-  		<th class="nowrap">Next Ep</th>
-  		#if $layout=="poster" then "<th>Poster</th>" else ""#<th>Show</th>
-  		<th>Network</th>
-  		<th>Quality</th>
-  		<th>Downloads</th>
-  		<th>French Ep</th>
-  		<th>Active</th>
-  		<th>Audio</th>
-  		<th>Status</th>
-  	</tr>
-  </thead>
-  <tbody>
-
-
-	
-#for $curLoadingShow in $sickbeard.showQueueScheduler.action.loadingShowList:
-
-  #if $curLoadingShow.show != None and $curLoadingShow.show in $sickbeard.showList:
-    #continue
-  #end if
-
-  <tr>
-    <td align="center">(loading)</td>
-    <td></td>
-    <td>
-    #if $curLoadingShow.show == None:
-    Loading... ($curLoadingShow.show_name)
-    #else:
-    <a href="displayShow?show=$curLoadingShow.show.tvdbid">$curLoadingShow.show.name</a>
-    #end if
-    </td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    #if ($layout == 'poster'):
-    <td></td>
-    #end if
-  </tr>
-#end for
-
-#if 0==1:
-#for $curShow in $myShowList:
-#set $curEp = $curShow.nextEpisode()
-#set $curShowSubsfr = [x[1] for x in $subfr if int(x[0]) == $curShow.tvdbid]
-#set $curShowDownloads = [x[1] for x in $downloadedEps if int(x[0]) == $curShow.tvdbid]
-#set $curShowSnatched = [x[1] for x in $snatchedEps if int(x[0]) == $curShow.tvdbid]
-#set $curfr = [x[1] for x in $fr if int(x[0]) == $curShow.tvdbid]
-#set $curShowAll = [x[1] for x in $allEps if int(x[0]) == $curShow.tvdbid]
-#if len($curShowAll) != 0:
-  #if len($curShowDownloads) != 0:
-    #set $dlStat = str($curShowDownloads[0])+" / "+str($curShowAll[0])
-    #set $nom = $curShowDownloads[0]
-    #set $den = $curShowAll[0]
-  #else
-    #set $dlStat = "0 / "+str($curShowAll[0])
-    #set $nom = 0
-    #set $den = $curShowAll[0]
-  #end if
-#else
-  #set $dlStat = "?"
-  #set $nom = 0
-  #set $den = 1
-#end if
-#if len($curShowDownloads) != 0:
-  #if len($curfr) != 0:
-    #set $frStat = str($curfr[0])+" / "+str($curShowDownloads[0])
-    #set $nomfr = $curfr[0]
-    #set $denfr = $curShowDownloads[0]
-  #else
-    #set $frStat = "0 / "+str($curShowDownloads[0])
-    #set $nomfr = 0
-    #set $denfr = $curShowDownloads[0]
-  #end if
-#else
-  #set $frStat = "0 / 0"
-  #set $nomfr = 0
-  #set $denfr = 1
-#end if
-
-#if len($curShowSnatched) != 0:
-    #set $nomSna = $curShowSnatched[0]
-#else:
-    #set $nomSna = 0
-#end if
-#if len($curShowSubsfr) != 0:
-    #set $nomSub = $curShowSubsfr[0]
-#else:
-    #set $nomSub = 0
-#end if
-#set $which_thumb = $layout+"_thumb" 
-
-  <tr>
-    <td align="center" class="nowrap" style="color: #555555;font-weight:bold;">#if len($curEp) != 0 then $curEp[0].airdate else ""#</td>
-    #if $layout == 'poster':
-	    <td>
-	    	<div class="imgHomeWrapper $layout">
-		    	<a href="$sbRoot/showPoster/?show=$curShow.tvdbid&amp;which=$layout" rel="dialog" title="$curShow.name">
-		    		<img src="$sbRoot/showPoster/?show=$curShow.tvdbid&amp;which=$which_thumb" class="$layout" alt="$curShow.name"/>
-		    	</a>
-	    	</div>
-	    </td>
-    	<td class="tvShow"><a href="$sbRoot/home/displayShow?show=$curShow.tvdbid">$curShow.name</a></td>
-	#else if $layout == 'banner':
-	    <td align="center">
-	    	<span style="display: none;">$curShow.name</span>
-	    	<div class="imgHomeWrapper imgHomeWrapperRounded $layout">
-	    		<a href="$sbRoot/home/displayShow?show=$curShow.tvdbid">
-	    			<img src="$sbRoot/showPoster/?show=$curShow.tvdbid&amp;which=$layout" class="$layout" alt="$curShow.name" title="$curShow.name"/>
-	    		</a>
-	    	</div>
-	    </td>
-	#else if $layout == 'simple':
-	    <td class="tvShow"><a href="$sbRoot/home/displayShow?show=$curShow.tvdbid">$curShow.name</a></td>
-    #end if
-    <!--<td align="center">$curShow.network</td>//-->
-    <td align="center" style="color: #555555;font-weight:bold;">
-    #if $layout != 'simple':	
-        #if $curShow.network:
-        	<img id="network" width="60" height="30" src="$sbRoot/images/network/${curShow.network.lower()}.png" alt="$curShow.network" title="$curShow.network" />
-    	#else:
-    		<img id="network" width="60" height="30" src="$sbRoot/images/network/nonetwork.png" alt="No Network" title="No Network" />
-		#end if
-	#else:
-		$curShow.network
-	#end if		
-    </td>
-    
-#if $curShow.quality in $qualityPresets:
-    <td align="center"><span class="quality $qualityPresetStrings[$curShow.quality]">$qualityPresetStrings[$curShow.quality]</span></td>
-#else:
-    <td align="center"><span class="quality Custom">Custom</span></td>
-#end if
-    <td align="center"><span style="display: none;">$dlStat</span>
-
-        <div class="progress ui-progressbar ui-widget-header" id="new_progressbar$curShow.tvdbid" style="position:relative;">
-    		<div class="bar bar-success" ></div>
-    		<div class="bar bar-warning" ></div>
-    		<div class="bar bar-danger" ></div>
-    	</div>
-    	
-    	<div id="tipnew_progressbar$curShow.tvdbid" style="display:none">
-    		<div style="width:115px;">
-	    		<div style="font-size:10px;">
-		    		<div>
-		    			<span>Downloaded</span><span style="float:right;"> $nom</span>
-		    		</div>
-		    		<div>
-		    			<span>Snatched</span><span style="float:right;"> $nomSna</span>
-		    		</div>
-		    		<div>
-		    			<span>Total</span><span style="float:right;"> $den</span>
-		    		</div>
-				</div>
-    		</div>
-    	</div>
-    	
-    	<script type="text/javascript">
-        <!--
-            \$(function() {
-                var progressBarWidthDL = (parseInt($nom) * 100) / parseInt($den) + "%"
-               \$("\#new_progressbar$curShow.tvdbid > .bar-success").animate({ width: progressBarWidthDL }, 1000);
-                var progressBarWidthSN = (parseInt($nomSna) * 100) / parseInt($den) + "%"
-               \$("\#new_progressbar$curShow.tvdbid > .bar-warning").animate({ width: progressBarWidthSN }, 1000);
-                var progressBarWidthNO = "0%"
-               \$("\#new_progressbar$curShow.tvdbid > .bar-danger").animate({ width: progressBarWidthNO }, 1000);
-               \$("\#new_progressbar$curShow.tvdbid").append( "<div class='progressbarText'>$dlStat</div>" );
-               
-                if (progressBarWidthDL != "0%"  && progressBarWidthSN != "0%") {
-                	\$("\#new_progressbar$curShow.tvdbid > .bar-warning").css("-moz-border-radius" , "0px 10px 10px 0px");
-                	\$("\#new_progressbar$curShow.tvdbid > .bar-warning").css("-webkit-border-radius","0px 10px 10px 0px");
-                	\$("\#new_progressbar$curShow.tvdbid > .bar-warning").css("border-radius","0px 10px 10px 0px");
-                	\$("\#new_progressbar$curShow.tvdbid > .bar-success").css("-moz-border-radius" , "10px 0px 0px 10px");
-                	\$("\#new_progressbar$curShow.tvdbid > .bar-success").css("-webkit-border-radius","10px 0px 0px 10px");
-                	\$("\#new_progressbar$curShow.tvdbid > .bar-success").css("border-radius","10px 0px 0px 10px");
-                }
-               
-               
-               \$("\#new_progressbar$curShow.tvdbid").qtip({
-               		content : \$("\#tipnew_progressbar$curShow.tvdbid").html(),
-               		position : {
-               			at : "top center",
-               			my : "bottom center"
-               		},
-               		style : {
-               			classes : 'ui-tooltip-jtools',
-               			tip : {
-               				corner : false,
-               				width : 24
-               			}
-               		}
-               	});
-               		
-            });
-        //-->
-        </script>
-    	
-    </td>
-
-	<td align="center"><span style="display: none;">$frStat</span>
-      
-       <div class="progress ui-progressbar ui-widget-header" id="new_progressbar2$curShow.tvdbid" style="position:relative;">
-            <div class="bar bar-success" ></div>
-            <div class="bar bar-warning" ></div>
-            <div class="bar bar-danger" ></div>
-        </div>
-        <div id="tipnew_progressbar2$curShow.tvdbid" style="display:none">
-    		<div style="width:115px;">
-
-	    		<div style="font-size:10px;">
-		    		<div>
-		    			<span>Audio FR</span><span style="float:right;"> $nomfr</span>
-		    		</div>
-		    		<div>
-		    			<span>Only Sub FR</span><span style="float:right;"> $nomSub</span>
-		    		</div>
-		    		<div>
-		    			<span>Total Downloaded</span><span style="float:right;"> $denfr</span>
-		    		</div>
-				</div>
-    		</div>
-    	</div>
-    	
-        <script type="text/javascript">
-        <!--
-            \$(function() {
-                var progressBarWidthDL = parseInt($nomfr) * 100 / parseInt($denfr) + "%"
-               \$("\#new_progressbar2$curShow.tvdbid > .bar-success").animate({ width: progressBarWidthDL }, 1000);
-                var progressBarWidthSub = (parseInt($nomSub) * 100) / parseInt($den) + "%"
-                
-               \$("\#new_progressbar2$curShow.tvdbid > .bar-warning").animate({ width: progressBarWidthSub }, 1000);
-                var progressBarWidthNO = "0%"
-               \$("\#new_progressbar2$curShow.tvdbid > .bar-danger").animate({ width: progressBarWidthNO }, 1000);
-               \$("\#new_progressbar2$curShow.tvdbid").append( "<div class='progressbarText'>$frStat</div>" );
-               
-               if (progressBarWidthDL != "0%"  && progressBarWidthSub != "0%") {
-                	\$("\#new_progressbar2$curShow.tvdbid > .bar-warning").css("-moz-border-radius" , "0px 10px 10px 0px");
-                	\$("\#new_progressbar2$curShow.tvdbid > .bar-warning").css("-webkit-border-radius","0px 10px 10px 0px");
-                	\$("\#new_progressbar2$curShow.tvdbid > .bar-warning").css("border-radius","0px 10px 10px 0px");
-                	\$("\#new_progressbar2$curShow.tvdbid > .bar-success").css("-moz-border-radius" , "10px 0px 0px 10px");
-                	\$("\#new_progressbar2$curShow.tvdbid > .bar-success").css("-webkit-border-radius","10px 0px 0px 10px");
-                	\$("\#new_progressbar2$curShow.tvdbid > .bar-success").css("border-radius","10px 0px 0px 10px");
-                }
-               
-               \$("\#new_progressbar2$curShow.tvdbid").qtip({
-               		content : \$("\#tipnew_progressbar2$curShow.tvdbid").html(),
-               		position : {
-               			at : "top center",
-               			my : "bottom center"
-               		},
-               		style : {
-               			classes : 'ui-tooltip-jtools',
-               			tip : {
-               				corner : false,
-               				width : 24
-               			}
-               		}
-               	});
-            });
-        //-->
-        </script>
-    </td>
-        
-    
-    <td align="center"><img src="$sbRoot/images/#if int($curShow.paused) == 0 and $curShow.status != "Ended" then "yes16.png\" alt=\"Y\"" else "no16.png\" alt=\"N\""# width="16" height="16" /></td>
-    <td align="center">        
-            <img src="$sbRoot/images/flags/${curShow.audio_lang}.png" alt="$curShow.audio_lang" width="16" />
-    </td>
-    <td align="center" style="color: #555555; font-weight: bold;">$curShow.status</td>
-  </tr>
-
-
-#end for
-#end if
-</tbody>
-</table>
 
 <script type="text/javascript" src="$sbRoot/js/tableClick.js?$sbPID"></script>
 #include $os.path.join($sickbeard.PROG_DIR, "data/interfaces/default/inc_bottom.tmpl")

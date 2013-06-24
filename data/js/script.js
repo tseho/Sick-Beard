@@ -131,6 +131,8 @@ function init() {
 	initTabs();
 }
 
+
+
 $(document).ready(function(){
 	init();
 });
