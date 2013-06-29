@@ -74,7 +74,7 @@ class BinNewzProvider(generic.NZBProvider):
 
     url = "http://www.binnews.in/"
     supportsBacklog = True
-    nzbDownloaders = [BinSearch(), NZBIndex()]
+    nzbDownloaders = [BinSearch(), NZBIndex(), NZBClub()]
 
     def __init__(self):
         generic.NZBProvider.__init__(self, "BinnewZ")
@@ -115,7 +115,7 @@ class BinNewzProvider(generic.NZBProvider):
             data = {'chkInit': '1', 'edTitre': searchString, 'chkTitre': 'on', 'chkFichier': 'on', 'chkCat': 'on',
                     'cats[]': self.qualityCategories[quality], 'edAge': '', 'edYear': ''}
         else:
-            data = {'b_submit': 'BinnewZ', 'cats[]': 'all', 'edSearchAll': searchString, "sections[]": 'all'}
+            data = {'b_submit': 'BinnewZ', 'cats[]': 'all', 'edSearchAll': searchString, 'sections[]': 'all'}
         return data
 
     #wtf with the signature change...
@@ -163,7 +163,7 @@ class BinNewzProvider(generic.NZBProvider):
                     if newsgroup in self.allowedGroups:
                         newsgroup = self.allowedGroups[newsgroup]
                     else:
-                        logger.log(u"Unknown binnewz newsgroup: " + str(newsgroup), logger.ERROR)
+                        logger.log(u"Unknown binnewz newsgroup: " + newsgroup, logger.ERROR)
                         continue
                     if newsgroup in blacklist_groups:
                         logger.log(u"Ignoring result, newsgroup is blacklisted: " + newsgroup, logger.WARNING)
@@ -171,7 +171,6 @@ class BinNewzProvider(generic.NZBProvider):
 
                 filename = cells[5].contents[0]
 
-                # FIXME
                 acceptedQualities = Quality.splitQuality(show.quality)[0]
                 quality = Quality.nameQuality(filename)
                 if quality not in acceptedQualities:
