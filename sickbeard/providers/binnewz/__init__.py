@@ -66,9 +66,15 @@ class BinNewzProvider(generic.NZBProvider):
         500: ['44', '53']
     }
 
+    qualityMinSize = {
+        (Quality.SDTV, Quality.SDDVD): 130,
+        Quality.HDTV: 500,
+        (Quality.HDWEBDL, Quality.HDBLURAY, Quality.FULLHDBLURAY, Quality.FULLHDTV, Quality.FULLHDWEBDL): 600
+    }
+
     url = "http://www.binnews.in/"
     supportsBacklog = True
-    nzbDownloaders = [BinSearch(), NZBIndex(), NZBClub()]
+    nzbDownloaders = [BinSearch(), NZBIndex()]
 
     def __init__(self):
         generic.NZBProvider.__init__(self, "BinnewZ")
@@ -109,22 +115,23 @@ class BinNewzProvider(generic.NZBProvider):
             data = {'chkInit': '1', 'edTitre': searchString, 'chkTitre': 'on', 'chkFichier': 'on', 'chkCat': 'on',
                     'cats[]': self.qualityCategories[quality], 'edAge': '', 'edYear': ''}
         else:
-            data = {'b_submit': 'BinnewZ', 'cats[]': 'all', 'edSearchAll': searchString, 'sections[]': 'all'}
+            data = {'b_submit': 'BinnewZ', 'cats[]': 'all', 'edSearchAll': searchString, "sections[]": 'all'}
         return data
 
     #wtf with the signature change...
     def _doSearch(self, searchString=None, show=None, season=None):
-
+        if searchString is None:
+            return []
         logger.log("BinNewz : Searching for " + searchString)
         data = self.buildUrl(searchString, show.quality)
         try:
-            soup = BeautifulSoup(urllib2.urlopen("http://www.binnews.in/_bin/search2.php", urllib.urlencode(data)))
+            soup = BeautifulSoup(urllib2.urlopen("http://www.binnews.in/_bin/search2.php",
+                                                 urllib.urlencode(data, True)))
         except Exception, e:
             logger.log(u"Error trying to load BinNewz response: " + ex(e), logger.ERROR)
             return []
 
         results = []
-
         tables = soup.findAll("table", id="tabliste")
         for table in tables:
 
@@ -146,7 +153,7 @@ class BinNewzProvider(generic.NZBProvider):
                         if "_fr" in language:
                             continue
 
-                            # blacklist_groups = [ "alt.binaries.multimedia" ]
+                # blacklist_groups = [ "alt.binaries.multimedia" ]
                 blacklist_groups = []
 
                 newgroupLink = cells[4].find("a")
@@ -156,7 +163,7 @@ class BinNewzProvider(generic.NZBProvider):
                     if newsgroup in self.allowedGroups:
                         newsgroup = self.allowedGroups[newsgroup]
                     else:
-                        logger.log(u"Unknown binnewz newsgroup: " + newsgroup, logger.ERROR)
+                        logger.log(u"Unknown binnewz newsgroup: " + str(newsgroup), logger.ERROR)
                         continue
                     if newsgroup in blacklist_groups:
                         logger.log(u"Ignoring result, newsgroup is blacklisted: " + newsgroup, logger.WARNING)
@@ -164,68 +171,13 @@ class BinNewzProvider(generic.NZBProvider):
 
                 filename = cells[5].contents[0]
 
-                m = re.search("^(.+)\s+\{(.*)}$", name)
-                qualityStr = ""
-                if m:
-                    name = m.group(1)
-                    qualityStr = m.group(2)
-
-                m = re.search("^(.+)\s+\[(.*)]$", name)
-                source = None
-                if m:
-                    name = m.group(1)
-                    source = m.group(2)
-
-                m = re.search("(.+)\(([0-9]{4})\)", name)
-                #year = ""
-                if m:
-                    name = m.group(1)
-                    #year = m.group(2)
-
-                m = re.search("(.+)\((\d{2}/\d{2}/\d{4})\)", name)
-                #dateStr = ""
-                if m:
-                    name = m.group(1)
-                    #dateStr = m.group(2)
-
-                m = re.search("(.+)\s+S(\d{2})\s+E(\d{2})(.*)", name)
-                if m:
-                    name = m.group(1) + " S" + m.group(2) + "E" + m.group(3) + m.group(4)
-
-                m = re.search("(.+)\s+S(\d{2})\s+Ep(\d{2})(.*)", name)
-                if m:
-                    name = m.group(1) + " S" + m.group(2) + "E" + m.group(3) + m.group(4)
-
-                filenameLower = filename.lower() if filename else ""
-                sourcelower = source.lower() if source else ""
-
-                if "720p" in qualityStr:
-                    if "web-dl" in name or "web-dl" in filenameLower:
-                        quality = Quality.HDWEBDL
-                    elif "bluray" in filenameLower or "blu-ray" in filenameLower:
-                        quality = Quality.HDBLURAY
-                    else:
-                        quality = Quality.HDWEBDL
-                    minSize = 600
-                elif "1080p" in qualityStr:
-                    if "web-dl" in name or "web-dl" in filenameLower:
-                        quality = Quality.FULLHDWEBDL
-                    elif "bluray" in filenameLower or "blu-ray" in filenameLower:
-                        quality = Quality.FULLHDBLURAY
-                    else:
-                        quality = Quality.FULLHDTV
-                    minSize = 600
-                elif "dvdrip" in qualityStr or "dvdrip" in filenameLower or "dvdrip" in sourcelower:
-                    quality = Quality.SDDVD
-                    minSize = 130
-                else:
-                    quality = Quality.SDTV
-                    minSize = 130
-
                 # FIXME
-                if show and show.quality == 28 and quality == Quality.SDTV:
+                acceptedQualities = Quality.splitQuality(show.quality)[0]
+                quality = Quality.nameQuality(filename)
+                if quality not in acceptedQualities:
                     continue
 
+                minSize = self.qualityMinSize[quality] if quality in self.qualityMinSize else 0
                 searchItems = []
                 #multiEpisodes = False
 
