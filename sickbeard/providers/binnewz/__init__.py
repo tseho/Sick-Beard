@@ -16,91 +16,113 @@
 # You should have received a copy of the GNU General Public License
 # along with Sick Beard.  If not, see <http://www.gnu.org/licenses/>.
 
-from binsearch import BinSearch
-from nzbclub import NZBClub
-from nzbindex import NZBIndex
-
-from bs4 import BeautifulSoup
-from sickbeard import logger, classes, show_name_helpers,db
-from sickbeard.providers import generic
-from sickbeard.common import Quality
-from sickbeard.exceptions import ex
-
-import sickbeard
 import re
 import urllib
 import urllib2
 
+from binsearch import BinSearch
+from nzbclub import NZBClub
+from nzbindex import NZBIndex
+from bs4 import BeautifulSoup
+from sickbeard import logger, classes, show_name_helpers, db
+from sickbeard.providers import generic
+from sickbeard.common import Quality
+from sickbeard.exceptions import ex
+import sickbeard
+
+
 class BinNewzProvider(generic.NZBProvider):
+    allowedGroups = {
+        'abmulti': 'alt.binaries.multimedia',
+        'abtvseries': 'alt.binaries.tvseries',
+        'abtv': 'alt.binaries.tv',
+        'a.b.teevee': 'alt.binaries.teevee',
+        'abstvdivxf': 'alt.binaries.series.tv.divx.french',
+        'abhdtvx264fr': 'alt.binaries.hdtv.x264.french',
+        'abmom': 'alt.binaries.mom',
+        'abhdtv': 'alt.binaries.hdtv',
+        'abboneless': 'alt.binaries.boneless',
+        'abhdtvf': 'alt.binaries.hdtv.french',
+        'abhdtvx264': 'alt.binaries.hdtv.x264',
+        'absuperman': 'alt.binaries.superman',
+        'abechangeweb': 'alt.binaries.echange-web',
+        'abmdfvost': 'alt.binaries.movies.divx.french.vost',
+        'abdvdr': 'alt.binaries.dvdr',
+        'abmzeromov': 'alt.binaries.movies.zeromovies',
+        'abcfaf': 'alt.binaries.cartoons.french.animes-fansub',
+        'abcfrench': 'alt.binaries.cartoons.french',
+        'abgougouland': 'alt.binaries.gougouland',
+        'abroger': 'alt.binaries.roger',
+        'abtatu': 'alt.binaries.tatu',
+        'abstvf': 'alt.binaries.series.tv.french',
+        'abmdfreposts': 'alt.binaries.movies.divx.french.reposts',
+        'abmdf': 'alt.binaries.movies.french',
+        'ab.aa': 'alt.binaries.aa',
+        'abspectdf': 'alt.binaries.spectacles.divx.french'
+    }
+
+    qualityCategories = {
+        3: ['24', '7', '56'],
+        500: ['44', '53']
+    }
+
+    url = "http://www.binnews.in/"
+    supportsBacklog = True
+    nzbDownloaders = [BinSearch(), NZBIndex(), NZBClub()]
 
     def __init__(self):
-        
         generic.NZBProvider.__init__(self, "BinnewZ")
 
-        self.supportsBacklog = True
-        
-        self.nzbDownloaders = [BinSearch(),NZBIndex(), NZBClub() ]
-        
-        self.url = "http://www.binnews.in/"
-        
     def isEnabled(self):
         return sickbeard.BINNEWZ
 
-    def _get_season_search_strings(self, show, season):
-        
+    def _get_season_search_strings(self, show, season, episode=None):
         showNames = show_name_helpers.allPossibleShowNames(show)
         result = []
         global globepid
-        globepid=show.tvdbid
+        globepid = show.tvdbid
         for showName in showNames:
-            result.append( showName + ".saison %2d" % season )
+            result.append(showName + ".saison %2d" % season)
         return result
 
     def _get_episode_search_strings(self, ep_obj):
         strings = []
-
         showNames = show_name_helpers.allPossibleShowNames(ep_obj.show)
         global globepid
         myDB = db.DBConnection()
-        epidr=myDB.select("SELECT episode_id from tv_episodes where tvdbid=?",[ep_obj.tvdbid])
+        epidr = myDB.select("SELECT episode_id from tv_episodes where tvdbid=?", [ep_obj.tvdbid])
         globepid = epidr[0][0]
         for showName in showNames:
-            strings.append("%s S%02dE%02d" % ( showName, ep_obj.season, ep_obj.episode) )
-            strings.append("%s %dx%d" % ( showName, ep_obj.season, ep_obj.episode ) )
-            strings.append("%s S%02d E%02d" % ( showName, ep_obj.season, ep_obj.episode) )
-
+            strings.append("%s S%02dE%02d" % (showName, ep_obj.season, ep_obj.episode))
+            strings.append("%s %dx%d" % (showName, ep_obj.season, ep_obj.episode))
+            strings.append("%s S%02d E%02d" % (showName, ep_obj.season, ep_obj.episode))
         return strings
-    
+
     def _get_title_and_url(self, item):
-        return (item.title, item.refererURL)
-    
+        return item.title, item.refererURL
+
     def getQuality(self, item):
         return item.quality
-    
-    def _doSearch(self, searchString, show=None, season=None):
-        
-        logger.log("BinNewz : Searching for " + searchString)
-        if show.quality==3:
-            cat1='24'
-            cat2='7'
-            cat3='56'
-            data = 'chkInit=1&edTitre='+searchString+'&chkTitre=on&chkFichier=on&chkCat=on&cats%5B%5D='+cat1+'&cats%5B%5D='+cat2+'&cats%5B%5D='+cat3+'&edAge=&edYear='
-        
-        elif show.quality==500:
-            cat1='44'
-            cat2='53'
-            data = 'chkInit=1&edTitre='+searchString+'&chkTitre=on&chkFichier=on&chkCat=on&cats%5B%5D='+cat1+'&cats%5B%5D='+cat2+'&edAge=&edYear='
-        
+
+    def buildUrl(self, searchString, quality):
+        if quality in self.qualityCategories:
+            data = {'chkInit': '1', 'edTitre': searchString, 'chkTitre': 'on', 'chkFichier': 'on', 'chkCat': 'on',
+                    'cats[]': self.qualityCategories[quality], 'edAge': '', 'edYear': ''}
         else:
-            data = urllib.urlencode({'b_submit': 'BinnewZ', 'cats[]' : 'all', 'edSearchAll' : searchString, 'sections[]': 'all'})
-              
-       
+            data = {'b_submit': 'BinnewZ', 'cats[]': 'all', 'edSearchAll': searchString, 'sections[]': 'all'}
+        return data
+
+    #wtf with the signature change...
+    def _doSearch(self, searchString=None, show=None, season=None):
+
+        logger.log("BinNewz : Searching for " + searchString)
+        data = self.buildUrl(searchString, show.quality)
         try:
-            soup = BeautifulSoup( urllib2.urlopen("http://www.binnews.in/_bin/search2.php", data) )
+            soup = BeautifulSoup(urllib2.urlopen("http://www.binnews.in/_bin/search2.php", urllib.urlencode(data)))
         except Exception, e:
-            logger.log(u"Error trying to load BinNewz response: "+ex(e), logger.ERROR)
+            logger.log(u"Error trying to load BinNewz response: " + ex(e), logger.ERROR)
             return []
-        
+
         results = []
 
         tables = soup.findAll("table", id="tabliste")
@@ -108,9 +130,9 @@ class BinNewzProvider(generic.NZBProvider):
 
             rows = table.findAll("tr")
             for row in rows:
-                
+
                 cells = row.select("> td")
-                if (len(cells) < 11):
+                if len(cells) < 11:
                     continue
 
                 name = cells[2].text.strip()
@@ -122,125 +144,68 @@ class BinNewzProvider(generic.NZBProvider):
                             continue
                     elif show.audio_lang == "en":
                         if "_fr" in language:
-                            continue                
-  
-                # blacklist_groups = [ "alt.binaries.multimedia" ]
-                blacklist_groups = []                
-                
+                            continue
+
+                            # blacklist_groups = [ "alt.binaries.multimedia" ]
+                blacklist_groups = []
+
                 newgroupLink = cells[4].find("a")
                 newsgroup = None
                 if newgroupLink.contents:
                     newsgroup = newgroupLink.contents[0]
-                    if newsgroup == "abmulti":
-                        newsgroup = "alt.binaries.multimedia"
-                    elif newsgroup == "abtvseries":
-                        newsgroup = "alt.binaries.tvseries"
-                    elif newsgroup == "abtv":
-                        newsgroup = "alt.binaries.tv"
-                    elif newsgroup == "a.b.teevee":
-                        newsgroup = "alt.binaries.teevee"
-                    elif newsgroup == "abstvdivxf":
-                        newsgroup = "alt.binaries.series.tv.divx.french"
-                    elif newsgroup == "abhdtvx264fr":
-                        newsgroup = "alt.binaries.hdtv.x264.french"
-                    elif newsgroup == "abmom":
-                        newsgroup = "alt.binaries.mom"  
-                    elif newsgroup == "abhdtv":
-                        newsgroup = "alt.binaries.hdtv"
-                    elif newsgroup == "abboneless":
-                        newsgroup = "alt.binaries.boneless"
-                    elif newsgroup == "abhdtvf":
-                        newsgroup = "alt.binaries.hdtv.french"
-                    elif newsgroup == "abhdtvx264":
-                        newsgroup = "alt.binaries.hdtv.x264"
-                    elif newsgroup == "absuperman":
-                        newsgroup = "alt.binaries.superman"
-                    elif newsgroup == "abechangeweb":
-                        newsgroup = "alt.binaries.echange-web"
-                    elif newsgroup == "abmdfvost":
-                        newsgroup = "alt.binaries.movies.divx.french.vost"
-                    elif newsgroup == "abdvdr":
-                        newsgroup = "alt.binaries.dvdr"
-                    elif newsgroup == "abmzeromov":
-                        newsgroup = "alt.binaries.movies.zeromovies"
-                    elif newsgroup == "abcfaf":
-                        newsgroup = "alt.binaries.cartoons.french.animes-fansub"
-                    elif newsgroup == "abcfrench":
-                        newsgroup = "alt.binaries.cartoons.french"
-                    elif newsgroup == "abgougouland":
-                        newsgroup = "alt.binaries.gougouland"
-                    elif newsgroup == "abroger":
-                        newsgroup = "alt.binaries.roger"
-                    elif newsgroup == "abtatu":
-                        newsgroup = "alt.binaries.tatu"
-                    elif newsgroup =="abstvf":
-                        newsgroup = "alt.binaries.series.tv.french"
-                    elif newsgroup =="abmdfreposts":
-                        newsgroup="alt.binaries.movies.divx.french.reposts"
-                    elif newsgroup =="abmdf":
-                        newsgroup="alt.binaries.movies.french"
-                    elif newsgroup =="ab.aa":
-                        newsgroup="alt.binaries.aa"
-                    elif newsgroup =="abspectdf":
-                        newsgroup="alt.binaries.spectacles.divx.french"
+                    if newsgroup in self.allowedGroups:
+                        newsgroup = self.allowedGroups[newsgroup]
                     else:
                         logger.log(u"Unknown binnewz newsgroup: " + newsgroup, logger.ERROR)
                         continue
-                    
                     if newsgroup in blacklist_groups:
                         logger.log(u"Ignoring result, newsgroup is blacklisted: " + newsgroup, logger.WARNING)
                         continue
-   
-                filename =  cells[5].contents[0]
-    
-                m =  re.search("^(.+)\s+{(.*)}$", name)
+
+                filename = cells[5].contents[0]
+
+                m = re.search("^(.+)\s+\{(.*)}$", name)
                 qualityStr = ""
                 if m:
                     name = m.group(1)
                     qualityStr = m.group(2)
-    
-                m =  re.search("^(.+)\s+\[(.*)\]$", name)
+
+                m = re.search("^(.+)\s+\[(.*)]$", name)
                 source = None
                 if m:
                     name = m.group(1)
                     source = m.group(2)
 
-                m =  re.search("(.+)\(([0-9]{4})\)", name)
-                year = ""
+                m = re.search("(.+)\(([0-9]{4})\)", name)
+                #year = ""
                 if m:
                     name = m.group(1)
-                    year = m.group(2)
-    
-                m =  re.search("(.+)\((\d{2}/\d{2}/\d{4})\)", name)
-                dateStr = ""
+                    #year = m.group(2)
+
+                m = re.search("(.+)\((\d{2}/\d{2}/\d{4})\)", name)
+                #dateStr = ""
                 if m:
                     name = m.group(1)
-                    dateStr = m.group(2)
-    
-                m =  re.search("(.+)\s+S(\d{2})\s+E(\d{2})(.*)", name)
+                    #dateStr = m.group(2)
+
+                m = re.search("(.+)\s+S(\d{2})\s+E(\d{2})(.*)", name)
                 if m:
                     name = m.group(1) + " S" + m.group(2) + "E" + m.group(3) + m.group(4)
-    
-                m =  re.search("(.+)\s+S(\d{2})\s+Ep(\d{2})(.*)", name)
+
+                m = re.search("(.+)\s+S(\d{2})\s+Ep(\d{2})(.*)", name)
                 if m:
                     name = m.group(1) + " S" + m.group(2) + "E" + m.group(3) + m.group(4)
-                    
-                        
-                if filename:
-                    filenameLower = filename.lower()
-                else:
-                    filenameLower=""
-                if source:
-                    sourcelower = source.lower()
-                else:
-                    sourcelower=""
+
+                filenameLower = filename.lower() if filename else ""
+                sourcelower = source.lower() if source else ""
+
                 if "720p" in qualityStr:
                     if "web-dl" in name or "web-dl" in filenameLower:
                         quality = Quality.HDWEBDL
                     elif "bluray" in filenameLower or "blu-ray" in filenameLower:
                         quality = Quality.HDBLURAY
                     else:
-                        quality=Quality.HDWEBDL
+                        quality = Quality.HDWEBDL
                     minSize = 600
                 elif "1080p" in qualityStr:
                     if "web-dl" in name or "web-dl" in filenameLower:
@@ -251,61 +216,63 @@ class BinNewzProvider(generic.NZBProvider):
                         quality = Quality.FULLHDTV
                     minSize = 600
                 elif "dvdrip" in qualityStr or "dvdrip" in filenameLower or "dvdrip" in sourcelower:
-                    quality= Quality.SDDVD
+                    quality = Quality.SDDVD
                     minSize = 130
                 else:
                     quality = Quality.SDTV
                     minSize = 130
-                
+
                 # FIXME
                 if show and show.quality == 28 and quality == Quality.SDTV:
                     continue
-                
+
                 searchItems = []
-                multiEpisodes = False
-                
+                #multiEpisodes = False
+
                 rangeMatcher = re.search(".*S\d{2}\s*E(\d{2})\s+[.|Et]\s+E(\d{2}).*", name)
                 if not rangeMatcher:
                     rangeMatcher = re.search(".*S\d{2}\s*E(\d{2}),(\d{2}).*", name)
                 if rangeMatcher:
-                    rangeStart = int( rangeMatcher.group(1))
-                    rangeEnd = int( rangeMatcher.group(2))
-                    if ( filename.find("*") != -1 ):
+                    rangeStart = int(rangeMatcher.group(1))
+                    rangeEnd = int(rangeMatcher.group(2))
+                    if filename.find("*") != -1:
                         for i in range(rangeStart, rangeEnd + 1):
-                            searchItem = filename.replace("**", str(i) )
-                            searchItem = searchItem.replace("*", str(i) )
-                            searchItems.append( searchItem )
-                    else:
-                        multiEpisodes = True
+                            searchItem = filename.replace("**", str(i))
+                            searchItem = searchItem.replace("*", str(i))
+                            searchItems.append(searchItem)
+                    #else:
+                    #    multiEpisodes = True
 
                 if len(searchItems) == 0:
-                    searchItems.append( filename )
+                    searchItems.append(filename)
 
                 for searchItem in searchItems:
                     for downloader in self.nzbDownloaders:
-                        logger.log("Searching for download : " + name + ", search string = "+ searchItem + " on " + downloader.__class__.__name__)
+                        logger.log("Searching for download : " + name + ", search string = " + searchItem + " on " +
+                                   downloader.__class__.__name__)
                         try:
-                            binsearch_result =  downloader.search(searchItem, minSize, newsgroup )
+                            binsearch_result = downloader.search(searchItem, minSize, newsgroup)
                             if binsearch_result:
-                                links=[]
+                                links = []
                                 binsearch_result.audio_langs = show.audio_lang
                                 binsearch_result.title = name
                                 binsearch_result.quality = quality
                                 myDB = db.DBConnection()
-                                listlink=myDB.select("SELECT link from episode_links where episode_id =?",[globepid])
+                                listlink = myDB.select("SELECT link from episode_links where episode_id =?", [globepid])
                                 for dlink in listlink:
                                     links.append(dlink[0])
                                 if binsearch_result.nzburl in links:
                                     continue
                                 else:
-                                    results.append( binsearch_result )
+                                    results.append(binsearch_result)
                                     logger.log("Found : " + searchItem + " on " + downloader.__class__.__name__)
                                     break
                         except Exception, e:
-                            logger.log("Searching from " + downloader.__class__.__name__ + " failed : " + ex(e), logger.ERROR)
+                            logger.log("Searching from " + downloader.__class__.__name__ + " failed : " + ex(e),
+                                       logger.ERROR)
 
         return results
-    
+
     def getResult(self, episodes):
         """
         Returns a result of the correct type for this provider
@@ -313,6 +280,7 @@ class BinNewzProvider(generic.NZBProvider):
         result = classes.NZBDataSearchResult(episodes)
         result.provider = self
 
-        return result    
+        return result
+
 
 provider = BinNewzProvider()
