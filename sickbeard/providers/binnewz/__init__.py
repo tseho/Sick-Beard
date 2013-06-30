@@ -100,8 +100,12 @@ class BinNewzProvider(generic.NZBProvider):
         globepid = epidr[0][0]
         for showName in showNames:
             strings.append("%s S%02dE%02d" % (showName, ep_obj.season, ep_obj.episode))
+            strings.append("%s S%02dE%d" % (showName, ep_obj.season, ep_obj.episode))
+            strings.append("%s S%dE%02d" % (showName, ep_obj.season, ep_obj.episode))
             strings.append("%s %dx%d" % (showName, ep_obj.season, ep_obj.episode))
             strings.append("%s S%02d E%02d" % (showName, ep_obj.season, ep_obj.episode))
+            strings.append("%s S%02d E%d" % (showName, ep_obj.season, ep_obj.episode))
+            strings.append("%s S%d E%02d" % (showName, ep_obj.season, ep_obj.episode))
         return strings
 
     def _get_title_and_url(self, item):
@@ -173,6 +177,8 @@ class BinNewzProvider(generic.NZBProvider):
 
                 acceptedQualities = Quality.splitQuality(show.quality)[0]
                 quality = Quality.nameQuality(filename)
+                if quality == Quality.UNKNOWN:
+                    quality = self.getReleaseQuality(name)
                 if quality not in acceptedQualities:
                     continue
 
@@ -232,6 +238,31 @@ class BinNewzProvider(generic.NZBProvider):
         result.provider = self
 
         return result
+
+    def getReleaseQuality(self, releaseName):
+        name = releaseName.lower()
+        checkName = lambda elemlist, func: func([re.search(x, name, re.I) for x in elemlist])
+
+        if checkName(["dvdrip"], all):
+            return Quality.SDDVD
+        elif checkName(["720p", "hdtv"], all):
+            return Quality.HDTV
+        elif checkName(["1080p", "hdtv"], all):
+            return Quality.FULLHDTV
+        elif checkName(["720p", "webrip"], all):
+            return Quality.HDWEBDL
+        elif checkName(["1080p", "webrip"], all):
+            return Quality.FULLHDWEBDL
+        elif checkName(["720p", "blu ray"], all):
+            return Quality.HDBLURAY
+        elif checkName(["1080p", "blu ray"], all):
+            return Quality.FULLHDBLURAY
+        elif checkName(["dvdrip"], all):
+            return Quality.SDDVD
+        elif checkName(["tvrip"], all):
+            return Quality.SDTV
+        else:
+            return Quality.SDTV
 
 
 provider = BinNewzProvider()
