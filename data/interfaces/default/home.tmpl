@@ -90,10 +90,37 @@ $myShowList.sort(lambda x, y: cmp(x.name, y.name))
 <script type="text/javascript">
 
 function setPbDl(download, snatch, total){
-	return download + "/" + total + "";
+
+	var pourcDownload = Math.round(((parseInt(download) * 100) / parseInt(total)));
+	var pourcSnatched = Math.round(((parseInt(snatch) * 100) / parseInt(total)));
+
+	var StringDL = "";
+	var StringSn = "";
+
+	if(pourcDownload < 1){
+		StringDl = "000";
+	}else if(pourcDownload < 10){
+		StringDl = "00" + pourcDownload;
+	}else if(pourcDownload < 100){
+		StringDl = "0" + pourcDownload;
+	}else{
+		StringDl = "100";
+	}
+
+	if(pourcSnatched < 1){
+		StringSn = "000";
+	}else if(pourcSnatched < 10){
+		StringSn = "00" + pourcSnatched;
+	}else if(pourcSnatched < 100){
+		StringSn = "0" + pourcSnatched;
+	}else{
+		StringSn = "100";
+	}
+
+	return StringDl + "" + StringSn;
 }
 function setPbFr(fr, st, total){
-	return fr + " / " + total
+	return setPbDl(fr,st,total);
 }
 
 function createDownloadBar(tvID,download,snatched, wanted,total){
@@ -339,12 +366,12 @@ function createFRBar(tvID,audio,st,total){
 								}, 
 								{name:'network',index:'network', width:75,align:"center",sorttype:"text",stype:"text",search:false}, 
 								{name:'quality',index:'quality', width:60,align:"center",search:false}, 
-								{name:'downloads',index:'downloads', width:90, align:"right",sorttype:"int",align:"center",search:false,title:false,
+								{name:'downloads',index:'downloads', width:100, align:"right",sorttype:"int",align:"center",search:false,title:false,
 									formatter:function(cellvalue,option,rowObject){
 										return createDownloadBar(rowObject.imdb,rowObject.download,rowObject.snatched,rowObject.wanted,rowObject.total);
 									}
 								}, 
-								{name:'frenchep',index:'frenchep', width:90, align:"right",sorttype:"int",align:"center",search:false,title:false,
+								{name:'frenchep',index:'frenchep', width:100, align:"right",sorttype:"int",align:"center",search:false,title:false,
 									formatter:function(cellvalue,option,rowObject){
 										return createFRBar(rowObject.imdb,rowObject.fr,rowObject.subfr,rowObject.download);
 									}
