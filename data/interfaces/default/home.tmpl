@@ -360,7 +360,7 @@ function setLayout(imdb,name){
 								'Audio',
 								'Status'], 
 							colModel:
-								[{name:'nextep',index:'nextep',width:86,align:"center",search:false},
+								[{name:'nextep',index:'nextep',align:"center",search:false},
 								{name:'imdb',index:'imdb',hidden:true,align:"center",search:false},
 								{name:'name',index:'name',hidden:true,align:"center",search:false},
 								{name:'download',index:'download',hidden:true,align:"center",search:false},
@@ -369,27 +369,27 @@ function setLayout(imdb,name){
 								{name:'total',index:'total',hidden:true,align:"center",search:false},
 								{name:'fr',index:'fr',hidden:true,align:"center",search:false},
 								{name:'subfr',index:'subfr',hidden:true,align:"center",search:false},
-								{name:'show',index:'show', width:320,align:"center",stype:"text",searchoptions:{sopt:['cn']},
+								{name:'show',index:'show', width:350, align:"center",stype:"text",searchoptions:{sopt:['cn']},
 									formatter:function (cellvalue, options,rowObject){
 										return setLayout(rowObject.imdb,rowObject.name)
 									}
 								}, 
 
-								{name:'network',index:'network', width:80,align:"center",sorttype:"text",stype:"text",search:false}, 
-								{name:'quality',index:'quality', width:75,align:"center",search:false}, 
-								{name:'downloads',index:'downloads', width:100, align:"right",sorttype:"int",align:"center",search:false,title:false,
+								{name:'network',index:'network', align:"center",sorttype:"text",stype:"text",search:false}, 
+								{name:'quality',index:'quality', align:"center",search:false}, 
+								{name:'downloads',index:'downloads', align:"right",sorttype:"int",align:"center",search:false,title:false,
 									formatter:function(cellvalue,option,rowObject){
 										return createDownloadBar(rowObject.imdb,rowObject.download,rowObject.snatched,rowObject.wanted,rowObject.total);
 									}
 								}, 
-								{name:'frenchep',index:'frenchep', width:100, align:"right",sorttype:"int",align:"center",search:false,title:false,
+								{name:'frenchep',index:'frenchep', align:"right",sorttype:"int",align:"center",search:false,title:false,
 									formatter:function(cellvalue,option,rowObject){
 										return createFRBar(rowObject.imdb,rowObject.fr,rowObject.subfr,rowObject.download);
 									}
 								}, 
-								{name:'active',index:'active', width:65,align:"right",align:"center",search:false}, 
-								{name:'audio',index:'audio', width:65, sortable:true,align:"center",search:false},
-								{name:'status',index:'status', width:90, sortable:true,align:"center",search:false} ],
+								{name:'active',index:'active', align:"right",align:"center",search:false}, 
+								{name:'audio',index:'audio',  sortable:true,align:"center",search:false},
+								{name:'status',index:'status', sortable:true,align:"center",search:false} ],
 							autowidth: true,
 							ignoreCase:true,
 							rowNum:10000,
