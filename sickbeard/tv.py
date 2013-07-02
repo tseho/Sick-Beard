@@ -1182,9 +1182,10 @@ class TVEpisode(object):
             logger.log(str(self.show.tvdbid) + ": No subtitles downloaded for episode " + str(self.season) + "x" + str(self.episode), logger.DEBUG)
 
         if newsubtitles and (sickbeard.SUBTITLES_CLEAN_HI or sickbeard.SUBTITLES_CLEAN_TEAM or sickbeard.SUBTITLES_CLEAN_MUSIC or sickbeard.SUBTITLES_CLEAN_PUNC):
-            for i in newsubtitles:
-                sub = cleaner.TidySub(i)
-                sub.Clean(sickbeard.SUBTITLES_CLEAN_HI, sickbeard.SUBTITLES_CLEAN_TEAM, sickbeard.SUBTITLES_CLEAN_MUSIC, sickbeard.SUBTITLES_CLEAN_PUNC)
+            for video in subtitles:
+                for subtitle in subtitles.get(video):
+                    sub = cleaner.TidySub(subtitle.path)
+                    sub.Clean(sickbeard.SUBTITLES_CLEAN_HI, sickbeard.SUBTITLES_CLEAN_TEAM, sickbeard.SUBTITLES_CLEAN_MUSIC, sickbeard.SUBTITLES_CLEAN_PUNC)
 
         if sickbeard.SUBTITLES_HISTORY:
             for video in subtitles:
