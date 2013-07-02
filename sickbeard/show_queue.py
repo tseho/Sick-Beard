@@ -156,6 +156,7 @@ class ShowQueueActions:
     FORCEUPDATE = 4
     RENAME = 5
     SUBTITLE=6
+    SUBTITLE_CLEAN=7
     
     names = {REFRESH: 'Refresh',
                     ADD: 'Add',
@@ -163,6 +164,7 @@ class ShowQueueActions:
                     FORCEUPDATE: 'Force Update',
                     RENAME: 'Rename',
                     SUBTITLE: 'Subtitle',
+                    SUBTITLE_CLEAN: 'Subtitle Cleaning',
                     }
 
 class ShowQueueItem(generic_queue.QueueItem):
