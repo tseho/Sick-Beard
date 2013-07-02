@@ -1248,6 +1248,8 @@ class TVEpisode(object):
         logger.log(str(self.show.tvdbid) + ": Cleaning subtitles for episode " + str(self.season) + "x" + str(self.episode), logger.DEBUG)
         
         self.refreshSubtitles()
+        
+        subtitles = self.subtitles
                 
         if self.subtitles and (sickbeard.SUBTITLES_CLEAN_HI or sickbeard.SUBTITLES_CLEAN_TEAM or sickbeard.SUBTITLES_CLEAN_MUSIC or sickbeard.SUBTITLES_CLEAN_PUNC):
             logger.log("TIDYSUB: Try to clean sub", logger.DEBUG)

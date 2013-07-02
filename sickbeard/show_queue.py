@@ -73,6 +73,9 @@ class ShowQueue(generic_queue.GenericQueue):
     
     def isBeingSubtitled(self, show):
         return self._isBeingSomethinged(show, (ShowQueueActions.SUBTITLE,))
+    
+    def isBeingCleanedSubtitle(self, show):
+        return self._isBeingSomethinged(show, (ShowQueueActions.SUBTITLE_CLEAN,))
 
     def _getLoadingShowList(self):
         return [x for x in self.queue + [self.currentItem] if x != None and x.isLoading]
@@ -448,7 +451,7 @@ class QueueItemSubtitle(ShowQueueItem):
 
 class QueueItemCleanSubtitle(ShowQueueItem):
     def __init__(self, show=None):
-        ShowQueueItem.__init__(self, ShowQueueActions.SUBTITLE, show)
+        ShowQueueItem.__init__(self, ShowQueueActions.SUBTITLE_CLEAN, show)
 
     def execute(self):
 

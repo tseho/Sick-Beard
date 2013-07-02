@@ -2879,6 +2879,9 @@ class Home:
             
         elif sickbeard.showQueueScheduler.action.isBeingSubtitled(showObj): #@UndefinedVariable
             show_message = 'Currently downloading subtitles for this show'
+            
+        elif sickbeard.showQueueScheduler.action.isBeingCleanedSubtitle(showObj): #@UndefinedVariable
+            show_message = 'Currently cleaning subtitles for this show'
 
         elif sickbeard.showQueueScheduler.action.isInRefreshQueue(showObj): #@UndefinedVariable
             show_message = 'This show is queued to be refreshed.'
@@ -2896,7 +2899,7 @@ class Home:
                 t.submenu.append({ 'title': 'Force Full Update',    'path': 'home/updateShow?show=%d&amp;force=1'%showObj.tvdbid })
                 t.submenu.append({ 'title': 'Update show in XBMC',  'path': 'home/updateXBMC?showName=%s'%urllib.quote_plus(showObj.name.encode('utf-8')), 'requires': haveXBMC })
                 t.submenu.append({ 'title': 'Preview Rename',       'path': 'home/testRename?show=%d'%showObj.tvdbid })
-                if sickbeard.USE_SUBTITLES and not sickbeard.showQueueScheduler.action.isBeingSubtitled(showObj) and showObj.subtitles:
+                if sickbeard.USE_SUBTITLES and not sickbeard.showQueueScheduler.action.isBeingSubtitled(showObj) and not sickbeard.showQueueScheduler.action.isBeingCleanedSubtitle(showObj) and showObj.subtitles:
                     t.submenu.append({ 'title': 'Download Subtitles', 'path': 'home/subtitleShow?show=%d'%showObj.tvdbid })
                     t.submenu.append({ 'title': 'Clean Subtitles', 'path': 'home/subtitleShowClean?show=%d'%showObj.tvdbid })
 
