@@ -3171,6 +3171,23 @@ class Home:
 
         redirect("/home/displayShow?show="+str(showObj.tvdbid))
 
+    @cherrypy.expose
+    def subtitleShowClean(self, show=None, force=0):
+
+        if show == None:
+            return _genericMessage("Error", "Invalid show ID")
+
+        showObj = sickbeard.helpers.findCertainShow(sickbeard.showList, int(show))
+
+        if showObj == None:
+            return _genericMessage("Error", "Unable to find the specified show")
+
+        # search and download subtitles
+        sickbeard.showQueueScheduler.action.cleanSubtitles(showObj, bool(force)) #@UndefinedVariable
+
+        time.sleep(3)
+
+        redirect("/home/displayShow?show="+str(showObj.tvdbid))
     
     @cherrypy.expose
     def updateXBMC(self, showName=None):

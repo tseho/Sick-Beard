@@ -129,6 +129,14 @@ class ShowQueue(generic_queue.GenericQueue):
         self.add_item(queueItemObj)
 
         return queueItemObj
+    
+    def cleanSubtitles(self, show, force=False):
+
+        queueItemObj = QueueItemCleanSubtitle(show)
+
+        self.add_item(queueItemObj)
+
+        return queueItemObj
 
     def addShow(self, tvdb_id, showDir, default_status=None, quality=None, flatten_folders=None, lang="fr", subtitles=None, audio_lang=None):
         queueItemObj = QueueItemAdd(tvdb_id, showDir, default_status, quality, flatten_folders, lang, subtitles, audio_lang)
@@ -438,6 +446,19 @@ class QueueItemSubtitle(ShowQueueItem):
 
         self.inProgress = False
 
+class QueueItemCleanSubtitle(ShowQueueItem):
+    def __init__(self, show=None):
+        ShowQueueItem.__init__(self, ShowQueueActions.SUBTITLE, show)
+
+    def execute(self):
+
+        ShowQueueItem.execute(self)
+
+        logger.log(u"Cleaning subtitles for "+self.show.name)
+
+        self.show.cleanSubtitles()
+
+        self.inProgress = False
 
 class QueueItemUpdate(ShowQueueItem):
     def __init__(self, show=None):
