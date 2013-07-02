@@ -2898,6 +2898,7 @@ class Home:
                 t.submenu.append({ 'title': 'Preview Rename',       'path': 'home/testRename?show=%d'%showObj.tvdbid })
                 if sickbeard.USE_SUBTITLES and not sickbeard.showQueueScheduler.action.isBeingSubtitled(showObj) and showObj.subtitles:
                     t.submenu.append({ 'title': 'Download Subtitles', 'path': 'home/subtitleShow?show=%d'%showObj.tvdbid })
+                    t.submenu.append({ 'title': 'Clean Subtitles', 'path': 'home/subtitleShowClean?show=%d'%showObj.tvdbid })
 
         t.show = showObj
         t.sqlResults = sqlResults
