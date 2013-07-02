@@ -35,7 +35,7 @@ from name_parser.parser import NameParser, InvalidNameException
 
 from lib import subliminal
 
-from lib import tidysub
+from lib.tidysub import cleaner
 
 from lib.tvdb_api import tvdb_api, tvdb_exceptions
 
@@ -1183,7 +1183,7 @@ class TVEpisode(object):
 
         if newsubtitles and (sickbeard.SUBTITLES_CLEAN_HI or sickbeard.SUBTITLES_CLEAN_TEAM or sickbeard.SUBTITLES_CLEAN_MUSIC or sickbeard.SUBTITLES_CLEAN_PUNC):
             for i in newsubtitles:
-                sub = tidysub.cleaner.TidySub(i)
+                sub = cleaner.TidySub(i)
                 sub.Clean(sickbeard.SUBTITLES_CLEAN_HI, sickbeard.SUBTITLES_CLEAN_TEAM, sickbeard.SUBTITLES_CLEAN_MUSIC, sickbeard.SUBTITLES_CLEAN_PUNC)
 
         if sickbeard.SUBTITLES_HISTORY:
