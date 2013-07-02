@@ -10,7 +10,7 @@ def get_guess_french():
 
 def get_teams():
     
-    return [ "OpenSubtitles", \
+    return  [ "OpenSubtitles", \
              "opensubtitles", \
              "addic7ed", \
              "Addic7ed",\
@@ -27,5 +27,4 @@ def get_teams():
              "Syncro par", \
              "Sync par", \
              "== sync", \
-             "podnapisi" \       
-             ]
+             "podnapisi" ]
