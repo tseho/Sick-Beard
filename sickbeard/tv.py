@@ -1185,7 +1185,6 @@ class TVEpisode(object):
             logger.log("TIDYSUB: Try to clean sub", logger.DEBUG)
             for video in subtitles:
                 for subtitle in subtitles.get(video):
-                    logger.log("TIDYSUB: Path : " + str(subtitle.path), logger.DEBUG)
                     sub = cleaner.TidySub(subtitle.path)
                     sub.Clean(sickbeard.SUBTITLES_CLEAN_HI, sickbeard.SUBTITLES_CLEAN_TEAM, sickbeard.SUBTITLES_CLEAN_MUSIC, sickbeard.SUBTITLES_CLEAN_PUNC)
 
