@@ -16,31 +16,31 @@
 <link rel="stylesheet" type="text/css" href="$sbRoot/css/token-input.css" />
 
 <script type="text/javascript">
-  	\$(document).ready(function() {
-		\$("#subtitles_languages").tokenInput(
-				[
-	                <%=",\r\n".join("{id: \"" + lang[2] + "\", name: \"" + lang[3] + "\"}" for lang in subtitles.subtitleLanguageFilter())%>
-	            ],
-	            {
-					method: "POST",
-	            	hintText: "Write to search a language and select it",
-					preventDuplicates: true,
-	            	prePopulate:
-	            		
-		            		[
-		            			<%=
-		            					",\r\n".join("{id: \"" + lang + "\", name: \"" + subtitles.getLanguageName(lang) + "\"}" for lang in sickbeard.SUBTITLES_LANGUAGES) if sickbeard.SUBTITLES_LANGUAGES != '' else ''
-		            			%>
-		            		]
-	            }
+    \$(document).ready(function() {
+        \$("#subtitles_languages").tokenInput(
+                [
+                    <%=",\r\n".join("{id: \"" + lang[2] + "\", name: \"" + lang[3] + "\"}" for lang in subtitles.subtitleLanguageFilter())%>
+                ],
+                {
+                    method: "POST",
+                    hintText: "Write to search a language and select it",
+                    preventDuplicates: true,
+                    prePopulate:
+                        
+                            [
+                                <%=
+                                        ",\r\n".join("{id: \"" + lang + "\", name: \"" + subtitles.getLanguageName(lang) + "\"}" for lang in sickbeard.SUBTITLES_LANGUAGES) if sickbeard.SUBTITLES_LANGUAGES != '' else ''
+                                %>
+                            ]
+                }
             );
-	});
+    });
 </script>
 
 #if $varExists('header') 
-	<h1 class="header">$header</h1>
+    <h1 class="header">$header</h1>
 #else 
-	<h1 class="title">$title</h1>
+    <h1 class="title">$title</h1>
 #end if
 
 <div id="config">
@@ -50,67 +50,68 @@
 
             <div id="config-components">
                 <ul>
-                	<li><a href="#core-component-group4">Subtitles Search</a></li>
-                	<li><a href="#core-component-group2">Subtitles Plugin</a></li>
+                    <li><a href="#core-component-group1">Subtitles Search</a></li>
+                    <li><a href="#core-component-group2">Subtitles Plugin</a></li>
+                    <li><a href="#core-component-group3">Subtitles Cleansing</a></li>
                 </ul>
                 
-                <div id="core-component-group4" class="component-group clearfix">
+                <div id="core-component-group1" class="component-group clearfix">
 
                     <div class="component-group-desc">
                         <h3>Subtitles Search</h3>
                         <p>Settings that dictate how Sick Beard handles subtitles search results.</p>
                     </div>
                     
-					<fieldset class="component-group-list">
-			            <div class="field-pair">
+                    <fieldset class="component-group-list">
+                        <div class="field-pair">
                             <input type="checkbox" class="enabler" #if $sickbeard.USE_SUBTITLES then " checked=\"checked\"" else ""# id="use_subtitles" name="use_subtitles">
                             <label for="use_subtitles" class="clearfix">
                                 <span class="component-title">Search Subtitles</span>
                             </label>
                         </div>
                         <div id="content_use_subtitles">
-	                        	<div class="field-pair">
-		                            <label class="nocheck clearfix">
-		                                <span class="component-title">Subtitle Languages</span>
-		                                <input type="text" id="subtitles_languages" name="subtitles_languages" style="border: 0px none"/>
-		                            </label>
-		                        </div>
-                        		<div class="field-pair">
-	                        		<label class="nocheck clearfix">
-		                                <span class="component-title">Subtitle Directory</span>
-		                                <input type="text" size="35" value="$sickbeard.SUBTITLES_DIR" id="subtitles_dir" name="subtitles_dir">
-		                            </label>
-	                            	<label class="nocheck clearfix">
-	    	                            	<span class="component-title">&nbsp;</span>
-			                                <span class="component-desc">The directory where Sick Beard should store your <i>Subtitles</i> files.</span>
-	          	                	</label>
-	                            	<label class="nocheck clearfix">
-	    	                            	<span class="component-title">&nbsp;</span>
-			                                <span class="component-desc"><b>NOTE:</b> Leave empty if you want store subtitle in episode path.</span>
-	          	                	</label>
-                        		</div>
-                        		<div class="field-pair">
-                            		<input type="checkbox" class="enabler" #if $sickbeard.SUBTITLES_DIR_SUB then " checked=\"checked\"" else ""# id="subtitles_dir_sub" name="subtitles_dir_sub">
-                            		<label for="subtitles_dir_subs" class="clearfix">
-                                	<span class="component-title">Use Subs Folder</span>
-									<span class="component-desc">For XBMC users. Do not use if you use a custom dir</span>                       
-                            </label>
-                        </div>
-                         <div class="field-pair">
-                            <input type="checkbox" class="enabler" #if $sickbeard.SUBSNOLANG then " checked=\"checked\"" else ""# id="subsnolang" name="subsnolang">
-                            <label for="subsnolang" class="clearfix">
-                                <span class="component-title">Create Sub Files without language code</span>
-								<span class="component-desc">Create a sub file without language code next to the language coded one (usefull for players which needs same name between video and srt files)</span>
-                            </label>
-                        </div>
-<div class="field-pair">
-		                            <input type="checkbox" name="subtitles_history" id="subtitles_history" #if $sickbeard.SUBTITLES_HISTORY then " checked=\"checked\"" else ""#/>
-		                            <label class="clearfix" for="subtitles_history">
-		                                <span class="component-title">Subtitles History</span>
-		                                <span class="component-desc">Log downloaded Subtitle on History page?</span>
-		                            </label>
-		                        </div>                        		
-	                    <br/><input type="submit" class="btn config_submitter" value="Save Changes" /><br/>
+                                <div class="field-pair">
+                                    <label class="nocheck clearfix">
+                                        <span class="component-title">Subtitle Languages</span>
+                                        <input type="text" id="subtitles_languages" name="subtitles_languages" style="border: 0px none"/>
+                                    </label>
+                                </div>
+                                <div class="field-pair">
+                                    <label class="nocheck clearfix">
+                                        <span class="component-title">Subtitle Directory</span>
+                                        <input type="text" size="35" value="$sickbeard.SUBTITLES_DIR" id="subtitles_dir" name="subtitles_dir">
+                                    </label>
+                                    <label class="nocheck clearfix">
+                                            <span class="component-title">&nbsp;</span>
+                                            <span class="component-desc">The directory where Sick Beard should store your <i>Subtitles</i> files.</span>
+                                      </label>
+                                    <label class="nocheck clearfix">
+                                            <span class="component-title">&nbsp;</span>
+                                            <span class="component-desc"><b>NOTE:</b> Leave empty if you want store subtitle in episode path.</span>
+                                      </label>
+                                </div>
+                                <div class="field-pair">
+                                    <input type="checkbox" class="enabler" #if $sickbeard.SUBTITLES_DIR_SUB then " checked=\"checked\"" else ""# id="subtitles_dir_sub" name="subtitles_dir_sub">
+                                    <label for="subtitles_dir_subs" class="clearfix">
+                                        <span class="component-title">Use Subs Folder</span>
+                                        <span class="component-desc">For XBMC users. Do not use if you use a custom dir</span>                       
+                                    </label>
+                                </div>
+                                <div class="field-pair">
+                                    <input type="checkbox" class="enabler" #if $sickbeard.SUBSNOLANG then " checked=\"checked\"" else ""# id="subsnolang" name="subsnolang">
+                                    <label for="subsnolang" class="clearfix">
+                                        <span class="component-title">Create Sub Files without language code</span>
+                                        <span class="component-desc">Create a sub file without language code next to the language coded one (usefull for players which needs same name between video and srt files)</span>
+                                    </label>
+                                </div>
+                                <div class="field-pair">
+                                    <input type="checkbox" name="subtitles_history" id="subtitles_history" #if $sickbeard.SUBTITLES_HISTORY then " checked=\"checked\"" else ""#/>
+                                    <label class="clearfix" for="subtitles_history">
+                                        <span class="component-title">Subtitles History</span>
+                                        <span class="component-desc">Log downloaded Subtitle on History page?</span>
+                                    </label>
+                                </div>                                
+                        <br/><input type="submit" class="btn config_submitter" value="Save Changes" /><br/>
                         </div>
                     </fieldset>
                 </div><!-- /component-group1 //-->
@@ -118,7 +119,7 @@
                 <div id="core-component-group2" class="component-group clearfix">
 
                     <div class="component-group-desc">
-                        <h3>Subtitle Plugins</h3>
+                        <h3>Subtitles Plugins</h3>
                         <p>Check off and drag the plugins into the order you want them to be used.</p>
                         <p class="note">At least one plugin is required.</p>
                         <p class="note"><span style="color: #654B24; font-size: 16px;">*</span> Web-scraping plugin</p>
@@ -145,8 +146,45 @@
                     </fieldset>
                 </div><!-- /component-group2 //-->
 
-	            <br/><input type="submit" class="btn config_submitter" value="Save Changes" /><br/>
+                <div id="core-component-group3" class="component-group clearfix">
 
+                    <div class="component-group-desc">
+                        <h3>Subtitles Cleansing</h3>
+                        <p>Check actions to be run after subtitles download.</p>
+                    </div>
+
+                    <fieldset class="component-group-list" style="margin-left: 50px; margin-top:36px">
+                        <div class="field-pair">
+                            <input type="checkbox" class="enabler" #if $sickbeard.SUBTITLES_CLEAN_HI then " checked=\"checked\"" else ""# id="subtitles_clean_hi" name="subtitles_clean_hi">
+                            <label for="subtitles_clean_hi" class="clearfix">
+                                <span class="component-title">Remove Hi</span>
+                                <span class="component-desc">Remove Hearing Impaired parts</span>                       
+                            </label>
+                        </div>
+                        <div class="field-pair">
+                            <input type="checkbox" class="enabler" #if $sickbeard.SUBTITLES_CLEAN_TEAM then " checked=\"checked\"" else ""# id="subtitles_clean_team" name="subtitles_clean_team">
+                            <label for="subtitles_clean_team" class="clearfix">
+                                <span class="component-title">Remove Teams Tags</span>
+                                <span class="component-desc">Remove lines containing team or website tags</span>                       
+                            </label>
+                        </div>
+                        <div class="field-pair">
+                            <input type="checkbox" class="enabler" #if $sickbeard.SUBTITLES_CLEAN_MUSIC then " checked=\"checked\"" else ""# id="subtitles_clean_music" name="subtitles_clean_music">
+                            <label for="subtitles_clean_music" class="clearfix">
+                                <span class="component-title">Remove Lyrics</span>
+                                <span class="component-desc">Remove lines containing music lyrics</span>                       
+                            </label>
+                        </div>
+                        <div class="field-pair">
+                            <input type="checkbox" class="enabler" #if $sickbeard.SUBTITLES_CLEAN_PUNC then " checked=\"checked\"" else ""# id="subtitles_clean_punc" name="subtitles_clean_punc">
+                            <label for="subtitles_clean_punc" class="clearfix">
+                                <span class="component-title">Correct punctuation</span>
+                                <span class="component-desc">Try to correct the punctuation (English and French)</span>                       
+                            </label>
+                        </div>
+
+                    <br/><input type="submit" class="btn config_submitter" value="Save Changes" /><br/>
+                    </fieldset>
             </div><!-- /config-components //-->
 
 </form>
@@ -155,7 +193,7 @@
 <script type="text/javascript" charset="utf-8">
 <!--
     jQuery('#config-components').tabs();
-	jQuery('#subtitles_dir').fileBrowser({ title: 'Select Subtitles Download Directory' });    
+    jQuery('#subtitles_dir').fileBrowser({ title: 'Select Subtitles Download Directory' });    
 //-->
 </script>
 #include $os.path.join($sickbeard.PROG_DIR, "data/interfaces/default/inc_bottom.tmpl")

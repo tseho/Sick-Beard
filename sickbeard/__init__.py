@@ -390,6 +390,10 @@ SUBSNOLANG = False
 SUBTITLES_SERVICES_LIST = []
 SUBTITLES_SERVICES_ENABLED = []
 SUBTITLES_HISTORY = False
+SUBTITLES_CLEAN_HI = False
+SUBTITLES_CLEAN_TEAM = False
+SUBTITLES_CLEAN_MUSIC = False
+SUBTITLES_CLEAN_PUNC = False
 
 USE_TORRENT_FTP = False
 FTP_HOST  = ''
@@ -463,6 +467,7 @@ def initialize(consoleLogging=True):
                 GKS, GKS_KEY, \
                 HOME_LAYOUT, DISPLAY_SHOW_SPECIALS, COMING_EPS_LAYOUT, COMING_EPS_SORT, COMING_EPS_DISPLAY_PAUSED, COMING_EPS_MISSED_RANGE, METADATA_WDTV, METADATA_TIVO, IGNORE_WORDS, CREATE_MISSING_SHOW_DIRS, \
                 ADD_SHOWS_WO_DIR, USE_SUBTITLES, SUBTITLES_LANGUAGES, SUBTITLES_DIR, SUBTITLES_DIR_SUB, SUBSNOLANG, SUBTITLES_SERVICES_LIST, SUBTITLES_SERVICES_ENABLED, SUBTITLES_HISTORY, subtitlesFinderScheduler, TOGGLE_SEARCH, \
+                SUBTITLES_CLEAN_HI, SUBTITLES_CLEAN_TEAM, SUBTITLES_CLEAN_MUSIC, SUBTITLES_CLEAN_PUNC, \
                 USE_TORRENT_FTP, FTP_HOST, FTP_LOGIN, FTP_PASSWORD, FTP_PORT, FTP_TIMEOUT, FTP_DIR, FTP_PASSIVE, sentFTPSchedular
 
         if __INITIALIZED__:
@@ -908,7 +913,7 @@ def initialize(consoleLogging=True):
         MAIL_TO = check_setting_str(CFG, 'Mail', 'mail_to', '')
         MAIL_NOTIFY_ONSNATCH = bool(check_setting_int(CFG, 'Mail', 'mail_notify_onsnatch', 0))
 
-
+        CheckSection(CFG, 'Subtitles')
         USE_SUBTITLES = bool(check_setting_int(CFG, 'Subtitles', 'use_subtitles', 0))
         SUBTITLES_LANGUAGES = check_setting_str(CFG, 'Subtitles', 'subtitles_languages', '').split(',')
         if SUBTITLES_LANGUAGES[0] == '':
@@ -920,6 +925,11 @@ def initialize(consoleLogging=True):
         SUBTITLES_SERVICES_ENABLED = [int(x) for x in check_setting_str(CFG, 'Subtitles', 'SUBTITLES_SERVICES_ENABLED', '').split('|') if x]
         SUBTITLES_DEFAULT = bool(check_setting_int(CFG, 'Subtitles', 'subtitles_default', 0))
         SUBTITLES_HISTORY = bool(check_setting_int(CFG, 'Subtitles', 'subtitles_history', 0))
+        SUBTITLES_CLEAN_HI = bool(check_setting_int(CFG, 'Subtitles', 'subtitles_clean_hi', 0))
+        SUBTITLES_CLEAN_TEAM = bool(check_setting_int(CFG, 'Subtitles', 'subtitles_clean_team', 0))
+        SUBTITLES_CLEAN_MUSIC = bool(check_setting_int(CFG, 'Subtitles', 'subtitles_clean_music', 0))
+        SUBTITLES_CLEAN_PUNC = bool(check_setting_int(CFG, 'Subtitles', 'subtitles_clean_punc', 0))
+
 
         CheckSection(CFG, 'FTP')
         USE_TORRENT_FTP = bool(check_setting_int(CFG, 'FTP', 'ftp_useftp', 0))
@@ -1612,6 +1622,12 @@ def save_config():
     new_config['Subtitles']['subsnolang'] = int(SUBSNOLANG)
     new_config['Subtitles']['subtitles_default'] = int(SUBTITLES_DEFAULT)
     new_config['Subtitles']['subtitles_history'] = int(SUBTITLES_HISTORY)
+    new_config['Subtitles']['subtitles_clean_hi'] = int(SUBTITLES_CLEAN_HI)
+    new_config['Subtitles']['subtitles_clean_team'] = int(SUBTITLES_CLEAN_TEAM)
+    new_config['Subtitles']['subtitles_clean_music'] = int(SUBTITLES_CLEAN_MUSIC)
+    new_config['Subtitles']['subtitles_clean_punc'] = int(SUBTITLES_CLEAN_PUNC)
+
+
 
     new_config['FTP'] = {}
     new_config['FTP']['ftp_useftp'] = int(USE_TORRENT_FTP)

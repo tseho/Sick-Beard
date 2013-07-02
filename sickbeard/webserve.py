@@ -1939,7 +1939,7 @@ class ConfigSubtitles:
         return _munge(t)
 
     @cherrypy.expose
-    def saveSubtitles(self, use_subtitles=None, subtitles_plugins=None, subtitles_languages=None, subtitles_dir=None, subtitles_dir_sub=None, subsnolang = None, service_order=None, subtitles_history=None):
+    def saveSubtitles(self, use_subtitles=None, subtitles_plugins=None, subtitles_languages=None, subtitles_dir=None, subtitles_dir_sub=None, subsnolang = None, service_order=None, subtitles_history=None, subtitles_clean_hi=None, subtitles_clean_team=None, subtitles_clean_music=None, subtitles_clean_punc=None):
         results = []
 
         if use_subtitles == "on":
@@ -1988,6 +1988,32 @@ class ConfigSubtitles:
             
         sickbeard.SUBTITLES_SERVICES_LIST = subtitles_services_list
         sickbeard.SUBTITLES_SERVICES_ENABLED = subtitles_services_enabled
+
+        #Subtitles Cleansing
+        if subtitles_clean_hi == "on":
+            subtitles_clean_hi = 1
+        else: 
+            subtitles_clean_hi = 0 
+  
+        if subtitles_clean_team == "on":
+            subtitles_clean_team = 1
+        else: 
+            subtitles_clean_team = 0   
+
+        if subtitles_clean_music == "on":
+            subtitles_clean_music = 1
+        else: 
+            subtitles_clean_music = 0  
+            
+        if subtitles_clean_punc == "on":
+            subtitles_clean_punc = 1
+        else: 
+            subtitles_clean_punc = 0 
+            
+        sickbeard.SUBTITLES_CLEAN_HI = subtitles_clean_hi
+        sickbeard.SUBTITLES_CLEAN_TEAM = subtitles_clean_team
+        sickbeard.SUBTITLES_CLEAN_MUSIC = subtitles_clean_music
+        sickbeard.SUBTITLES_CLEAN_PUNC = subtitles_clean_punc
 
         sickbeard.save_config()
 
@@ -2853,6 +2879,9 @@ class Home:
             
         elif sickbeard.showQueueScheduler.action.isBeingSubtitled(showObj): #@UndefinedVariable
             show_message = 'Currently downloading subtitles for this show'
+            
+        elif sickbeard.showQueueScheduler.action.isBeingCleanedSubtitle(showObj): #@UndefinedVariable
+            show_message = 'Currently cleaning subtitles for this show'
 
         elif sickbeard.showQueueScheduler.action.isInRefreshQueue(showObj): #@UndefinedVariable
             show_message = 'This show is queued to be refreshed.'
@@ -2870,8 +2899,9 @@ class Home:
                 t.submenu.append({ 'title': 'Force Full Update',    'path': 'home/updateShow?show=%d&amp;force=1'%showObj.tvdbid })
                 t.submenu.append({ 'title': 'Update show in XBMC',  'path': 'home/updateXBMC?showName=%s'%urllib.quote_plus(showObj.name.encode('utf-8')), 'requires': haveXBMC })
                 t.submenu.append({ 'title': 'Preview Rename',       'path': 'home/testRename?show=%d'%showObj.tvdbid })
-                if sickbeard.USE_SUBTITLES and not sickbeard.showQueueScheduler.action.isBeingSubtitled(showObj) and showObj.subtitles:
+                if sickbeard.USE_SUBTITLES and not sickbeard.showQueueScheduler.action.isBeingSubtitled(showObj) and not sickbeard.showQueueScheduler.action.isBeingCleanedSubtitle(showObj) and showObj.subtitles:
                     t.submenu.append({ 'title': 'Download Subtitles', 'path': 'home/subtitleShow?show=%d'%showObj.tvdbid })
+                    t.submenu.append({ 'title': 'Clean Subtitles', 'path': 'home/subtitleShowClean?show=%d'%showObj.tvdbid })
 
         t.show = showObj
         t.sqlResults = sqlResults
@@ -3144,6 +3174,23 @@ class Home:
 
         redirect("/home/displayShow?show="+str(showObj.tvdbid))
 
+    @cherrypy.expose
+    def subtitleShowClean(self, show=None, force=0):
+
+        if show == None:
+            return _genericMessage("Error", "Invalid show ID")
+
+        showObj = sickbeard.helpers.findCertainShow(sickbeard.showList, int(show))
+
+        if showObj == None:
+            return _genericMessage("Error", "Unable to find the specified show")
+
+        # search and download subtitles
+        sickbeard.showQueueScheduler.action.cleanSubtitles(showObj, bool(force)) #@UndefinedVariable
+
+        time.sleep(3)
+
+        redirect("/home/displayShow?show="+str(showObj.tvdbid))
     
     @cherrypy.expose
     def updateXBMC(self, showName=None):
