@@ -35,6 +35,8 @@ from name_parser.parser import NameParser, InvalidNameException
 
 from lib import subliminal
 
+from lib import tidysub
+
 from lib.tvdb_api import tvdb_api, tvdb_exceptions
 
 from lib.imdb import imdb
@@ -1178,6 +1180,11 @@ class TVEpisode(object):
 
         else:
             logger.log(str(self.show.tvdbid) + ": No subtitles downloaded for episode " + str(self.season) + "x" + str(self.episode), logger.DEBUG)
+
+        if newsubtitles and (sickbeard.SUBTITLES_CLEAN_HI or sickbeard.SUBTITLES_CLEAN_TEAM or sickbeard.SUBTITLES_CLEAN_MUSIC or sickbeard.SUBTITLES_CLEAN_PUNC):
+            for i in newsubtitles:
+                sub = tidysub.cleaner.TidySub(i)
+                sub.Clean(sickbeard.SUBTITLES_CLEAN_HI, sickbeard.SUBTITLES_CLEAN_TEAM, sickbeard.SUBTITLES_CLEAN_MUSIC, sickbeard.SUBTITLES_CLEAN_PUNC)
 
         if sickbeard.SUBTITLES_HISTORY:
             for video in subtitles:
