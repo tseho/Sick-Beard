@@ -4,6 +4,7 @@ import codecs
 import re
 from datetime import timedelta
 from datetime import datetime
+from regex import strings
 
 
 #Definition of the TidySub class
@@ -16,10 +17,7 @@ class TidySub:
 
         #Boolean to stock if file is loaded
         self._is_file_loaded = False
-        
-        #Path to the file containing the teams name to remove
-        self._team_path = "regex/listTeam"
-        
+               
         #Path to the subtitles file
         if re.match(r'^.+\.srt$', path_to_sub, re.UNICODE):
             self._path_to_sub = path_to_sub
@@ -103,8 +101,8 @@ class TidySub:
             return
 
         #combine words into one regex string
-        _french = "(^|[ ])" + "((" + ")|(".join(self._load_file("regex/guessFrench",True)) + "))" + "([ ]|$)"
-        _english = "(^|[ ])" + "((" + ")|(".join(self._load_file("regex/guessEnglish",True)) + "))" + "([ ]|$)"
+        _french = "(^|[ ])" + "((" + ")|(".join(strings.get_guess_french(),True) + "))" + "([ ]|$)"
+        _english = "(^|[ ])" + "((" + ")|(".join(strings.get_guess_english(),True) + "))" + "([ ]|$)"
 
         _count_french = 0
         _count_english = 0
@@ -135,7 +133,7 @@ class TidySub:
     def _clean_team(self):
 
         #combine team names into one regex string
-        combined = "(" + ")|(".join(self._team_list) + ")"
+        combined = "(" + ")|(".join(strings.get_teams()) + ")"
 
         i = 0
         
@@ -539,8 +537,6 @@ class TidySub:
         #If the team strings must be removed
         if removeTeam:
             print("INFO: Removing teams names")
-            # Load the file of Team names
-            self._team_list = self._load_file(self._team_path, True)
             
             #Call the function
             self._clean_team()
