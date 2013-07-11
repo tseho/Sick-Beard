@@ -194,8 +194,8 @@ class BinNewzProvider(generic.NZBProvider):
 
                 rangeMatcher = re.search(".*[sS](aison)?[ _-]*([0-9]{1,2})[ _-]*(x|dvd|[eéEÉ](p|pisode(s)?)?)[ _-]*([0-9]{1,2})[ _-]*(([aàAÀ,/-]|\.|et|and|&|to)[ _-]*((x|dvd|[eéEÉ]?(p|pisode(s)?)?)?[ _-]*([0-9]{1,2})?[,]?)*(fin(al)?)*)+.*", name)
                 if rangeMatcher:
-                    rangeStart = int(rangeMatcher.group(1))
-                    rangeEnd = int(rangeMatcher.group(2))
+                    rangeStart = int(rangeMatcher.group(5))
+                    rangeEnd = int(rangeMatcher.group(11))
                     if filename.find("*") != -1:
                         for i in range(rangeStart, rangeEnd + 1):
                             searchItem = filename.replace("**", str(i))
