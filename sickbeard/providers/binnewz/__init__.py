@@ -192,10 +192,10 @@ class BinNewzProvider(generic.NZBProvider):
                 searchItems = []
                 #multiEpisodes = False
 
-                rangeMatcher = re.search(".*[sS](aison)?[ _-]*([0-9]{1,2})[ _-]*(x|dvd|[eéEÉ](p|pisode(s)?)?)[ _-]*([0-9]{1,2})[ _-]*(([aàAÀ,/-]|\.|et|and|&|to)[ _-]*((x|dvd|[eéEÉ]?(p|pisode(s)?)?)?[ _-]*([0-9]{1,2})?[,]?)*(fin(al)?)*)+.*", name)
+                rangeMatcher = re.search(".*[sS](aison)?[\s\.\-_]*([0-9]{1,2})[\s\.\-_]?([xX]|dvd|[eéEÉ](p|pisode(s)?)?)[\s\.\-_]*([0-9]{1,2})([\s\.\-_]*([aàAÀ,/\-\.\s\&_]|et|and|to)[\s\.\-_]*(([xX]|dvd|[eéEÉ]?(p|pisode(s)?)?)*[\s\.\-_]*([0-9]{1,2}))([fF]in(al)?)?)+.*", name)
                 if rangeMatcher:
                     rangeStart = int(rangeMatcher.group(5))
-                    rangeEnd = int(rangeMatcher.group(11))
+                    rangeEnd = int(rangeMatcher.group(12))
                     if filename.find("*") != -1:
                         for i in range(rangeStart, rangeEnd + 1):
                             searchItem = filename.replace("**", str(i))
