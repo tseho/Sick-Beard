@@ -112,6 +112,9 @@ class BinNewzProvider(generic.NZBProvider):
             strings.append("%s S%02d Ep%02d" % (showName, ep_obj.season, ep_obj.episode))
             strings.append("%s S%02d Ep%d" % (showName, ep_obj.season, ep_obj.episode))
             strings.append("%s S%d Ep%02d" % (showName, ep_obj.season, ep_obj.episode))
+            strings.append("%s S%02d Ep %02d" % (showName, ep_obj.season, ep_obj.episode))
+            strings.append("%s S%02d Ep %d" % (showName, ep_obj.season, ep_obj.episode))
+            strings.append("%s S%d Ep %02d" % (showName, ep_obj.season, ep_obj.episode))
         return strings
 
     def _get_title_and_url(self, item):
