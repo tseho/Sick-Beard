@@ -133,6 +133,7 @@ function createDownloadBar(tvID,download,snatched, wanted,total){
 	var AddStyleWarning = "";
 	var AddStyleSuccess = "";
 	var AddStyleError   = "";
+	var txtDownload = "";
 	
 	
 	if ((parseInt(snatched)+parseInt(wanted)) != 0) {
@@ -151,11 +152,19 @@ function createDownloadBar(tvID,download,snatched, wanted,total){
 		AddStyleError = "-moz-border-radius:0px 10px 10px 0px;-webkit-border-radius:0px 10px 10px 0px;border-radius:0px 10px 10px 0px;";
     }
 
+	if (total != 0) {
+		txtDownload = download +" / " + total;	
+    }else{
+    	txtDownload = "?";
+    }
+	
+
+
 	return "<div class=\"progress ui-progressbar ui-widget-header qTip\" tvId=\"show_"+ tvID +"\" id=\"new_progressbar"+ tvID +"\" style=\"position:relative;\">" +
     	   "<div class=\"bar bar-success\" style=\"width:"+ pourcDownload +AddStyleSuccess+"\" ></div>"+
     		"<div class=\"bar bar-warning\" style=\"width:"+ pourcSnatched +AddStyleWarning+"\" ></div>"+
     		"<div class=\"bar bar-danger\" style=\"width:"+ pourcWanted +AddStyleError+"\" ></div>"+
-    		"<div class=\"progressbarText\">" + download +" / " + total +"</div>"+
+    		"<div class=\"progressbarText\">" + txtDownload +"</div>"+
     	"</div>"+
     	"<div id=\"tipnew_progressbarshow_"+ tvID +"\" style=\"display:none\" >"+
     		"<div style=\"width:115px;\">"+
@@ -222,8 +231,10 @@ function setLayout(imdb,name){
 
     if("$layout" == "simple"){
         return "<a href=\"displayShow?show="+imdb+"\" rel=\"dialog\" title=\""+name+"\">"+name+"</a>" ;
-    }else{
+    }else if("$layout" == "banner"){
         return "<div class=\"imgHomeWrapper imgHomeWrapperRounded $layout\"><a href=\"displayShow?show="+imdb+"\" rel=\"dialog\" title=\""+name+"\"><img src=\"$sbRoot/showPoster/?show="+imdb+"&amp;which=$which_thumb\" class=\"$layout\" alt=\""+name+"\"/></a></div>" ;
+    }else{
+    	return "<div class=\"imgHomeWrapper imgHomeWrapperRounded $layout\"><a href=\"displayShow?show="+imdb+"\" rel=\"dialog\" title=\""+name+"\"><img src=\"$sbRoot/showPoster/?show="+imdb+"&amp;which=$which_thumb\" class=\"$layout\" alt=\""+name+"\"/></a></div>" ;
     }
 }
 
@@ -252,7 +263,7 @@ function setLayout(imdb,name){
 #else
   #set $dlStat = "?"
   #set $nom = 0
-  #set $den = 1
+  #set $den = 0
 #end if
 
 #if len($curShowDownloads) != 0:
@@ -268,7 +279,7 @@ function setLayout(imdb,name){
 #else
   #set $frStat = "0 / 0"
   #set $nomfr = 0
-  #set $denfr = 1
+  #set $denfr = 0
 #end if
 
 #if len($curShowSnatched) != 0:
@@ -317,6 +328,7 @@ function setLayout(imdb,name){
 		imdb : $curShow.tvdbid,
 		name : "$curShow.name",
 		show : "$curShow.name",
+		poster : "$curShow.name",
 		network : "$network", 
 		quality : "$quality", 
 		download : "$denfr",
@@ -344,7 +356,6 @@ function setLayout(imdb,name){
 							colNames:[
 								'Next Ep',
 								'imdb',
-								'Name',
 								'Download',
 								'Snatched',
 								'Wanted',
@@ -352,6 +363,8 @@ function setLayout(imdb,name){
 								'FR',
 								'Sub FR',
 								'Show',
+								'Poster',
+								'Name',
 								'Network', 
 								'Quality', 
 								'Downloads',
@@ -362,19 +375,27 @@ function setLayout(imdb,name){
 							colModel:
 								[{name:'nextep',index:'nextep',align:"center",search:false},
 								{name:'imdb',index:'imdb',hidden:true,align:"center",search:false},
-								{name:'name',index:'name',hidden:true,align:"center",search:false},
 								{name:'download',index:'download',hidden:true,align:"center",search:false},
 								{name:'snatched',index:'snatched',hidden:true,align:"center",search:false},
 								{name:'wanted',index:'wanted',hidden:true,align:"center",search:false},
 								{name:'total',index:'total',hidden:true,align:"center",search:false},
 								{name:'fr',index:'fr',hidden:true,align:"center",search:false},
 								{name:'subfr',index:'subfr',hidden:true,align:"center",search:false},
-								{name:'show',index:'show', width:350, align:"center",stype:"text",searchoptions:{sopt:['cn']},
+								{name:'show',index:'show',width:350,align:"center",stype:"text",searchoptions:{sopt:['cn']},
 									formatter:function (cellvalue, options,rowObject){
 										return setLayout(rowObject.imdb,rowObject.name)
 									}
 								}, 
-
+								{name:'poster',index:'poster',width:50,align:"center",stype:"text",search:false,
+									formatter:function (cellvalue, options,rowObject){
+										return setLayout(rowObject.imdb,rowObject.name)
+									}
+								}, 
+								{name:'name',index:'name',width:300,hidden:true,align:"center",searchoptions:{sopt:['cn']},
+									formatter:function (cellvalue, options,rowObject){
+										return "<a class=\"tvShow\" href=\"/home/displayShow?show=" + rowObject.imdb + "\">" + rowObject.name + "</a>"
+									}
+								},
 								{name:'network',index:'network', align:"center",sorttype:"text",stype:"text",search:false}, 
 								{name:'quality',index:'quality', align:"center",search:false}, 
 								{name:'downloads',index:'downloads', align:"right",sorttype:"int",align:"center",search:false,title:false,
@@ -421,6 +442,19 @@ function setLayout(imdb,name){
 #else:
 	jQuery("#EpisodeListe").jqGrid('hideCol',["frenchep"]);
 #end if
+	
+#if ($layout == "poster"):
+	jQuery("#EpisodeListe").jqGrid('showCol',["name"]);	
+	jQuery("#EpisodeListe").jqGrid('showCol',["poster"]);
+	jQuery("#EpisodeListe").jqGrid('hideCol',["show"]);
+	
+#else:
+	jQuery("#EpisodeListe").jqGrid('hideCol',["name"]);
+	jQuery("#EpisodeListe").jqGrid('hideCol',["poster"]);
+	jQuery("#EpisodeListe").jqGrid('showCol',["show"]);
+#end if
+	
+	UpdateTableHeaders();
 	
 	jQuery("#EpisodeListe").stickyTableHeaders();
 	
