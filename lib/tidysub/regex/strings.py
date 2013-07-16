@@ -25,6 +25,7 @@ def get_teams():
              "Sous-titrage :", \
              "Adaptation :", \
              "Syncro par", \
+             "Synchro par", \
              "Sync par", \
              "== sync", \
              "podnapisi", \
