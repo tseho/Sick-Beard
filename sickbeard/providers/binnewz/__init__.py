@@ -118,7 +118,8 @@ class BinNewzProvider(generic.NZBProvider):
         return strings
 
     def _get_title_and_url(self, item):
-        return item.title, item.refererURL
+        cleanedTitle = re.sub(r'(^.*\[\w+)\-(\w+\].*$)',r'\1\2',item.title)
+        return cleanedTitle, item.refererURL
 
     def getQuality(self, item):
         return item.quality
