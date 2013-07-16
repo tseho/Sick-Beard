@@ -106,6 +106,15 @@ class BinNewzProvider(generic.NZBProvider):
             strings.append("%s S%02d E%02d" % (showName, ep_obj.season, ep_obj.episode))
             strings.append("%s S%02d E%d" % (showName, ep_obj.season, ep_obj.episode))
             strings.append("%s S%d E%02d" % (showName, ep_obj.season, ep_obj.episode))
+            strings.append("%s S%02dEp%02d" % (showName, ep_obj.season, ep_obj.episode))
+            strings.append("%s S%02dEp%d" % (showName, ep_obj.season, ep_obj.episode))
+            strings.append("%s S%dEp%02d" % (showName, ep_obj.season, ep_obj.episode))
+            strings.append("%s S%02d Ep%02d" % (showName, ep_obj.season, ep_obj.episode))
+            strings.append("%s S%02d Ep%d" % (showName, ep_obj.season, ep_obj.episode))
+            strings.append("%s S%d Ep%02d" % (showName, ep_obj.season, ep_obj.episode))
+            strings.append("%s S%02d Ep %02d" % (showName, ep_obj.season, ep_obj.episode))
+            strings.append("%s S%02d Ep %d" % (showName, ep_obj.season, ep_obj.episode))
+            strings.append("%s S%d Ep %02d" % (showName, ep_obj.season, ep_obj.episode))
         return strings
 
     def _get_title_and_url(self, item):
@@ -186,12 +195,10 @@ class BinNewzProvider(generic.NZBProvider):
                 searchItems = []
                 #multiEpisodes = False
 
-                rangeMatcher = re.search(".*S\d{2}\s*E(\d{2})\s+[.|Et]\s+E(\d{2}).*", name)
-                if not rangeMatcher:
-                    rangeMatcher = re.search(".*S\d{2}\s*E(\d{2}),(\d{2}).*", name)
+                rangeMatcher = re.search(".*[sS](aison)?[\s\.\-_]*([0-9]{1,2})[\s\.\-_]?([xX]|dvd|[eéEÉ](p|pisode(s)?)?)[\s\.\-_]*([0-9]{1,2})([\s\.\-_]*([aàAÀ,/\-\.\s\&_]|et|and|to)[\s\.\-_]*(([xX]|dvd|[eéEÉ]?(p|pisode(s)?)?)*[\s\.\-_]*([0-9]{1,2}))([fF]in(al)?)?)+.*", name)
                 if rangeMatcher:
-                    rangeStart = int(rangeMatcher.group(1))
-                    rangeEnd = int(rangeMatcher.group(2))
+                    rangeStart = int(rangeMatcher.group(5))
+                    rangeEnd = int(rangeMatcher.group(12))
                     if filename.find("*") != -1:
                         for i in range(rangeStart, rangeEnd + 1):
                             searchItem = filename.replace("**", str(i))
