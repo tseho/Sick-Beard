@@ -10,24 +10,24 @@ def get_guess_french():
 
 def get_teams():
     
-    return  ["OpenSubtitles", \
-             "opensubtitles", \
+    return  ["== sync", \
+             "Adaptation :", \
              "addic7ed", \
              "Addic7ed", \
-             "tvsubtitles", \
+             "podnapisi", \
              "Sync & corrections by", \
              "sync and corrections", \
              "Sync and corrections", \
-             "Sync et corrections", \
              "Sync by", \
+             "Sync et corrections", \
              "synchro par", \
+             "OpenSubtitles", \
+             "opensubtitles", \
              "Open Subtitles MKV Player", \
              "Sous-titrage :", \
-             "Adaptation :", \
+             "Sync :", \
              "Syncro par", \
              "Synchro par", \
              "Sync par", \
-             "== sync", \
-             "podnapisi", \
-             "Sync :", \
-             "Trad :" ]
+             "Trad :", \
+             "tvsubtitles"]
