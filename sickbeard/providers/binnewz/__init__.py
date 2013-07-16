@@ -1,3 +1,4 @@
+# -*- coding: latin-1 -*-
 # Author: Guillaume Serre <guillaume.serre@gmail.com>
 # URL: http://code.google.com/p/sickbeard/
 #
