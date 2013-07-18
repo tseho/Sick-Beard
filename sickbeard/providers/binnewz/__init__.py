@@ -196,7 +196,7 @@ class BinNewzProvider(generic.NZBProvider):
                 searchItems = []
                 #multiEpisodes = False
 
-                rangeMatcher = re.search("(?i).*(?<![\s\.\-_])[\s\.\-_]+s?(?:aison)?[\s\.\-_]*\d{1,2}[\s\.\-_]?(?:x|dvd|[eéEÉ](?:p|pisodes?)?)[\s\.\-_]*(\d{1,2})(?:(?:[\s\.\-_]*(?:[aàAÀ,/\-\.\s\&_]|et|and|to|x)[\s\.\-_]*(?:x|dvd|[eéEÉ](?:p|pisodes?)?)?[\s\.\-_]*([0-9]{1,2})))+.*", name)
+                rangeMatcher = re.search("(?i).*(?<![\s\.\-_])[\s\.\-_]+s?(?:aison)?[\s\.\-_]*\d{1,2}[\s\.\-_]?(?:x|dvd|E(?:p|pisodes?)?)[\s\.\-_]*(\d{1,2})(?:(?:[\s\.\-_]*(?:[a,/\-\.\s\&_]|et|and|to|x)[\s\.\-_]*(?:x|dvd|E(?:p|pisodes?)?)?[\s\.\-_]*([0-9]{1,2})))+.*", name)
                 if rangeMatcher:
                     rangeStart = int(rangeMatcher.group(1))
                     rangeEnd = int(rangeMatcher.group(2))
