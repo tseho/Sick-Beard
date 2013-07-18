@@ -119,7 +119,8 @@ class BinNewzProvider(generic.NZBProvider):
         return strings
 
     def _get_title_and_url(self, item):
-        return item.title, item.refererURL
+        cleanTitle = re.sub(r'(\s*\[[\w\s]+\-\w+\])',"",item.title)
+        return cleanTitle, item.refererURL
 
     def getQuality(self, item):
         return item.quality
@@ -196,10 +197,10 @@ class BinNewzProvider(generic.NZBProvider):
                 searchItems = []
                 #multiEpisodes = False
 
-                rangeMatcher = re.search(".*[sS](aison)?[\s\.\-_]*([0-9]{1,2})[\s\.\-_]?([xX]|dvd|[eéEÉ](p|pisode(s)?)?)[\s\.\-_]*([0-9]{1,2})([\s\.\-_]*([aàAÀ,/\-\.\s\&_]|et|and|to)[\s\.\-_]*(([xX]|dvd|[eéEÉ]?(p|pisode(s)?)?)*[\s\.\-_]*([0-9]{1,2}))([fF]in(al)?)?)+.*", name)
+                rangeMatcher = re.search("(?i).*(?<![\s\.\-_])[\s\.\-_]+s?(?:aison)?[\s\.\-_]*\d{1,2}[\s\.\-_]?(?:x|dvd|[eéEÉ](?:p|pisodes?)?)[\s\.\-_]*(\d{1,2})(?:(?:[\s\.\-_]*(?:[aàAÀ,/\-\.\s\&_]|et|and|to|x)[\s\.\-_]*(?:x|dvd|[eéEÉ](?:p|pisodes?)?)?[\s\.\-_]*([0-9]{1,2})))+.*", name)
                 if rangeMatcher:
-                    rangeStart = int(rangeMatcher.group(5))
-                    rangeEnd = int(rangeMatcher.group(12))
+                    rangeStart = int(rangeMatcher.group(1))
+                    rangeEnd = int(rangeMatcher.group(2))
                     if filename.find("*") != -1:
                         for i in range(rangeStart, rangeEnd + 1):
                             searchItem = filename.replace("**", str(i))
