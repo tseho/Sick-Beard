@@ -447,14 +447,16 @@ function setLayout(imdb,name){
 	jQuery("#EpisodeListe").jqGrid('showCol',["name"]);	
 	jQuery("#EpisodeListe").jqGrid('showCol',["poster"]);
 	jQuery("#EpisodeListe").jqGrid('hideCol',["show"]);
+	UpdateTableHeaders();
 	
 #else:
 	jQuery("#EpisodeListe").jqGrid('hideCol',["name"]);
 	jQuery("#EpisodeListe").jqGrid('hideCol',["poster"]);
 	jQuery("#EpisodeListe").jqGrid('showCol',["show"]);
+	UpdateTableHeaders();
 #end if
 	
-	UpdateTableHeaders();
+	ResizeHeaders();
 	
 	jQuery("#EpisodeListe").stickyTableHeaders();
 	
@@ -551,11 +553,14 @@ function setLayout(imdb,name){
 	
 	
 	window.onresize = function(event) {
-        jQuery("#EpisodeListe").setGridWidth(\$("#gbox_" + "EpisodeListe").parent().width());
-        
-        
-        \$(".ui-state-default.ui-jqgrid-hdiv").css("width",\$(".ui-state-default.ui-jqgrid-hdiv.floatingHeader").css("width"));
+        ResizeHeaders();
     }
+	
+	function ResizeHeaders() {
+		jQuery("#EpisodeListe").setGridWidth(\$("#gbox_" + "EpisodeListe").parent().width());
+        \$(".ui-state-default.ui-jqgrid-hdiv").css("width",\$(".ui-state-default.ui-jqgrid-hdiv.floatingHeader").css("width"));
+	}
+	
 	
 </script>
 
