@@ -363,7 +363,7 @@ function setLayout(imdb,name){
 								'FR',
 								'Sub FR',
 								'Show',
-								'Poster',
+								' ',
 								'Name',
 								'Network', 
 								'Quality', 
@@ -381,7 +381,7 @@ function setLayout(imdb,name){
 								{name:'total',index:'total',hidden:true,align:"center",search:false},
 								{name:'fr',index:'fr',hidden:true,align:"center",search:false},
 								{name:'subfr',index:'subfr',hidden:true,align:"center",search:false},
-								{name:'show',index:'show',width:350,align:"center",stype:"text",searchoptions:{sopt:['cn']},
+								{name:'show',index:'show',width:380,align:"center",stype:"text",searchoptions:{sopt:['cn']},
 									formatter:function (cellvalue, options,rowObject){
 										return setLayout(rowObject.imdb,rowObject.name)
 									}
@@ -398,12 +398,12 @@ function setLayout(imdb,name){
 								},
 								{name:'network',index:'network', align:"center",sorttype:"text",stype:"text",search:false}, 
 								{name:'quality',index:'quality', align:"center",search:false}, 
-								{name:'downloads',index:'downloads', align:"right",sorttype:"int",align:"center",search:false,title:false,
+								{name:'downloads',index:'downloads',width:200, align:"right",sorttype:"int",align:"center",search:false,title:false,
 									formatter:function(cellvalue,option,rowObject){
 										return createDownloadBar(rowObject.imdb,rowObject.download,rowObject.snatched,rowObject.wanted,rowObject.total);
 									}
 								}, 
-								{name:'frenchep',index:'frenchep', align:"right",sorttype:"int",align:"center",search:false,title:false,
+								{name:'frenchep',index:'frenchep',width:200, align:"right",sorttype:"int",align:"center",search:false,title:false,
 									formatter:function(cellvalue,option,rowObject){
 										return createFRBar(rowObject.imdb,rowObject.fr,rowObject.subfr,rowObject.download);
 									}
@@ -447,14 +447,16 @@ function setLayout(imdb,name){
 	jQuery("#EpisodeListe").jqGrid('showCol',["name"]);	
 	jQuery("#EpisodeListe").jqGrid('showCol',["poster"]);
 	jQuery("#EpisodeListe").jqGrid('hideCol',["show"]);
+	UpdateTableHeaders();
 	
 #else:
 	jQuery("#EpisodeListe").jqGrid('hideCol',["name"]);
 	jQuery("#EpisodeListe").jqGrid('hideCol',["poster"]);
 	jQuery("#EpisodeListe").jqGrid('showCol',["show"]);
+	UpdateTableHeaders();
 #end if
 	
-	UpdateTableHeaders();
+	ResizeHeaders();
 	
 	jQuery("#EpisodeListe").stickyTableHeaders();
 	
@@ -551,11 +553,14 @@ function setLayout(imdb,name){
 	
 	
 	window.onresize = function(event) {
-        jQuery("#EpisodeListe").setGridWidth(\$("#gbox_" + "EpisodeListe").parent().width());
-        
-        
-        \$(".ui-state-default.ui-jqgrid-hdiv").css("width",\$(".ui-state-default.ui-jqgrid-hdiv.floatingHeader").css("width"));
+        ResizeHeaders();
     }
+	
+	function ResizeHeaders() {
+		jQuery("#EpisodeListe").setGridWidth(\$("#gbox_" + "EpisodeListe").parent().width());
+        \$(".ui-state-default.ui-jqgrid-hdiv").css("width",\$(".ui-state-default.ui-jqgrid-hdiv.floatingHeader").css("width"));
+	}
+	
 	
 </script>
 
