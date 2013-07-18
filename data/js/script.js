@@ -69,7 +69,7 @@ function preventDefault(){
 }
 
 function initFancybox() {
-	if ( $("a[rel=dialog]").length > 0 ) {
+	if ( $("a[rel=dialog].fancy").length > 0 ) {
 		$.getScript('/js/fancybox/jquery.fancybox-1.3.4.js', function() {
 			$("head").append("<link rel='stylesheet' href='/js/fancybox/jquery.fancybox-1.3.4.css'>");
 	 		$("a[rel=dialog]").fancybox({
@@ -130,6 +130,8 @@ function init() {
 	initFancybox();
 	initTabs();
 }
+
+
 
 $(document).ready(function(){
 	init();

@@ -35,6 +35,8 @@ from name_parser.parser import NameParser, InvalidNameException
 
 from lib import subliminal
 
+from lib.tidysub import cleaner
+
 from lib.tvdb_api import tvdb_api, tvdb_exceptions
 
 from lib.imdb import imdb
@@ -935,6 +937,21 @@ class TVShow(object):
             logger.log("Error occurred when downloading subtitles: " + str(e), logger.DEBUG)
             return
 
+    def cleanSubtitles(self):
+        if not ek.ek(os.path.isdir, self._location):
+            logger.log(str(self.tvdbid) + ": Show dir doesn't exist, can't clean subtitles", logger.DEBUG)
+            return
+        logger.log(str(self.tvdbid) + ": Cleaning subtitles", logger.DEBUG)
+        
+        try:
+            episodes = db.DBConnection().select("SELECT location FROM tv_episodes WHERE showid = ? AND location NOT LIKE '' ORDER BY season DESC, episode DESC", [self.tvdbid])
+            for episodeLoc in episodes:
+                episode = self.makeEpFromFile(episodeLoc['location']);
+                subtitles = episode.cleanSubtitles()
+                
+        except Exception as e:
+            logger.log("Error occurred when cleaning subtitles: " + str(e), logger.DEBUG)
+            return
 
     def saveToDB(self):
         logger.log(str(self.tvdbid) + ": Saving show info to database", logger.DEBUG)
@@ -1179,6 +1196,13 @@ class TVEpisode(object):
         else:
             logger.log(str(self.show.tvdbid) + ": No subtitles downloaded for episode " + str(self.season) + "x" + str(self.episode), logger.DEBUG)
 
+        if newsubtitles and (sickbeard.SUBTITLES_CLEAN_HI or sickbeard.SUBTITLES_CLEAN_TEAM or sickbeard.SUBTITLES_CLEAN_MUSIC or sickbeard.SUBTITLES_CLEAN_PUNC):
+            logger.log("TIDYSUB: Try to clean sub", logger.DEBUG)
+            for video in subtitles:
+                for subtitle in subtitles.get(video):
+                    sub = cleaner.TidySub(subtitle.path)
+                    sub.Clean(sickbeard.SUBTITLES_CLEAN_HI, sickbeard.SUBTITLES_CLEAN_TEAM, sickbeard.SUBTITLES_CLEAN_MUSIC, sickbeard.SUBTITLES_CLEAN_PUNC)
+
         if sickbeard.SUBTITLES_HISTORY:
             for video in subtitles:
                 for subtitle in subtitles.get(video):
@@ -1217,6 +1241,24 @@ class TVEpisode(object):
                         helpers.chmodAsParent(subtitle.path) 
         return subtitles
 
+    def cleanSubtitles(self):
+        if not ek.ek(os.path.isfile, self.location):
+            logger.log(str(self.show.tvdbid) + ": Episode file doesn't exist, can't clean subtitles for episode " + str(self.season) + "x" + str(self.episode), logger.DEBUG)
+            return
+        logger.log(str(self.show.tvdbid) + ": Cleaning subtitles for episode " + str(self.season) + "x" + str(self.episode), logger.DEBUG)
+        
+        self.refreshSubtitles()
+        
+        subtitles = set(self.subtitles)
+                
+        if subtitles and (sickbeard.SUBTITLES_CLEAN_HI or sickbeard.SUBTITLES_CLEAN_TEAM or sickbeard.SUBTITLES_CLEAN_MUSIC or sickbeard.SUBTITLES_CLEAN_PUNC):
+            logger.log("TIDYSUB: Try to clean sub", logger.DEBUG)
+            for video in subtitles:
+                for subtitle in subtitles.get(video):
+                    sub = cleaner.TidySub(subtitle.path)
+                    sub.Clean(sickbeard.SUBTITLES_CLEAN_HI, sickbeard.SUBTITLES_CLEAN_TEAM, sickbeard.SUBTITLES_CLEAN_MUSIC, sickbeard.SUBTITLES_CLEAN_PUNC)
+
+        return subtitles
 
     def checkForMetaFiles(self):
 
