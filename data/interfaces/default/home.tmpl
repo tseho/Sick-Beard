@@ -381,12 +381,12 @@ function setLayout(imdb,name){
 								{name:'total',index:'total',hidden:true,align:"center",search:false},
 								{name:'fr',index:'fr',hidden:true,align:"center",search:false},
 								{name:'subfr',index:'subfr',hidden:true,align:"center",search:false},
-								{name:'show',index:'show',width:380,align:"center",stype:"text",searchoptions:{sopt:['cn']},
+								{name:'show',index:'show',width:470,align:"center",stype:"text",searchoptions:{sopt:['cn']},
 									formatter:function (cellvalue, options,rowObject){
 										return setLayout(rowObject.imdb,rowObject.name)
 									}
 								}, 
-								{name:'poster',index:'poster',width:50,align:"center",stype:"text",search:false,
+								{name:'poster',index:'poster',width:100,align:"center",stype:"text",search:false,
 									formatter:function (cellvalue, options,rowObject){
 										return setLayout(rowObject.imdb,rowObject.name)
 									}
@@ -408,9 +408,9 @@ function setLayout(imdb,name){
 										return createFRBar(rowObject.imdb,rowObject.fr,rowObject.subfr,rowObject.download);
 									}
 								}, 
-								{name:'active',index:'active', align:"right",align:"center",search:false}, 
-								{name:'audio',index:'audio',  sortable:true,align:"center",search:false},
-								{name:'status',index:'status', sortable:true,align:"center",search:false} ],
+								{name:'active',index:'active',width:95, align:"right",align:"center",search:false}, 
+								{name:'audio',index:'audio',width:95,  sortable:true,align:"center",search:false},
+								{name:'status',index:'status',width:115, sortable:true,align:"center",search:false} ],
 							autowidth: true,
 							ignoreCase:true,
 							rowNum:10000,
@@ -467,6 +467,7 @@ function setLayout(imdb,name){
 		name = name + window.location.pathname;
 		gridInfo.sortname = grid.jqGrid('getGridParam', 'sortname');
 		gridInfo.sortorder = grid.jqGrid('getGridParam', 'sortorder');
+		grid.sortwidth = grid.jqGrid('getGridParam','width');
 		$.cookie(name, $.toJSON(gridInfo));
 	}
 	function loadGridFromCookie(name) {
@@ -477,6 +478,9 @@ function setLayout(imdb,name){
 		var grid = jQuery("#" + name);
 		grid.jqGrid('setGridParam', { sortorder: gridInfo.sortorder });
 		grid.sortGrid(gridInfo.sortname,true);
+		
+		grid.jqGrid('setGridParam',{width:grid.sortwidth});
+		
 		grid.trigger("reloadGrid");
 	}
 	
@@ -567,3 +571,4 @@ function setLayout(imdb,name){
 
 <script type="text/javascript" src="$sbRoot/js/tableClick.js?$sbPID"></script>
 #include $os.path.join($sickbeard.PROG_DIR, "data/interfaces/default/inc_bottom.tmpl")
+
