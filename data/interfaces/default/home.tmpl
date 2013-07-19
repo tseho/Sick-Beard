@@ -232,9 +232,9 @@ function setLayout(imdb,name){
     if("$layout" == "simple"){
         return "<a href=\"displayShow?show="+imdb+"\" rel=\"dialog\" title=\""+name+"\">"+name+"</a>" ;
     }else if("$layout" == "banner"){
-        return "<div class=\"imgHomeWrapper imgHomeWrapperRounded $layout\"><a href=\"displayShow?show="+imdb+"\" rel=\"dialog\" title=\""+name+"\"><img src=\"$sbRoot/showPoster/?show="+imdb+"&amp;which=$which_thumb\" class=\"$layout\" alt=\""+name+"\"/></a></div>" ;
+        return "<div class=\"imgHomeWrapper imgHomeWrapperRounded $layout\"><a href=\"displayShow?show="+imdb+"\" rel=\"dialog\" title=\""+name+"\"><img src=\"$sbRoot/showPoster/?show="+imdb+"&amp;which=$layout\" class=\"$layout\" alt=\""+name+"\"/></a></div>" ;
     }else{
-    	return "<div class=\"imgHomeWrapper imgHomeWrapperRounded $layout\"><a href=\"displayShow?show="+imdb+"\" rel=\"dialog\" title=\""+name+"\"><img src=\"$sbRoot/showPoster/?show="+imdb+"&amp;which=$which_thumb\" class=\"$layout\" alt=\""+name+"\"/></a></div>" ;
+    	return "<div class=\"imgHomeWrapper imgHomeWrapperRounded $layout\"><a href=\"displayShow?show="+imdb+"\" rel=\"dialog\" title=\""+name+"\"><img src=\"$sbRoot/showPoster/?show="+imdb+"&amp;which=$layout\" class=\"$layout\" alt=\""+name+"\"/></a></div>" ;
     }
 }
 
