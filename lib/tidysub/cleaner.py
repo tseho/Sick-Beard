@@ -48,7 +48,7 @@ class TidySub:
             return
         except UnicodeDecodeError:
             try:
-                fileToRead = codecs.open(path_to_file, "r", "utf-8")
+                fileToRead = codecs.open(path_to_file, "r", "latin-1")
             except:
                 logger.log("TidySub : ERROR: File not encoded in UTF-8 neither in latin-1")
             return
