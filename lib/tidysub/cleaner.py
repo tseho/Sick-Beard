@@ -47,7 +47,10 @@ class TidySub:
             logger.log("TidySub : ERROR: File does not exist")
             return
         except UnicodeDecodeError:
-            logger.log("TidySub : ERROR: File not encoded in UTF-8")
+            try:
+                fileToRead = codecs.open(path_to_file, "r", "utf-8")
+            except:
+                logger.log("TidySub : ERROR: File not encoded in UTF-8 neither in latin-1")
             return
         
         tempList = list ()
