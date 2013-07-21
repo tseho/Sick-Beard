@@ -1262,7 +1262,7 @@ class TVEpisode(object):
                     sub = cleaner.TidySub(subtitle_path)
                     sub.Clean(sickbeard.SUBTITLES_CLEAN_HI, sickbeard.SUBTITLES_CLEAN_TEAM, sickbeard.SUBTITLES_CLEAN_MUSIC, sickbeard.SUBTITLES_CLEAN_PUNC)
                 else:
-                    subtitle_path = ek.ek(os.path.join, os.path.join(os.path.dirname(self.location),"Subs"), self.formatted_filename()+"fr.srt")
+                    subtitle_path = ek.ek(os.path.join, os.path.join(os.path.dirname(self.location),"Subs"), self.formatted_filename()+".fr.srt")
                     sub = cleaner.TidySub(subtitle_path)
                     sub.Clean(sickbeard.SUBTITLES_CLEAN_HI, sickbeard.SUBTITLES_CLEAN_TEAM, sickbeard.SUBTITLES_CLEAN_MUSIC, sickbeard.SUBTITLES_CLEAN_PUNC)
             elif sickbeard.SUBTITLES_DIR:
@@ -1274,7 +1274,7 @@ class TVEpisode(object):
                     sub = cleaner.TidySub(subtitle_path)
                     sub.Clean(sickbeard.SUBTITLES_CLEAN_HI, sickbeard.SUBTITLES_CLEAN_TEAM, sickbeard.SUBTITLES_CLEAN_MUSIC, sickbeard.SUBTITLES_CLEAN_PUNC)
                 else:
-                    subtitle_path = ek.ek(os.path.join, os.path.join(os.path.dirname(sickbeard.SUBTITLES_DIR),"Subs"), self.formatted_filename()+"fr.srt")
+                    subtitle_path = ek.ek(os.path.join, os.path.join(os.path.dirname(sickbeard.SUBTITLES_DIR),"Subs"), self.formatted_filename()+".fr.srt")
                     sub = cleaner.TidySub(subtitle_path)
                     sub.Clean(sickbeard.SUBTITLES_CLEAN_HI, sickbeard.SUBTITLES_CLEAN_TEAM, sickbeard.SUBTITLES_CLEAN_MUSIC, sickbeard.SUBTITLES_CLEAN_PUNC)
             else:
@@ -1286,7 +1286,7 @@ class TVEpisode(object):
                     sub = cleaner.TidySub(subtitle_path)
                     sub.Clean(sickbeard.SUBTITLES_CLEAN_HI, sickbeard.SUBTITLES_CLEAN_TEAM, sickbeard.SUBTITLES_CLEAN_MUSIC, sickbeard.SUBTITLES_CLEAN_PUNC)
                 else:
-                    subtitle_path = ek.ek(os.path.join, os.path.dirname(self.location), self.formatted_filename()+"fr.srt")
+                    subtitle_path = ek.ek(os.path.join, os.path.dirname(self.location), self.formatted_filename()+".fr.srt")
                     sub = cleaner.TidySub(subtitle_path)
                     sub.Clean(sickbeard.SUBTITLES_CLEAN_HI, sickbeard.SUBTITLES_CLEAN_TEAM, sickbeard.SUBTITLES_CLEAN_MUSIC, sickbeard.SUBTITLES_CLEAN_PUNC)
             
