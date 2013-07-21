@@ -373,7 +373,9 @@ function setLayout(imdb,name){
 								'Audio',
 								'Status'], 
 							colModel:
-								[{name:'nextep',index:'nextep',align:"center",search:false},
+								[{name:'nextep',index:'nextep',align:"center",search:false,
+									sorttype: function (cellValue) {
+        								return cellValue == "" ? "9999-99-99": cellValue}},
 								{name:'imdb',index:'imdb',hidden:true,align:"center",search:false},
 								{name:'download',index:'download',hidden:true,align:"center",search:false},
 								{name:'snatched',index:'snatched',hidden:true,align:"center",search:false},
