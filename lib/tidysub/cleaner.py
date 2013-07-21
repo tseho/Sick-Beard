@@ -235,8 +235,8 @@ class TidySub:
                 if re.match("^.+ \.",self._sub_list[i], re.UNICODE):
                     self._sub_list[i] = re.sub(r' \.', '.', self._sub_list[i], re.UNICODE) 
             
-                if re.match("^.+\.[^ ]+",self._sub_list[i], re.UNICODE):
-                    self._sub_list[i] = re.sub(r'(?<=[A-Z]\.)\.(?!\")(?![A-Z]\.)', '. ', self._sub_list[i], re.UNICODE)
+                #if re.match("^.+\.[^ ]+",self._sub_list[i], re.UNICODE):
+                #    self._sub_list[i] = re.sub(r'(?<=[A-Z]\.)\.(?!\")(?![A-Z]\.)', '. ', self._sub_list[i], re.UNICODE)
                     
                 #Correct question mark
                 if re.match("^.+[^ ]+\?",self._sub_list[i], re.UNICODE):
