@@ -41,7 +41,7 @@ class TidySub:
     def _load_file(self, path_to_file, removeEOL=False):
 
         try:
-            fileToRead = codecs.open(path_to_file, "r", "utf-8")
+            fileToRead = codecs.open(path_to_file, "r", "latin-1")
 
         except IOError:
             logger.log("TidySub : ERROR: File does not exist")
