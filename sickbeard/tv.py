@@ -1253,10 +1253,43 @@ class TVEpisode(object):
                 
         if subtitles and (sickbeard.SUBTITLES_CLEAN_HI or sickbeard.SUBTITLES_CLEAN_TEAM or sickbeard.SUBTITLES_CLEAN_MUSIC or sickbeard.SUBTITLES_CLEAN_PUNC):
             logger.log("TIDYSUB: Try to clean sub", logger.DEBUG)
-            for video in subtitles:
-                for subtitle in subtitles.get(video):
-                    sub = cleaner.TidySub(subtitle.path)
+            if sickbeard.SUBTITLES_DIR_SUB:
+                if sickbeard.SUBSNOLANG:
+                    subtitle_path = ek.ek(os.path.join, os.path.join(os.path.dirname(self.location),"Subs"), self.formatted_filename()+".srt")
+                    sub = cleaner.TidySub(subtitle_path)
                     sub.Clean(sickbeard.SUBTITLES_CLEAN_HI, sickbeard.SUBTITLES_CLEAN_TEAM, sickbeard.SUBTITLES_CLEAN_MUSIC, sickbeard.SUBTITLES_CLEAN_PUNC)
+                    subtitle_path = ek.ek(os.path.join, os.path.join(os.path.dirname(self.location),"Subs"), self.formatted_filename()+".fr.srt")
+                    sub = cleaner.TidySub(subtitle_path)
+                    sub.Clean(sickbeard.SUBTITLES_CLEAN_HI, sickbeard.SUBTITLES_CLEAN_TEAM, sickbeard.SUBTITLES_CLEAN_MUSIC, sickbeard.SUBTITLES_CLEAN_PUNC)
+                else:
+                    subtitle_path = ek.ek(os.path.join, os.path.join(os.path.dirname(self.location),"Subs"), self.formatted_filename()+"fr.srt")
+                    sub = cleaner.TidySub(subtitle_path)
+                    sub.Clean(sickbeard.SUBTITLES_CLEAN_HI, sickbeard.SUBTITLES_CLEAN_TEAM, sickbeard.SUBTITLES_CLEAN_MUSIC, sickbeard.SUBTITLES_CLEAN_PUNC)
+            elif sickbeard.SUBTITLES_DIR:
+                if sickbeard.SUBSNOLANG:
+                    subtitle_path = ek.ek(os.path.join, os.path.join(os.path.dirname(sickbeard.SUBTITLES_DIR),"Subs"), self.formatted_filename()+".srt")
+                    sub = cleaner.TidySub(subtitle_path)
+                    sub.Clean(sickbeard.SUBTITLES_CLEAN_HI, sickbeard.SUBTITLES_CLEAN_TEAM, sickbeard.SUBTITLES_CLEAN_MUSIC, sickbeard.SUBTITLES_CLEAN_PUNC)
+                    subtitle_path = ek.ek(os.path.join, os.path.join(os.path.dirname(sickbeard.SUBTITLES_DIR),"Subs"), self.formatted_filename()+".fr.srt")
+                    sub = cleaner.TidySub(subtitle_path)
+                    sub.Clean(sickbeard.SUBTITLES_CLEAN_HI, sickbeard.SUBTITLES_CLEAN_TEAM, sickbeard.SUBTITLES_CLEAN_MUSIC, sickbeard.SUBTITLES_CLEAN_PUNC)
+                else:
+                    subtitle_path = ek.ek(os.path.join, os.path.join(os.path.dirname(sickbeard.SUBTITLES_DIR),"Subs"), self.formatted_filename()+"fr.srt")
+                    sub = cleaner.TidySub(subtitle_path)
+                    sub.Clean(sickbeard.SUBTITLES_CLEAN_HI, sickbeard.SUBTITLES_CLEAN_TEAM, sickbeard.SUBTITLES_CLEAN_MUSIC, sickbeard.SUBTITLES_CLEAN_PUNC)
+            else:
+                if sickbeard.SUBSNOLANG:
+                    subtitle_path = ek.ek(os.path.join, os.path.dirname(self.location), self.formatted_filename()+".srt")
+                    sub = cleaner.TidySub(subtitle_path)
+                    sub.Clean(sickbeard.SUBTITLES_CLEAN_HI, sickbeard.SUBTITLES_CLEAN_TEAM, sickbeard.SUBTITLES_CLEAN_MUSIC, sickbeard.SUBTITLES_CLEAN_PUNC)
+                    subtitle_path = ek.ek(os.path.join, os.path.dirname(self.location), self.formatted_filename()+".fr.srt")
+                    sub = cleaner.TidySub(subtitle_path)
+                    sub.Clean(sickbeard.SUBTITLES_CLEAN_HI, sickbeard.SUBTITLES_CLEAN_TEAM, sickbeard.SUBTITLES_CLEAN_MUSIC, sickbeard.SUBTITLES_CLEAN_PUNC)
+                else:
+                    subtitle_path = ek.ek(os.path.join, os.path.dirname(self.location), self.formatted_filename()+"fr.srt")
+                    sub = cleaner.TidySub(subtitle_path)
+                    sub.Clean(sickbeard.SUBTITLES_CLEAN_HI, sickbeard.SUBTITLES_CLEAN_TEAM, sickbeard.SUBTITLES_CLEAN_MUSIC, sickbeard.SUBTITLES_CLEAN_PUNC)
+            
 
         return subtitles
 
