@@ -179,6 +179,9 @@ function createDownloadBar(tvID,download,snatched, wanted,total){
 		    			"<span>Wanted</span><span style=\"float:right;\"> "+ wanted +"</span>"+
 		    		"</div>"+
 		    		"<div>"+
+		    			"<span>Missing</span><span style=\"float:right;\"> "+ parseInt(parseInt(total)-(parseInt(download)+parseInt(snatched)+parseInt(wanted))) +"</span>"+
+		    		"</div>"+
+		    		"<div>"+
 		    			"<span>Total</span><span style=\"float:right;\"> "+ total +"</span>"+
 		    		"</div>"+
 				"</div>"+
@@ -217,6 +220,9 @@ function createFRBar(tvID,audio,st,total){
 		    		"</div>"+
 		    		"<div>"+
 		    			"<span>Only Sub FR</span><span style=\"float:right;\"> "+ st +"</span>"+
+		    		"</div>"+
+		    		"<div>"+
+		    			"<span>Missing</span><span style=\"float:right;\"> "+ parseInt(parseInt(total)-(parseInt(audio)+parseInt(st))) +"</span>"+
 		    		"</div>"+
 		    		"<div>"+
 		    			"<span>Total Downloaded</span><span style=\"float:right;\"> "+ total +"</span>"+
