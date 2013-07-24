@@ -1245,7 +1245,7 @@ class TVEpisode(object):
         if not ek.ek(os.path.isfile, self.location):
             logger.log(str(self.show.tvdbid) + ": Episode file doesn't exist, can't clean subtitles for episode " + str(self.season) + "x" + str(self.episode), logger.DEBUG)
             return
-        logger.log(str(self.show.tvdbid) + ": Cleaning subtitles for episode " + str(self.season) + "x" + str(self.episode), logger.DEBUG)
+        logger.log(str(self.show.tvdbid) + ": Cleaning subtitles for episode " + str(self.season) + "x" + str(self.episode))
         
         self.refreshSubtitles()
         
