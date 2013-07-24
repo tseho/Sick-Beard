@@ -1939,7 +1939,7 @@ class ConfigSubtitles:
         return _munge(t)
 
     @cherrypy.expose
-    def saveSubtitles(self, use_subtitles=None, subtitles_plugins=None, subtitles_languages=None, subtitles_dir=None, subtitles_dir_sub=None, subsnolang = None, service_order=None, subtitles_history=None, subtitles_clean_hi=None, subtitles_clean_team=None, subtitles_clean_music=None, subtitles_clean_punc=None):
+    def saveSubtitles(self, use_subtitles=None, subsnewasold=None, subtitles_plugins=None, subtitles_languages=None, subtitles_dir=None, subtitles_dir_sub=None, subsnolang = None, service_order=None, subtitles_history=None, subtitles_clean_hi=None, subtitles_clean_team=None, subtitles_clean_music=None, subtitles_clean_punc=None):
         results = []
 
         if use_subtitles == "on":
@@ -1965,12 +1965,18 @@ class ConfigSubtitles:
         else: 
             subtitles_dir_sub = 0
         
+        if subsnewasold == "on":
+            subsnewasold = 1
+        else: 
+            subsnewasold = 0
+        
         if subsnolang == "on":
             subsnolang = 1
         else: 
             subsnolang = 0   
 
         sickbeard.USE_SUBTITLES = use_subtitles
+        sickbeard.SUBSNEWASOLD = subsnewasold
         sickbeard.SUBTITLES_LANGUAGES = [lang.alpha2 for lang in subtitles.isValidLanguage(subtitles_languages.replace(' ', '').split(','))] if subtitles_languages != ''  else ''
         sickbeard.SUBTITLES_DIR = subtitles_dir
         sickbeard.SUBTITLES_DIR_SUB = subtitles_dir_sub        
