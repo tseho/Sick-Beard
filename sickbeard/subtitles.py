@@ -119,29 +119,54 @@ class SubtitlesFinder():
                 continue
             
             # Old shows rule
-            if ((epToSub['airdate_daydiff'] > 7 and epToSub['searchcount'] < 2 and now - datetime.datetime.strptime(epToSub['lastsearch'], '%Y-%m-%d %H:%M:%S') > datetime.timedelta(hours=rules['old'][epToSub['searchcount']])) or
-                # Recent shows rule 
-                (epToSub['airdate_daydiff'] <= 7 and epToSub['searchcount'] < 7 and now - datetime.datetime.strptime(epToSub['lastsearch'], '%Y-%m-%d %H:%M:%S') > datetime.timedelta(hours=rules['new'][epToSub['searchcount']]))):
-                logger.log('Downloading subtitles for episode %dx%d of show %s' % (epToSub['season'], epToSub['episode'], epToSub['show_name']), logger.DEBUG)
-                
-                showObj = helpers.findCertainShow(sickbeard.showList, int(epToSub['showid']))
-                if not showObj:
-                    logger.log(u'Show not found', logger.DEBUG)
-                    return
-                
-                epObj = showObj.getEpisode(int(epToSub["season"]), int(epToSub["episode"]))
-                if isinstance(epObj, str):
-                    logger.log(u'Episode not found', logger.DEBUG)
-                    return
-                
-                previous_subtitles = epObj.subtitles
-                
-                try:
-                    subtitles = epObj.downloadSubtitles()
+            if sickbeard.SUBSNEWASOLD:
+                if ((epToSub['airdate_daydiff'] > 7 and epToSub['searchcount'] < 2 and now - datetime.datetime.strptime(epToSub['lastsearch'], '%Y-%m-%d %H:%M:%S') > datetime.timedelta(hours=rules['old'][epToSub['searchcount']])) or
+                    # Recent shows rule 
+                    (epToSub['airdate_daydiff'] <= 7 and epToSub['searchcount'] < 7 and now - datetime.datetime.strptime(epToSub['lastsearch'], '%Y-%m-%d %H:%M:%S') > datetime.timedelta(hours=rules['old'][epToSub['searchcount']]))):
+                    logger.log('Downloading subtitles for episode %dx%d of show %s' % (epToSub['season'], epToSub['episode'], epToSub['show_name']), logger.DEBUG)
                     
-                except:
-                    logger.log(u'Unable to find subtitles', logger.DEBUG)
-                    return
+                    showObj = helpers.findCertainShow(sickbeard.showList, int(epToSub['showid']))
+                    if not showObj:
+                        logger.log(u'Show not found', logger.DEBUG)
+                        return
+                    
+                    epObj = showObj.getEpisode(int(epToSub["season"]), int(epToSub["episode"]))
+                    if isinstance(epObj, str):
+                        logger.log(u'Episode not found', logger.DEBUG)
+                        return
+                    
+                    previous_subtitles = epObj.subtitles
+                    
+                    try:
+                        subtitles = epObj.downloadSubtitles()
+                        
+                    except:
+                        logger.log(u'Unable to find subtitles', logger.DEBUG)
+                        return
+            else:
+                if ((epToSub['airdate_daydiff'] > 7 and epToSub['searchcount'] < 2 and now - datetime.datetime.strptime(epToSub['lastsearch'], '%Y-%m-%d %H:%M:%S') > datetime.timedelta(hours=rules['old'][epToSub['searchcount']])) or
+                    # Recent shows rule 
+                    (epToSub['airdate_daydiff'] <= 7 and epToSub['searchcount'] < 7 and now - datetime.datetime.strptime(epToSub['lastsearch'], '%Y-%m-%d %H:%M:%S') > datetime.timedelta(hours=rules['new'][epToSub['searchcount']]))):
+                    logger.log('Downloading subtitles for episode %dx%d of show %s' % (epToSub['season'], epToSub['episode'], epToSub['show_name']), logger.DEBUG)
+                    
+                    showObj = helpers.findCertainShow(sickbeard.showList, int(epToSub['showid']))
+                    if not showObj:
+                        logger.log(u'Show not found', logger.DEBUG)
+                        return
+                    
+                    epObj = showObj.getEpisode(int(epToSub["season"]), int(epToSub["episode"]))
+                    if isinstance(epObj, str):
+                        logger.log(u'Episode not found', logger.DEBUG)
+                        return
+                    
+                    previous_subtitles = epObj.subtitles
+                    
+                    try:
+                        subtitles = epObj.downloadSubtitles()
+                        
+                    except:
+                        logger.log(u'Unable to find subtitles', logger.DEBUG)
+                        return
 
 
     def _getRules(self):

@@ -383,6 +383,7 @@ COMING_EPS_SORT = None
 COMING_EPS_MISSED_RANGE = None
 
 USE_SUBTITLES = False
+SUBSNEWASOLD = False
 SUBTITLES_LANGUAGES = []
 SUBTITLES_DIR = ''
 SUBTITLES_DIR_SUB = False
@@ -466,7 +467,7 @@ def initialize(consoleLogging=True):
                 NEWZBIN, NEWZBIN_USERNAME, NEWZBIN_PASSWORD, GIT_PATH, MOVE_ASSOCIATED_FILES, \
                 GKS, GKS_KEY, \
                 HOME_LAYOUT, DISPLAY_SHOW_SPECIALS, COMING_EPS_LAYOUT, COMING_EPS_SORT, COMING_EPS_DISPLAY_PAUSED, COMING_EPS_MISSED_RANGE, METADATA_WDTV, METADATA_TIVO, IGNORE_WORDS, CREATE_MISSING_SHOW_DIRS, \
-                ADD_SHOWS_WO_DIR, USE_SUBTITLES, SUBTITLES_LANGUAGES, SUBTITLES_DIR, SUBTITLES_DIR_SUB, SUBSNOLANG, SUBTITLES_SERVICES_LIST, SUBTITLES_SERVICES_ENABLED, SUBTITLES_HISTORY, subtitlesFinderScheduler, TOGGLE_SEARCH, \
+                ADD_SHOWS_WO_DIR, USE_SUBTITLES, SUBSNEWASOLD, SUBTITLES_LANGUAGES, SUBTITLES_DIR, SUBTITLES_DIR_SUB, SUBSNOLANG, SUBTITLES_SERVICES_LIST, SUBTITLES_SERVICES_ENABLED, SUBTITLES_HISTORY, subtitlesFinderScheduler, TOGGLE_SEARCH, \
                 SUBTITLES_CLEAN_HI, SUBTITLES_CLEAN_TEAM, SUBTITLES_CLEAN_MUSIC, SUBTITLES_CLEAN_PUNC, \
                 USE_TORRENT_FTP, FTP_HOST, FTP_LOGIN, FTP_PASSWORD, FTP_PORT, FTP_TIMEOUT, FTP_DIR, FTP_PASSIVE, sentFTPSchedular
 
@@ -915,6 +916,7 @@ def initialize(consoleLogging=True):
 
         CheckSection(CFG, 'Subtitles')
         USE_SUBTITLES = bool(check_setting_int(CFG, 'Subtitles', 'use_subtitles', 0))
+        SUBSNEWASOLD = bool(check_setting_int(CFG, 'Subtitles', 'subsnewasold', 0))
         SUBTITLES_LANGUAGES = check_setting_str(CFG, 'Subtitles', 'subtitles_languages', '').split(',')
         if SUBTITLES_LANGUAGES[0] == '':
             SUBTITLES_LANGUAGES = []
@@ -1613,7 +1615,8 @@ def save_config():
     new_config['GUI']['coming_eps_missed_range'] = int(COMING_EPS_MISSED_RANGE)
 
     new_config['Subtitles'] = {}
-    new_config['Subtitles']['use_subtitles'] = int(USE_SUBTITLES)
+    new_config['Subtitles']['use_subtitles'] = int(USE_SUBTITLES)    
+    new_config['Subtitles']['subsnewasold'] = int(SUBSNEWASOLD)
     new_config['Subtitles']['subtitles_languages'] = ','.join(SUBTITLES_LANGUAGES)
     new_config['Subtitles']['SUBTITLES_SERVICES_LIST'] = ','.join(SUBTITLES_SERVICES_LIST)
     new_config['Subtitles']['SUBTITLES_SERVICES_ENABLED'] = '|'.join([str(x) for x in SUBTITLES_SERVICES_ENABLED])

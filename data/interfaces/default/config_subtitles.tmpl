@@ -110,7 +110,14 @@
                                         <span class="component-title">Subtitles History</span>
                                         <span class="component-desc">Log downloaded Subtitle on History page?</span>
                                     </label>
-                                </div>                                
+                                </div>
+                                <div class="field-pair">
+                                    <input type="checkbox" name="subsnewasold" id="subsnewasold" #if $sickbeard.SUBSNEWASOLD then " checked=\"checked\"" else ""#/>
+                                    <label class="clearfix" for="subsnewasold">
+                                        <span class="component-title">Subtitles New as old</span>
+                                        <span class="component-desc">Search new subtitles only each 24H ?</span>
+                                    </label>
+                                </div>                                        
                         <br/><input type="submit" class="btn config_submitter" value="Save Changes" /><br/>
                         </div>
                     </fieldset>
