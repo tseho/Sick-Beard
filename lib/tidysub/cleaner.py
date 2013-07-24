@@ -23,7 +23,7 @@ class TidySub:
         if re.match(r'^.+\.srt$', path_to_sub, re.UNICODE):
             self._path_to_sub = path_to_sub
         else:
-            logger.log("TidySub : TidySub only corrects .srt files")
+            logger.log("TidySub : TidySub only corrects .srt files", logger.DEBUG)
             return
 
         self._team_list = list()
@@ -32,7 +32,7 @@ class TidySub:
         #Load the subtitles file
         self._sub_list = self._load_file(self._path_to_sub, True)
         if self._sub_list is not None:
-            logger.log("TidySub : INFO: Subtitles file loaded")
+            logger.log("TidySub : INFO: Subtitles file loaded", logger.DEBUG)
 
         return
         
@@ -44,15 +44,15 @@ class TidySub:
             fileToRead = codecs.open(path_to_file, "r", "latin-1")
 
         except IOError:
-            logger.log("TidySub : File does not exist or sub is in mkv")
+            logger.log("TidySub : File does not exist or sub is in mkv", logger.DEBUG)
             return
-        except UnicodeDecodeError:
+        except:
             try:
-                fileToRead = codecs.open(path_to_file, "r", "latin-1")
+                fileToRead = codecs.open(path_to_file, "r", "utf-8")
             except:
-                logger.log("TidySub : File not encoded in UTF-8 neither in latin-1")
+                logger.log("TidySub : File not encoded in UTF-8 neither in latin-1", logger.DEBUG)
+                return
             return
-        
         tempList = list ()
         self._is_file_loaded = True
 
@@ -72,7 +72,7 @@ class TidySub:
     def _write_file(self, path_to_file, toWrite):
 
         if not self._is_file_loaded:
-            logger.log("TidySub : No subtitles file was loaded")
+            logger.log("TidySub : No subtitles file was loaded", logger.DEBUG)
             return
                 
         fileDest = codecs.open(path_to_file, "w", "latin-1")
@@ -81,14 +81,14 @@ class TidySub:
             fileDest.write(i)
 
         fileDest.close()
-        logger.log("TidySub : INFO: Subtitles file saved")
+        logger.log("TidySub : INFO: Subtitles file saved", logger.DEBUG)
 
 
     #Try to detect subtitles language
     def _detect_language(self, path_to_sub):
                 
         if not self._is_file_loaded:
-            logger.log("TidySub : No subtitles file was loaded")
+            logger.log("TidySub : No subtitles file was loaded", logger.DEBUG)
             return
         
         if re.match("^.+\.[a-z]{2}\.srt$", path_to_sub.lower(), re.UNICODE):
@@ -101,7 +101,7 @@ class TidySub:
     def _guess_language(self):
 
         if not self._is_file_loaded:
-            logger.log("TidySub : No subtitles file was loaded")
+            logger.log("TidySub : No subtitles file was loaded", logger.DEBUG)
             return
 
         #combine words into one regex string
@@ -124,10 +124,10 @@ class TidySub:
 
         #Return the language which has the highest count
         if _count_french > _count_english:
-            logger.log("TidySub : INFO: Guessed language is French")
+            logger.log("TidySub : INFO: Guessed language is French", logger.DEBUG)
             return "fr"
         elif _count_english > _count_french:
-            logger.log("TidySub : INFO: Guessed language is English")
+            logger.log("TidySub : INFO: Guessed language is English", logger.DEBUG)
             return "en"
         else:
             return "undefined"
@@ -451,10 +451,10 @@ class TidySub:
                     count += 1
 
                 else:
-                    logger.log("TidySub : Formatting error : timerange")
+                    logger.log("TidySub : Formatting error : timerange", logger.DEBUG)
 
             else:
-                logger.log("TidySub : Formatting error : number line")
+                logger.log("TidySub : Formatting error : number line", logger.DEBUG)
                 
             i += j
 
@@ -529,7 +529,7 @@ class TidySub:
     def Clean(self, removeHi=False, removeTeam=False, removeMusic=False, correct_punctuation=False, force_language = ""):
 
         if not self._is_file_loaded:
-            logger.log("TidySub : No subtitles file was loaded")
+            logger.log("TidySub : No subtitles file was loaded", logger.DEBUG)
             return
        
         #Try to determine the language of the file
@@ -540,28 +540,28 @@ class TidySub:
 
         #If the team strings must be removed
         if removeTeam:
-            logger.log("TidySub : INFO: Removing teams names")
+            logger.log("TidySub : INFO: Removing teams names", logger.DEBUG)
             
             #Call the function
             self._clean_team()
         
         #If music strings must be removed
         if removeMusic:
-            logger.log("TidySub : INFO: Removing lyrics")
+            logger.log("TidySub : INFO: Removing lyrics", logger.DEBUG)
             self._clean_music()
 
         #If Hi must be removed
         if removeHi:
-            logger.log("TidySub : INFO: Removing HI")
+            logger.log("TidySub : INFO: Removing HI", logger.DEBUG)
             self._clean_hi() 
 
         #If punctuation must be corrected
         if correct_punctuation:
             if _language == "fr":
-                logger.log("TidySub : INFO: Correcting punctuation (French)")
+                logger.log("TidySub : INFO: Correcting punctuation (French)", logger.DEBUG)
                 self._clean_punctuation_fr()
             elif _language == "en":
-                logger.log("TidySub : INFO: Correcting punctuation (English)")
+                logger.log("TidySub : INFO: Correcting punctuation (English)", logger.DEBUG)
                 self._clean_punctuation_en() 
 
         #Clean the formatting before saving the subtitles
@@ -574,30 +574,30 @@ class TidySub:
     def Offset(self, _sign, _hour=0, _minute=0, _second=0, _ms=0):
 
         if not self._is_file_loaded:
-            logger.log("TidySub : No subtitles file was loaded")
+            logger.log("TidySub : No subtitles file was loaded", logger.DEBUG)
             return
         
         _correct = True
         
         # Check consistency of the parameters
         if _sign is not "+" and _sign is not "-":
-            logger.log("TidySub : Bad sign for offset")
+            logger.log("TidySub : Bad sign for offset", logger.DEBUG)
             _correct = False
             
         if (not isinstance(_hour, int)) or _hour < 0 or _hour > 5:
-            logger.log("TidySub : Hour is not correct for offset")
+            logger.log("TidySub : Hour is not correct for offset", logger.DEBUG)
             _correct = False
             
         if (not isinstance(_minute, int)) or _minute < 0 or _minute >= 60:
-            logger.log("TidySub : Minute is not correct for offset")
+            logger.log("TidySub : Minute is not correct for offset", logger.DEBUG)
             _correct = False
         
         if (not isinstance(_second, int)) or _second < 0 or _second >= 60:
-            logger.log("TidySub : Second is not correct for offset")
+            logger.log("TidySub : Second is not correct for offset", logger.DEBUG)
             _correct = False
         
         if (not isinstance(_ms, int)) or _ms < 0 or _ms >= 1000:
-            logger.log("TidySub : Milisecond is not correct for offset")
+            logger.log("TidySub : Milisecond is not correct for offset", logger.DEBUG)
             _correct = False
 
         if not _correct:
