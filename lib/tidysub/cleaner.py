@@ -75,7 +75,7 @@ class TidySub:
             logger.log("TidySub : No subtitles file was loaded")
             return
                 
-        fileDest = codecs.open(path_to_file, "w", "utf-8")
+        fileDest = codecs.open(path_to_file, "w", "latin-1")
 
         for i in toWrite:
             fileDest.write(i)
