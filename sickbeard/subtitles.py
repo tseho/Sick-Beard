@@ -135,6 +135,13 @@ class SubtitlesFinder():
                     return
                 
                 previous_subtitles = epObj.subtitles
+                
+                try:
+                    subtitles = epObj.downloadSubtitles()
+                    
+                except:
+                    logger.log(u'Unable to find subtitles', logger.DEBUG)
+                    return
 
 
     def _getRules(self):
