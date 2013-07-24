@@ -23,7 +23,8 @@ import logging
 logger = logging.getLogger("subliminal")
 
 
-COUNTRIES = [('AF', 'AFG', '004', u'Afghanistan'),
+COUNTRIES = [(' ', ' ', ' ', u'Vide'),
+             ('AF', 'AFG', '004', u'Afghanistan'),
              ('AX', 'ALA', '248', u'Åland Islands'),
              ('AL', 'ALB', '008', u'Albania'),
              ('DZ', 'DZA', '012', u'Algeria'),
@@ -877,12 +878,13 @@ class Language(object):
             language_tuple = dict((l[3].split('; ')[0].lower(), l) for l in languages).get(language)
         if language_tuple is None:
             language_tuple = dict((l[4].split('; ')[0].lower(), l) for l in languages).get(language)
-
-        # Raise ValueError if strict or continue with Undetermined
         if language_tuple is None:
-            if strict:
-                raise ValueError('Language %s does not exist' % language)
             language_tuple = dict((l[0].lower(), l) for l in languages).get('und')
+        # Raise ValueError if strict or continue with Undetermined
+        #if language_tuple is None:
+        #   if strict:
+        #      raise ValueError('Language %s does not exist' % language)
+        # language_tuple = dict((l[0].lower(), l) for l in languages).get('und')
 
         # Set attributes
         self.alpha2 = language_tuple[2]
