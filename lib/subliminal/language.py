@@ -23,8 +23,7 @@ import logging
 logger = logging.getLogger("subliminal")
 
 
-COUNTRIES = [(' ', ' ', ' ', u'Vide'),
-             ('AF', 'AFG', '004', u'Afghanistan'),
+COUNTRIES = [('AF', 'AFG', '004', u'Afghanistan'),
              ('AX', 'ALA', '248', u'Åland Islands'),
              ('AL', 'ALB', '008', u'Albania'),
              ('DZ', 'DZA', '012', u'Algeria'),
