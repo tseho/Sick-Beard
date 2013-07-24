@@ -1027,7 +1027,7 @@ def initialize(consoleLogging=True):
         subtitlesFinderScheduler = scheduler.Scheduler(subtitles.SubtitlesFinder(),
                                                      cycleTime=datetime.timedelta(hours=1),
                                                      threadName="FINDSUBTITLES",
-                                                     runImmediately=False)
+                                                     runImmediately=True)
 
         
         sentFTPSchedular = scheduler.Scheduler(SentFTPChecker.SentFTPChecker(),
