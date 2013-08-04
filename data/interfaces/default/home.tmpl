@@ -522,24 +522,31 @@ function setLayout(imdb,name){
 	function UpdateTableHeaders() {
 	   \$(".ui-jqgrid.ui-widget.ui-widget-content").each(function() {
 	   
-	       var el             = \$(this),
-	           offset         = el.offset(),
-	           scrollTop      = \$(window).scrollTop(),
-	           floatingHeader = \$(".floatingHeader", this)
-	       
-	       if ((scrollTop > offset.top) && (scrollTop < offset.top + el.height())) {
-	           floatingHeader.css({
-	            "visibility": "visible",
-	            "top" : "0px",
-	            "z-index" : "1000"
-	           });
-	       } else {
-	           floatingHeader.css({
-	           	"top" : offset.top - scrollTop + "px",
-	            "visibility": "visible",
-	            "z-index" : "2"
-	           });      
-	       };
+	   	    var visi = "visible";
+	   	   
+			if((navigator.userAgent.match(/iPhone/i))||(navigator.userAgent.match(/iPod/i))||(navigator.userAgent.match(/Android/i))||(navigator.userAgent.match(/Safari/i))){
+				var visi = "none";
+			}else{
+		   
+		       var el             = \$(this),
+		           offset         = el.offset(),
+		           scrollTop      = \$(window).scrollTop(),
+		           floatingHeader = \$(".floatingHeader", this)
+		       
+		       if ((scrollTop > offset.top) && (scrollTop < offset.top + el.height())) {
+		           floatingHeader.css({
+		            "visibility": visi,
+		            "top" : "0px",
+		            "z-index" : "1000"
+		           });
+		       } else {
+		           floatingHeader.css({
+		           	"top" : offset.top - scrollTop + "px",
+		            "visibility": visi,
+		            "z-index" : "2"
+		           });      
+		       };
+		    }
 	   });
 	}
 
@@ -549,12 +556,11 @@ function setLayout(imdb,name){
 	   var clonedHeaderRow;
 	
 	   \$(".ui-jqgrid.ui-widget.ui-widget-content").each(function() {
-	       clonedHeaderRow = \$(".ui-state-default.ui-jqgrid-hdiv", this);
-	       clonedHeaderRow
-	         .before(clonedHeaderRow.clone())
-	         .css("width", clonedHeaderRow.width())
-	         .addClass("floatingHeader");
-	         
+			   clonedHeaderRow = \$(".ui-state-default.ui-jqgrid-hdiv", this);
+		       clonedHeaderRow
+		         .before(clonedHeaderRow.clone())
+		         .css("width", clonedHeaderRow.width())
+		         .addClass("floatingHeader");
 	   });
 	   
 	   \$(window)

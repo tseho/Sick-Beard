@@ -22,3 +22,15 @@ font-size: 10px;
 
 #outerWrapper { width: 98%; padding-left: 1%; padding-right: 1%; }
 
+
+body .ui-jqgrid .ui-jqgrid-htable th {
+	background: #e6e6e6 50% 50% repeat-x;	
+}
+body .ui-state-default, body .ui-widget-content .ui-state-default, body .ui-widget-header .ui-state-default {
+	background: #e6e6e6 50% 50% repeat-x; 
+	color: #555555; 
+}
+
+body .floatingHeader{
+	visibility: none;
+}
