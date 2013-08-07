@@ -70,7 +70,10 @@ class Scheduler:
                 try:
                     if not self.silent:
                         logger.log(u"Starting new thread: "+self.threadName, logger.DEBUG)
-                    self.action.run()
+                    if self.threadName == 'FINDFRENCH':
+                        self.action.__init__()
+                    else:
+                        self.action.run()
                 except Exception, e:
                     logger.log(u"Exception generated in thread "+self.threadName+": " + ex(e), logger.ERROR)
                     logger.log(repr(traceback.format_exc()), logger.DEBUG)

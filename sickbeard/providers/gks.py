@@ -73,16 +73,20 @@ class GksProvider(generic.TorrentProvider):
                 results.append(result)
         return results
 
-    def _get_episode_search_strings(self, ep_obj):
+    def _get_episode_search_strings(self, ep_obj, french=None):
 
         showNames = show_name_helpers.allPossibleShowNames(ep_obj.show)
         results = []
         for showName in showNames:
-            for result in self.getSearchParams( "%s S%02dE%02d" % ( showName, ep_obj.season, ep_obj.episode), ep_obj.show.audio_lang) :
+            if french:
+                lang='fr'
+            else:
+                lang=ep_obj.show.audio_lang
+            for result in self.getSearchParams( "%s S%02dE%02d" % ( showName, ep_obj.season, ep_obj.episode), lang) :
                 results.append(result)
         return results
         
-    def _doSearch(self, searchString, show=None, season=None):
+    def _doSearch(self, searchString, show=None, season=None, french=None):
         results = []
         searchUrl = self.url+'rdirect.php?type=search&'+searchString
         logger.log(u"Search URL: " + searchUrl, logger.DEBUG)
@@ -130,8 +134,10 @@ class GksProvider(generic.TorrentProvider):
                     if quality==Quality.UNKNOWN and title:
                         if '720p' not in title.lower() and '1080p' not in title.lower():
                             quality=Quality.SDTV
-                    if show:
+                    if show and french==None:
                         results.append( GksSearchResult( self.opener, title, downloadURL, quality, str(show.audio_lang) ) )
+                    elif show and french:
+                        results.append( GksSearchResult( self.opener, title, downloadURL, quality, 'fr' ) )
                     else:
                         results.append( GksSearchResult( self.opener, title, downloadURL, quality ) )
         return results

@@ -58,6 +58,7 @@ ARCHIVED = 6 # episodes that you don't have locally (counts toward download comp
 IGNORED = 7 # episodes that you don't want included in your download stats
 SNATCHED_PROPER = 9 # qualified with quality
 SUBTITLED = 10 # qualified with quality
+SNATCHED_FRENCH = 11 # episodes downloaded in english then autodownloaded in french
 
 NAMING_REPEAT = 1
 NAMING_EXTEND = 2
@@ -220,11 +221,13 @@ class Quality:
     DOWNLOADED = None
     SNATCHED = None
     SNATCHED_PROPER = None
+    SNATCHED_FRENCH = None
     WANTED = None
 
 Quality.DOWNLOADED = [Quality.compositeStatus(DOWNLOADED, x) for x in Quality.qualityStrings.keys()]
 Quality.SNATCHED = [Quality.compositeStatus(SNATCHED, x) for x in Quality.qualityStrings.keys()]
 Quality.SNATCHED_PROPER = [Quality.compositeStatus(SNATCHED_PROPER, x) for x in Quality.qualityStrings.keys()]
+Quality.SNATCHED_FRENCH = [Quality.compositeStatus(SNATCHED_FRENCH, x) for x in Quality.qualityStrings.keys()]
 Quality.WANTED = [Quality.compositeStatus(WANTED, x) for x in Quality.qualityStrings.keys()]
 
 SD = Quality.combineQualities([Quality.SDTV, Quality.SDDVD], [])
@@ -252,13 +255,14 @@ class StatusStrings:
                               DOWNLOADED: "Downloaded",
                               SKIPPED: "Skipped",
                               SNATCHED_PROPER: "Snatched (Proper)",
+                              SNATCHED_FRENCH: "Snatched (French)",
                               WANTED: "Wanted",
                               ARCHIVED: "Archived",
                               IGNORED: "Ignored",
                               SUBTITLED: "Subtitled"}
 
     def __getitem__(self, name):
-        if name in Quality.DOWNLOADED + Quality.SNATCHED + Quality.SNATCHED_PROPER:
+        if name in Quality.DOWNLOADED + Quality.SNATCHED + Quality.SNATCHED_PROPER + Quality.SNATCHED_FRENCH:
             status, quality = Quality.splitCompositeStatus(name)
             if quality == Quality.NONE:
                 return self.statusStrings[status]
@@ -268,7 +272,7 @@ class StatusStrings:
             return self.statusStrings[name]
 
     def has_key(self, name):
-        return name in self.statusStrings or name in Quality.DOWNLOADED or name in Quality.SNATCHED or name in Quality.SNATCHED_PROPER
+        return name in self.statusStrings or name in Quality.DOWNLOADED or name in Quality.SNATCHED or name in Quality.SNATCHED_PROPER or name in Quality.SNATCHED_FRENCH
 
 statusStrings = StatusStrings()
 
@@ -280,7 +284,7 @@ class Overview:
     SKIPPED = SKIPPED # 5
 
     # For both snatched statuses. Note: SNATCHED/QUAL have same value and break dict.
-    SNATCHED = SNATCHED_PROPER # 9
+    SNATCHED = SNATCHED_PROPER = SNATCHED_FRENCH # 9
 
     overviewStrings = {SKIPPED: "skipped",
                        WANTED: "wanted",

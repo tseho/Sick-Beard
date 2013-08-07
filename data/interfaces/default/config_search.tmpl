@@ -42,10 +42,18 @@
                             <input type="checkbox" name="download_propers" id="download_propers" #if $sickbeard.DOWNLOAD_PROPERS == True then "checked=\"checked\"" else ""# />
                             <label class="clearfix" for="download_propers">
                                 <span class="component-title">Download Propers</span>
-                                <span class="component-desc">Replace original download with "Proper/Repack" if nuked?</span>
+                                <span class="component-desc">Replace original download with "Proper/Repack" if nuked? Needs restart</span>
                             </label>
                         </div>
-
+						
+						<div class="field-pair">
+                            <input type="checkbox" name="download_french" id="download_french" #if $sickbeard.DOWNLOAD_FRENCH == True then "checked=\"checked\"" else ""# />
+                            <label class="clearfix" for="download_french">
+                                <span class="component-title">Auto download French</span>
+                                <span class="component-desc">Replace non french downloads with French ones if they exist even if audio is English (for the show where option is activated, will check every weeks). Needs restart</span>
+                            </label>
+                        </div>
+						
                         <div class="field-pair">
                             <label class="nocheck clearfix">
                                 <span class="component-title">Search Frequency</span>

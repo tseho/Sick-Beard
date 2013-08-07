@@ -33,7 +33,7 @@ from sickbeard import providers, metadata
 from providers import ezrss, tvtorrents, torrentleech, btn, nzbsrus, newznab, womble, nzbx, omgwtfnzbs, binnewz, t411, cpasbien, piratebay, gks, kat
 from sickbeard.config import CheckSection, check_setting_int, check_setting_str, ConfigMigrator
 
-from sickbeard import searchCurrent, searchBacklog, showUpdater, versionChecker, properFinder, autoPostProcesser, subtitles, traktWatchListChecker, SentFTPChecker
+from sickbeard import searchCurrent, searchBacklog, showUpdater, versionChecker, properFinder, frenchFinder, autoPostProcesser, subtitles, traktWatchListChecker, SentFTPChecker
 from sickbeard import helpers, db, exceptions, show_queue, search_queue, scheduler
 from sickbeard import logger
 from sickbeard import naming
@@ -74,6 +74,7 @@ showUpdateScheduler = None
 versionCheckScheduler = None
 showQueueScheduler = None
 searchQueueScheduler = None
+frenchFinderScheduler = None
 properFinderScheduler = None
 autoPostProcesserScheduler = None
 autoTorrentPostProcesserScheduler = None
@@ -156,6 +157,7 @@ USENET_RETENTION = None
 TORRENT_METHOD = None
 TORRENT_DIR = None
 DOWNLOAD_PROPERS = None
+DOWNLOAD_FRENCH = None
 PREFERED_METHOD = None
 SEARCH_FREQUENCY = None
 BACKLOG_SEARCH_FREQUENCY = 1
@@ -427,7 +429,7 @@ def initialize(consoleLogging=True):
     with INIT_LOCK:
 
         global LOG_DIR, WEB_PORT, WEB_LOG, WEB_ROOT, WEB_USERNAME, WEB_PASSWORD, WEB_HOST, WEB_IPV6, USE_API, API_KEY, ENABLE_HTTPS, HTTPS_CERT, HTTPS_KEY, \
-                USE_NZBS, USE_TORRENTS, NZB_METHOD, NZB_DIR, DOWNLOAD_PROPERS, TORRENT_METHOD, PREFERED_METHOD, \
+                USE_NZBS, USE_TORRENTS, NZB_METHOD, NZB_DIR, DOWNLOAD_PROPERS, DOWNLOAD_FRENCH, TORRENT_METHOD, PREFERED_METHOD, \
                 SAB_USERNAME, SAB_PASSWORD, SAB_APIKEY, SAB_CATEGORY, SAB_HOST, \
                 NZBGET_PASSWORD, NZBGET_CATEGORY, NZBGET_HOST, currentSearchScheduler, backlogSearchScheduler, \
                 TORRENT_USERNAME, TORRENT_PASSWORD, TORRENT_HOST, TORRENT_PATH, TORRENT_RATIO, TORRENT_PAUSED, TORRENT_LABEL, \
@@ -456,7 +458,7 @@ def initialize(consoleLogging=True):
                 KEEP_PROCESSED_DIR, PROCESS_METHOD, TV_DOWNLOAD_DIR, TORRENT_DOWNLOAD_DIR, TVDB_BASE_URL, MIN_SEARCH_FREQUENCY, \
                 showQueueScheduler, searchQueueScheduler, ROOT_DIRS, CACHE_DIR, ACTUAL_CACHE_DIR, TVDB_API_PARMS, \
                 NAMING_PATTERN, NAMING_MULTI_EP, NAMING_FORCE_FOLDERS, NAMING_ABD_PATTERN, NAMING_CUSTOM_ABD, \
-                RENAME_EPISODES, properFinderScheduler, PROVIDER_ORDER, autoPostProcesserScheduler, autoTorrentPostProcesserScheduler, \
+                RENAME_EPISODES, frenchFinderScheduler, properFinderScheduler, PROVIDER_ORDER, autoPostProcesserScheduler, autoTorrentPostProcesserScheduler, \
                 NZBSRUS, NZBSRUS_UID, NZBSRUS_HASH, WOMBLE, NZBX, NZBX_COMPLETION, OMGWTFNZBS, OMGWTFNZBS_UID, OMGWTFNZBS_KEY, providerList, newznabProviderList, \
                 EXTRA_SCRIPTS, USE_TWITTER, TWITTER_USERNAME, TWITTER_PASSWORD, TWITTER_PREFIX, \
                 USE_NOTIFO, NOTIFO_USERNAME, NOTIFO_APISECRET, NOTIFO_NOTIFY_ONDOWNLOAD, NOTIFO_NOTIFY_ONSUBTITLEDOWNLOAD, NOTIFO_NOTIFY_ONSNATCH, \
@@ -575,6 +577,7 @@ def initialize(consoleLogging=True):
             PREFERED_METHOD = 'nzb'
 
         DOWNLOAD_PROPERS = bool(check_setting_int(CFG, 'General', 'download_propers', 1))
+        DOWNLOAD_FRENCH = bool(check_setting_int(CFG, 'General', 'download_french', 0))
         USENET_RETENTION = check_setting_int(CFG, 'General', 'usenet_retention', 500)
         SEARCH_FREQUENCY = check_setting_int(CFG, 'General', 'search_frequency', DEFAULT_SEARCH_FREQUENCY)
         if SEARCH_FREQUENCY < MIN_SEARCH_FREQUENCY:
@@ -999,6 +1002,11 @@ def initialize(consoleLogging=True):
                                                      cycleTime=properFinderInstance.updateInterval,
                                                      threadName="FINDPROPERS",
                                                      runImmediately=False)
+        
+        frenchFinderScheduler = scheduler.Scheduler(frenchFinder.FrenchFinder(),
+                                                     cycleTime=datetime.timedelta(minutes=10080),
+                                                     threadName="FINDFRENCH",
+                                                     runImmediately=True)
 
         if PROCESS_AUTOMATICALLY:
             autoPostProcesserScheduler = scheduler.Scheduler(autoPostProcesser.PostProcesser( TV_DOWNLOAD_DIR ),
@@ -1046,7 +1054,7 @@ def start():
 
     global __INITIALIZED__, currentSearchScheduler, backlogSearchScheduler, \
             showUpdateScheduler, versionCheckScheduler, showQueueScheduler, \
-            properFinderScheduler, autoPostProcesserScheduler, autoTorrentPostProcesserScheduler, searchQueueScheduler, \
+            frenchFinderScheduler, properFinderScheduler, autoPostProcesserScheduler, autoTorrentPostProcesserScheduler, searchQueueScheduler, \
             subtitlesFinderScheduler, started, USE_SUBTITLES, \
             traktWatchListCheckerSchedular, started, \
             sentFTPSchedular, started
@@ -1072,7 +1080,9 @@ def start():
 
             # start the search queue checker
             searchQueueScheduler.thread.start()
-
+            
+            if DOWNLOAD_FRENCH:
+                frenchFinderScheduler.thread.start()
             # start the queue checker
             if DOWNLOAD_PROPERS:
                 properFinderScheduler.thread.start()
@@ -1101,7 +1111,7 @@ def start():
 def halt():
 
     global __INITIALIZED__, currentSearchScheduler, backlogSearchScheduler, showUpdateScheduler, \
-            showQueueScheduler, properFinderScheduler, autoPostProcesserScheduler, autoTorrentPostProcesserScheduler, searchQueueScheduler, \
+            showQueueScheduler, frenchFinderScheduler, properFinderScheduler, autoPostProcesserScheduler, autoTorrentPostProcesserScheduler, searchQueueScheduler, \
             subtitlesFinderScheduler, started, \
             traktWatchListCheckerSchedular
 
@@ -1193,7 +1203,16 @@ def halt():
                     properFinderScheduler.thread.join(10)
                 except:
                     pass
-    
+                
+            if frenchFinderScheduler:
+                frenchFinderScheduler.abort = True
+                logger.log(u"Waiting for the FRENCHFINDER thread to exit")
+                try:
+                    frenchFinderScheduler.thread.join(10)
+                except:
+                    pass
+                            
+            if subtitlesFinderScheduler:
                 subtitlesFinderScheduler.abort = True
                 logger.log(u"Waiting for the SUBTITLESFINDER thread to exit")
                 try:
@@ -1321,6 +1340,7 @@ def save_config():
     new_config['General']['usenet_retention'] = int(USENET_RETENTION)
     new_config['General']['search_frequency'] = int(SEARCH_FREQUENCY)
     new_config['General']['download_propers'] = int(DOWNLOAD_PROPERS)
+    new_config['General']['download_french'] = int(DOWNLOAD_FRENCH)
     new_config['General']['quality_default'] = int(QUALITY_DEFAULT)
     new_config['General']['status_default'] = int(STATUS_DEFAULT)
     new_config['General']['audio_show_default'] = AUDIO_SHOW_DEFAULT

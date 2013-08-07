@@ -33,6 +33,8 @@ import xml.etree.cElementTree as etree
 
 from name_parser.parser import NameParser, InvalidNameException
 
+from frenchFinder import FrenchFinder
+
 from lib import subliminal
 
 from lib.tidysub import cleaner
@@ -54,7 +56,7 @@ from sickbeard import history
 from sickbeard import encodingKludge as ek
 
 from common import Quality, Overview
-from common import DOWNLOADED, SNATCHED, SNATCHED_PROPER, ARCHIVED, IGNORED, UNAIRED, WANTED, SKIPPED, UNKNOWN
+from common import DOWNLOADED, SNATCHED, SNATCHED_PROPER, SNATCHED_FRENCH, ARCHIVED, IGNORED, UNAIRED, WANTED, SKIPPED, UNKNOWN
 from common import NAMING_DUPLICATE, NAMING_EXTEND, NAMING_LIMITED_EXTEND, NAMING_SEPARATED_REPEAT, NAMING_LIMITED_EXTEND_E_PREFIXED
 
 
@@ -80,6 +82,7 @@ class TVShow(object):
         self.airs = ""
         self.startyear = 0
         self.paused = 0
+        self.frenchsearch = 0
         self.air_by_date = 0
         self.subtitles = int(sickbeard.SUBTITLES_DEFAULT if sickbeard.SUBTITLES_DEFAULT else 0)
         self.lang = lang
@@ -564,11 +567,11 @@ class TVShow(object):
                     newStatus = DOWNLOADED
 
                 # if it was snatched proper and we found a higher quality one then allow the status change
-                elif oldStatus == SNATCHED_PROPER and oldQuality < newQuality:
+                elif (oldStatus == SNATCHED_PROPER or oldStatus == SNATCHED_FRENCH) and oldQuality < newQuality:
                     logger.log(u"STATUS: this ep used to be snatched proper with quality "+Quality.qualityStrings[oldQuality]+" but a file exists with quality "+Quality.qualityStrings[newQuality]+" so I'm setting the status to DOWNLOADED", logger.DEBUG)
                     newStatus = DOWNLOADED
 
-                elif oldStatus not in (SNATCHED, SNATCHED_PROPER):
+                elif oldStatus not in (SNATCHED, SNATCHED_PROPER, SNATCHED_FRENCH):
                     newStatus = DOWNLOADED
 
                 if newStatus != None:
@@ -634,7 +637,7 @@ class TVShow(object):
             self.quality = int(sqlResults[0]["quality"])
             self.flatten_folders = int(sqlResults[0]["flatten_folders"])
             self.paused = int(sqlResults[0]["paused"])
-
+            self.frenchsearch = int(sqlResults[0]["frenchsearch"])
             self._location = sqlResults[0]["location"]
 
             if self.tvrid == 0:
@@ -952,6 +955,11 @@ class TVShow(object):
         except Exception as e:
             logger.log("Error occurred when cleaning subtitles: " + str(e), logger.DEBUG)
             return
+    
+    def searchFrench(self, show):
+        logger.log("Sending french episodes search")
+        FrenchFinder('force',show)
+        return
 
     def saveToDB(self):
         logger.log(str(self.tvdbid) + ": Saving show info to database", logger.DEBUG)
@@ -969,6 +977,7 @@ class TVShow(object):
                         "airs": self.airs,
                         "status": self.status,
                         "flatten_folders": self.flatten_folders,
+                        "frenchsearch":self.frenchsearch,
                         "paused": self.paused,
                         "air_by_date": self.air_by_date,
                         "subtitles": self.subtitles,
@@ -1048,7 +1057,7 @@ class TVShow(object):
         curStatus, curQuality = Quality.splitCompositeStatus(epStatus)
 
         # if we are re-downloading then we only want it if it's in our bestQualities list and better than what we have
-        if curStatus in Quality.DOWNLOADED + Quality.SNATCHED + Quality.SNATCHED_PROPER and quality in bestQualities and quality > curQuality:
+        if curStatus in Quality.DOWNLOADED + Quality.SNATCHED + Quality.SNATCHED_PROPER + Quality.SNATCHED_FRENCH and quality in bestQualities and quality > curQuality:
             logger.log(u"We already have this ep but the new one is better quality, saying yes", logger.DEBUG)
             return True
 
@@ -1066,7 +1075,7 @@ class TVShow(object):
             return Overview.SKIPPED
         elif epStatus == ARCHIVED:
             return Overview.GOOD
-        elif epStatus in Quality.DOWNLOADED + Quality.SNATCHED + Quality.SNATCHED_PROPER:
+        elif epStatus in Quality.DOWNLOADED + Quality.SNATCHED + Quality.SNATCHED_PROPER + Quality.SNATCHED_FRENCH:
 
             anyQualities, bestQualities = Quality.splitQuality(self.quality) #@UnusedVariable
             if bestQualities:
@@ -1076,7 +1085,7 @@ class TVShow(object):
 
             epStatus, curQuality = Quality.splitCompositeStatus(epStatus)
     
-            if epStatus in (SNATCHED, SNATCHED_PROPER):
+            if epStatus in (SNATCHED, SNATCHED_PROPER, SNATCHED_FRENCH):
                 return Overview.SNATCHED
             # if they don't want re-downloads then we call it good if they have anything
             elif maxBestQuality == None:
@@ -1488,7 +1497,7 @@ class TVEpisode(object):
         if not ek.ek(os.path.isfile, self.location):
 
             # if we don't have the file
-            if self.airdate >= datetime.date.today() and self.status not in Quality.SNATCHED + Quality.SNATCHED_PROPER:
+            if self.airdate >= datetime.date.today() and self.status not in Quality.SNATCHED + Quality.SNATCHED_PROPER + Quality.SNATCHED_FRENCH:
                 # and it hasn't aired yet set the status to UNAIRED
                 logger.log(u"Episode airs in the future, changing status from " + str(self.status) + " to " + str(UNAIRED), logger.DEBUG)
                 self.status = UNAIRED
@@ -1514,7 +1523,7 @@ class TVEpisode(object):
         # if we have a media file then it's downloaded
         elif sickbeard.helpers.isMediaFile(self.location):
             # leave propers alone, you have to either post-process them or manually change them back
-            if self.status not in Quality.SNATCHED_PROPER + Quality.DOWNLOADED + Quality.SNATCHED + [ARCHIVED]:
+            if self.status not in Quality.SNATCHED_FRENCH + Quality.SNATCHED_PROPER + Quality.DOWNLOADED + Quality.SNATCHED + [ARCHIVED]:
                 logger.log(u"5 Status changes from " + str(self.status) + " to " + str(Quality.statusFromName(self.location)), logger.DEBUG)
                 self.status = Quality.statusFromName(self.location)
 
