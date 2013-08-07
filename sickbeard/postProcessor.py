@@ -723,7 +723,7 @@ class PostProcessor(object):
         ep_quality = common.Quality.UNKNOWN
 
         # if there is a quality available in the status then we don't need to bother guessing from the filename
-        if ep_obj.status in common.Quality.SNATCHED + common.Quality.SNATCHED_PROPER:
+        if ep_obj.status in common.Quality.SNATCHED + common.Quality.SNATCHED_PROPER + common.Quality.SNATCHED_FRENCH:
             oldStatus, ep_quality = common.Quality.splitCompositeStatus(ep_obj.status) #@UnusedVariable
             if ep_quality != common.Quality.UNKNOWN:
                 self._log(u"The old status had a quality in it, using that: "+common.Quality.qualityStrings[ep_quality], logger.DEBUG)
@@ -789,7 +789,7 @@ class PostProcessor(object):
         """
         
         # if SB downloaded this on purpose then this is a priority download
-        if self.in_history or ep_obj.status in common.Quality.SNATCHED + common.Quality.SNATCHED_PROPER:
+        if self.in_history or ep_obj.status in common.Quality.SNATCHED + common.Quality.SNATCHED_PROPER + common.Quality.SNATCHED_FRENCH:
             self._log(u"SB snatched this episode so I'm marking it as priority", logger.DEBUG)
             return True
         

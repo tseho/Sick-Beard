@@ -226,7 +226,7 @@ class Manage:
 
         status_list = [int(whichStatus)]
         if status_list[0] == SNATCHED:
-            status_list = Quality.SNATCHED + Quality.SNATCHED_PROPER
+            status_list = Quality.SNATCHED + Quality.SNATCHED_PROPER + Quality.SNATCHED_FRENCH
 
         cur_show_results = myDB.select("SELECT season, episode, name FROM tv_episodes WHERE showid = ? AND season != 0 AND status IN ("+','.join(['?']*len(status_list))+")", [int(tvdb_id)] + status_list)
 
@@ -249,7 +249,7 @@ class Manage:
             whichStatus = int(whichStatus)
             status_list = [whichStatus]
             if status_list[0] == SNATCHED:
-                status_list = Quality.SNATCHED + Quality.SNATCHED_PROPER
+                status_list = Quality.SNATCHED + Quality.SNATCHED_PROPER + Quality.SNATCHED_FRENCH
         else:
             status_list = []
 
@@ -288,7 +288,7 @@ class Manage:
 
         status_list = [int(oldStatus)]
         if status_list[0] == SNATCHED:
-            status_list = Quality.SNATCHED + Quality.SNATCHED_PROPER
+            status_list = Quality.SNATCHED + Quality.SNATCHED_PROPER + Quality.SNATCHED_FRENCH
 
         to_change = {}
 
@@ -996,7 +996,7 @@ class ConfigSearch:
     @cherrypy.expose
     def saveSearch(self, use_nzbs=None, use_torrents=None, nzb_dir=None, sab_username=None, sab_password=None,
                        sab_apikey=None, sab_category=None, sab_host=None, nzbget_password=None, nzbget_category=None, nzbget_host=None,
-                       torrent_dir=None,torrent_method=None, nzb_method=None, usenet_retention=None, search_frequency=None, download_propers=None, torrent_username=None, torrent_password=None, torrent_host=None, torrent_label=None, torrent_path=None, 
+                       torrent_dir=None,torrent_method=None, nzb_method=None, usenet_retention=None, search_frequency=None, download_propers=None, download_french=None, torrent_username=None, torrent_password=None, torrent_host=None, torrent_label=None, torrent_path=None, 
                        torrent_ratio=None, torrent_paused=None, ignore_words=None, prefered_method=None, torrent_use_ftp = None, ftp_host=None, ftp_port=None, ftp_timeout=None, ftp_passive = None, ftp_login=None, ftp_password=None, ftp_remotedir=None):
 
         results = []
@@ -1013,7 +1013,11 @@ class ConfigSearch:
             download_propers = 1
         else:
             download_propers = 0
-
+        
+        if download_french == "on":
+            download_french = 1
+        else:
+            download_french = 0
         if use_nzbs == "on":
             use_nzbs = 1
         else:
@@ -1047,6 +1051,7 @@ class ConfigSearch:
         sickbeard.IGNORE_WORDS = ignore_words
         
         sickbeard.DOWNLOAD_PROPERS = download_propers
+        sickbeard.DOWNLOAD_FRENCH = download_french
 
         sickbeard.SAB_USERNAME = sab_username
         sickbeard.SAB_PASSWORD = sab_password
@@ -2905,6 +2910,7 @@ class Home:
                 t.submenu.append({ 'title': 'Force Full Update',    'path': 'home/updateShow?show=%d&amp;force=1'%showObj.tvdbid })
                 t.submenu.append({ 'title': 'Update show in XBMC',  'path': 'home/updateXBMC?showName=%s'%urllib.quote_plus(showObj.name.encode('utf-8')), 'requires': haveXBMC })
                 t.submenu.append({ 'title': 'Preview Rename',       'path': 'home/testRename?show=%d'%showObj.tvdbid })
+                t.submenu.append({ 'title': 'French Search',       'path': 'home/frenchSearch?show=%d'%showObj.tvdbid })
                 if sickbeard.USE_SUBTITLES and not sickbeard.showQueueScheduler.action.isBeingSubtitled(showObj) and not sickbeard.showQueueScheduler.action.isBeingCleanedSubtitle(showObj) and showObj.subtitles:
                     t.submenu.append({ 'title': 'Download Subtitles', 'path': 'home/subtitleShow?show=%d'%showObj.tvdbid })
                     t.submenu.append({ 'title': 'Clean Subtitles', 'path': 'home/subtitleShowClean?show=%d'%showObj.tvdbid })
@@ -2950,7 +2956,7 @@ class Home:
         return result['description'] if result else 'Episode not found.'
 
     @cherrypy.expose
-    def editShow(self, show=None, location=None, anyQualities=[], bestQualities=[], exceptions_list=[], flatten_folders=None, paused=None, directCall=False, air_by_date=None, tvdbLang=None, audio_lang=None, subtitles=None):
+    def editShow(self, show=None, location=None, anyQualities=[], bestQualities=[], exceptions_list=[], flatten_folders=None, paused=None, frenchsearch=None, directCall=False, air_by_date=None, tvdbLang=None, audio_lang=None, subtitles=None):
 
         if show == None:
             errString = "Invalid show ID: "+str(show)
@@ -2990,6 +2996,11 @@ class Home:
             paused = 1
         else:
             paused = 0
+            
+        if frenchsearch == "on":
+            frenchsearch = 1
+        else:
+            frenchsearch = 0
 
         if air_by_date == "on":
             air_by_date = 1
@@ -3047,6 +3058,7 @@ class Home:
             showObj.paused = paused
             showObj.air_by_date = air_by_date
             showObj.subtitles = subtitles
+            showObj.frenchsearch = frenchsearch
             showObj.lang = tvdb_lang
             showObj.audio_lang = audio_lang
 
@@ -3199,6 +3211,25 @@ class Home:
         redirect("/home/displayShow?show="+str(showObj.tvdbid))
     
     @cherrypy.expose
+    
+    def frenchSearch(self, show=None, force=0):
+
+        if show == None:
+            return _genericMessage("Error", "Invalid show ID")
+
+        showObj = sickbeard.helpers.findCertainShow(sickbeard.showList, int(show))
+
+        if showObj == None:
+            return _genericMessage("Error", "Unable to find the specified show")
+
+        # search and download subtitles
+        sickbeard.showQueueScheduler.action.searchFrench(showObj, bool(force)) #@UndefinedVariable
+
+        time.sleep(3)
+
+        redirect("/home/displayShow?show="+str(showObj.tvdbid))
+    
+    @cherrypy.expose
     def updateXBMC(self, showName=None):
         if sickbeard.XBMC_UPDATE_ONLYFIRST:
             # only send update to first host in the list -- workaround for xbmc sql backend users
@@ -3280,7 +3311,7 @@ class Home:
                         logger.log(u"Refusing to change status of "+curEp+" because it is UNAIRED", logger.ERROR)
                         continue
 
-                    if int(status) in Quality.DOWNLOADED and epObj.status not in Quality.SNATCHED + Quality.SNATCHED_PROPER + Quality.DOWNLOADED + [IGNORED] and not ek.ek(os.path.isfile, epObj.location):
+                    if int(status) in Quality.DOWNLOADED and epObj.status not in Quality.SNATCHED + Quality.SNATCHED_PROPER + Quality.SNATCHED_FRENCH + Quality.DOWNLOADED + [IGNORED] and not ek.ek(os.path.isfile, epObj.location):
                         logger.log(u"Refusing to change status of "+curEp+" to DOWNLOADED because it's not SNATCHED/DOWNLOADED", logger.ERROR)
                         continue
 

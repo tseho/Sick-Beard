@@ -53,7 +53,7 @@ class CpasbienProvider(generic.TorrentProvider):
             result.append( showName + " S%02d" % season )
         return result
 
-    def _get_episode_search_strings(self, ep_obj):
+    def _get_episode_search_strings(self, ep_obj, french=None):
 
         strings = []
 
@@ -70,7 +70,7 @@ class CpasbienProvider(generic.TorrentProvider):
     def getQuality(self, item):
         return item.getQuality()
         
-    def _doSearch(self, searchString, show=None, season=None):
+    def _doSearch(self, searchString, show=None, season=None, french=None):
 
         results = []
         searchUrl = self.url + '/recherche/'
@@ -91,7 +91,7 @@ class CpasbienProvider(generic.TorrentProvider):
             title = str(link.text).lower().strip()  
             pageURL = link['href']
 
-            if "vostfr" in title and ((not show.subtitles) or show.audio_lang == "fr"):
+            if "vostfr" in title and ((not show.subtitles) or show.audio_lang == "fr" or french):
                 continue
 
             torrentPage = self.opener.open( pageURL )
@@ -123,8 +123,10 @@ class CpasbienProvider(generic.TorrentProvider):
                 else:
                     quality = Quality.SDTV
 
-                if show:
+                if show and french==None:
                     results.append( CpasbienSearchResult( self.opener, title, downloadURL, quality, str(show.audio_lang) ) )
+                elif show and french:
+                    results.append( CpasbienSearchResult( self.opener, title, downloadURL, quality, 'fr' ) )
                 else:
                     results.append( CpasbienSearchResult( self.opener, title, downloadURL, quality ) )
 

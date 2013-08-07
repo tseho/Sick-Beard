@@ -45,10 +45,10 @@ class T411Provider(generic.TorrentProvider):
     def isEnabled(self):
         return sickbeard.T411
     
-    def getSearchParams(self, searchString, audio_lang, subcat):
-        if audio_lang == "en":
+    def getSearchParams(self, searchString, audio_lang, subcat, french):
+        if audio_lang == "en" and french==None:
             return urllib.urlencode( {'search': searchString, 'cat' : 210, 'submit' : 'Recherche', 'subcat': subcat } ) + "&term%5B17%5D%5B%5D=540&term%5B17%5D%5B%5D=721"
-        elif audio_lang == "fr":
+        elif audio_lang == "fr" or french:
             return urllib.urlencode( {'search': searchString, 'cat' : 210, 'submit' : 'Recherche', 'subcat': subcat } ) + "&term%5B17%5D%5B%5D=541&term%5B17%5D%5B%5D=542"
         else:
             return urllib.urlencode( {'search': searchString, 'cat' : 210, 'submit' : 'Recherche', 'subcat': subcat } )
@@ -77,24 +77,24 @@ class T411Provider(generic.TorrentProvider):
             results.append( self.getSearchParams(showName + " saison %02d" % season, show.audio_lang, 634 ))
         return results
 
-    def _get_episode_search_strings(self, ep_obj):
+    def _get_episode_search_strings(self, ep_obj, french=None):
 
         showNames = show_name_helpers.allPossibleShowNames(ep_obj.show)
         results = []
         for showName in showNames:
-            results.append( self.getSearchParams( "%s S%02dE%02d" % ( showName, ep_obj.season, ep_obj.episode), ep_obj.show.audio_lang, 433 ))
+            results.append( self.getSearchParams( "%s S%02dE%02d" % ( showName, ep_obj.season, ep_obj.episode), ep_obj.show.audio_lang, 433, french ))
             if (int(ep_obj.season) < 31 and int(ep_obj.episode) < 61):
-                results.append( self.getSearchParams( showName, ep_obj.show.audio_lang, 433)+ "&" + urllib.urlencode({'term[46][]': self.episodeValue(ep_obj.episode), 'term[45][]': self.seasonValue(ep_obj.season)}))
+                results.append( self.getSearchParams( showName, ep_obj.show.audio_lang, 433, french)+ "&" + urllib.urlencode({'term[46][]': self.episodeValue(ep_obj.episode), 'term[45][]': self.seasonValue(ep_obj.season)}))
             #results.append( self.getSearchParams( "%s %dx%d" % ( showName, ep_obj.season, ep_obj.episode ), ep_obj.show.audio_lang , 433 )) MAY RETURN 1x12 WHEN SEARCHING 1x1
-            results.append( self.getSearchParams( "%s %dx%02d" % ( showName, ep_obj.season, ep_obj.episode ), ep_obj.show.audio_lang, 433 ))
-            results.append( self.getSearchParams( "%s S%02dE%02d" % ( showName, ep_obj.season, ep_obj.episode), ep_obj.show.audio_lang, 637 ))
+            results.append( self.getSearchParams( "%s %dx%02d" % ( showName, ep_obj.season, ep_obj.episode ), ep_obj.show.audio_lang, 433, french ))
+            results.append( self.getSearchParams( "%s S%02dE%02d" % ( showName, ep_obj.season, ep_obj.episode), ep_obj.show.audio_lang, 637, french ))
             if (int(ep_obj.season) < 31 and int(ep_obj.episode) < 61):
-                results.append( self.getSearchParams( showName, ep_obj.show.audio_lang, 637)+ "&" + urllib.urlencode({'term[46][]': self.episodeValue(ep_obj.episode), 'term[45][]': self.seasonValue(ep_obj.season)}))
+                results.append( self.getSearchParams( showName, ep_obj.show.audio_lang, 637, french)+ "&" + urllib.urlencode({'term[46][]': self.episodeValue(ep_obj.episode), 'term[45][]': self.seasonValue(ep_obj.season)}))
             #results.append( self.getSearchParams( "%s %dx%d" % ( showName, ep_obj.season, ep_obj.episode ), ep_obj.show.audio_lang, 637 ))
-            results.append( self.getSearchParams( "%s %dx%02d" % ( showName, ep_obj.season, ep_obj.episode ), ep_obj.show.audio_lang, 637 ))
-            results.append( self.getSearchParams( "%s S%02dE%02d" % ( showName, ep_obj.season, ep_obj.episode), ep_obj.show.audio_lang, 634))
+            results.append( self.getSearchParams( "%s %dx%02d" % ( showName, ep_obj.season, ep_obj.episode ), ep_obj.show.audio_lang, 637, french ))
+            results.append( self.getSearchParams( "%s S%02dE%02d" % ( showName, ep_obj.season, ep_obj.episode), ep_obj.show.audio_lang, 634, french))
             #results.append( self.getSearchParams( "%s %dx%d" % ( showName, ep_obj.season, ep_obj.episode ), ep_obj.show.audio_lang, 634 ))
-            results.append( self.getSearchParams( "%s %dx%02d" % ( showName, ep_obj.season, ep_obj.episode ), ep_obj.show.audio_lang, 634 ))
+            results.append( self.getSearchParams( "%s %dx%02d" % ( showName, ep_obj.season, ep_obj.episode ), ep_obj.show.audio_lang, 634, french ))
         return results
     
     def _get_title_and_url(self, item):
@@ -108,7 +108,7 @@ class T411Provider(generic.TorrentProvider):
         data = urllib.urlencode({'login': login, 'password' : password, 'submit' : 'Connexion', 'remember': 1, 'url' : '/'})
         self.opener.open(self.url + '/users/login', data)
     
-    def _doSearch(self, searchString, show=None, season=None):
+    def _doSearch(self, searchString, show=None, season=None, french=None):
         
         if not self.login_done:
             self._doLogin( sickbeard.T411_USERNAME, sickbeard.T411_PASSWORD )
@@ -133,8 +133,10 @@ class T411Provider(generic.TorrentProvider):
                 if quality==Quality.UNKNOWN and title:
                     if '720p' not in title.lower() and '1080p' not in title.lower():
                         quality=Quality.SDTV
-                if show:
+                if show and french==None:
                     results.append( T411SearchResult( self.opener, link['title'], downloadURL, quality, str(show.audio_lang) ) )
+                elif show and french:
+                    results.append( T411SearchResult( self.opener, link['title'], downloadURL, quality, 'fr' ) )
                 else:
                     results.append( T411SearchResult( self.opener, link['title'], downloadURL, quality ) )
                 

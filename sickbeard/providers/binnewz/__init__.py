@@ -92,7 +92,7 @@ class BinNewzProvider(generic.NZBProvider):
             result.append(showName + ".saison %2d" % season)
         return result
 
-    def _get_episode_search_strings(self, ep_obj):
+    def _get_episode_search_strings(self, ep_obj, french=None):
         strings = []
         showNames = show_name_helpers.allPossibleShowNames(ep_obj.show)
         global globepid
@@ -134,7 +134,7 @@ class BinNewzProvider(generic.NZBProvider):
         return data
 
     #wtf with the signature change...
-    def _doSearch(self, searchString=None, show=None, season=None):
+    def _doSearch(self, searchString=None, show=None, season=None, french=None):
         if searchString is None:
             return []
         logger.log("BinNewz : Searching for " + searchString)
@@ -161,7 +161,7 @@ class BinNewzProvider(generic.NZBProvider):
                 language = cells[3].find("img").get("src")
 
                 if show:
-                    if show.audio_lang == "fr":
+                    if show.audio_lang == "fr" or french:
                         if not "_fr" in language:
                             continue
                     elif show.audio_lang == "en":
@@ -220,7 +220,10 @@ class BinNewzProvider(generic.NZBProvider):
                             binsearch_result = downloader.search(searchItem, minSize, newsgroup)
                             if binsearch_result:
                                 links = []
-                                binsearch_result.audio_langs = show.audio_lang
+                                if french:
+                                    binsearch_result.audio_langs = 'fr'
+                                else:
+                                    binsearch_result.audio_langs = show.audio_lang
                                 binsearch_result.title = name
                                 binsearch_result.quality = quality
                                 myDB = db.DBConnection()

@@ -140,6 +140,14 @@ class ShowQueue(generic_queue.GenericQueue):
         self.add_item(queueItemObj)
 
         return queueItemObj
+    
+    def searchFrench(self, show, force=False):
+
+        queueItemObj = QueueItemsearchFrench(show)
+
+        self.add_item(queueItemObj)
+
+        return queueItemObj
 
     def addShow(self, tvdb_id, showDir, default_status=None, quality=None, flatten_folders=None, lang="fr", subtitles=None, audio_lang=None):
         queueItemObj = QueueItemAdd(tvdb_id, showDir, default_status, quality, flatten_folders, lang, subtitles, audio_lang)
@@ -157,6 +165,7 @@ class ShowQueueActions:
     RENAME = 5
     SUBTITLE=6
     SUBTITLE_CLEAN=7
+    FRENCH_SEARCH=8
     
     names = {REFRESH: 'Refresh',
                     ADD: 'Add',
@@ -165,6 +174,7 @@ class ShowQueueActions:
                     RENAME: 'Rename',
                     SUBTITLE: 'Subtitle',
                     SUBTITLE_CLEAN: 'Subtitle Cleaning',
+                    FRENCH_SEARCH: 'French Search',
                     }
 
 class ShowQueueItem(generic_queue.QueueItem):
@@ -285,6 +295,7 @@ class QueueItemAdd(ShowQueueItem):
             self.show.quality = self.quality if self.quality else sickbeard.QUALITY_DEFAULT
             self.show.flatten_folders = self.flatten_folders if self.flatten_folders != None else sickbeard.FLATTEN_FOLDERS_DEFAULT
             self.show.paused = 0
+            self.show.frenchsearch = 0
 
             # be smartish about this
             if self.show.genre and "talk show" in self.show.genre.lower():
@@ -465,6 +476,19 @@ class QueueItemCleanSubtitle(ShowQueueItem):
 
         self.inProgress = False
 
+class QueueItemsearchFrench(ShowQueueItem):
+    def __init__(self, show=None):
+        ShowQueueItem.__init__(self, ShowQueueActions.FRENCH_SEARCH, show)
+
+    def execute(self):
+
+        ShowQueueItem.execute(self)
+
+        logger.log(u"Searching french episodes for "+self.show.name)
+
+        self.show.searchFrench(self.show.tvdbid)
+
+        self.inProgress = False
 class QueueItemUpdate(ShowQueueItem):
     def __init__(self, show=None):
         ShowQueueItem.__init__(self, ShowQueueActions.UPDATE, show)

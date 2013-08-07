@@ -110,7 +110,7 @@ class NewznabProvider(generic.NZBProvider):
 
         return to_return
 
-    def _get_episode_search_strings(self, ep_obj):
+    def _get_episode_search_strings(self, ep_obj, french=None):
         showNames = show_name_helpers.allPossibleShowNames(ep_obj.show)
         for show_name in showNames:
             ep_obj.show.sname=show_name
@@ -122,9 +122,13 @@ class NewznabProvider(generic.NZBProvider):
         # search directly by tvrage id
             if ep_obj.show.tvrid:
                 params['rid'] = ep_obj.show.tvrid
+                if ep_obj.show.audio_lang=="fr" or french:
+                    params['q'] = "french"
+                else:
+                    params['q'] = helpers.sanitizeSceneName(ep_obj.show.sname)
         # if we can't then fall back on a very basic name search
             else:
-                if ep_obj.show.audio_lang=="fr":
+                if ep_obj.show.audio_lang=="fr" or french:
                     params['q'] = helpers.sanitizeSceneName(ep_obj.show.sname) + " french"
                 else:
                     params['q'] = helpers.sanitizeSceneName(ep_obj.show.sname)
@@ -195,10 +199,10 @@ class NewznabProvider(generic.NZBProvider):
 
         return True
 
-    def _doSearch(self, search_params, show=None, max_age=0, season=None):
+    def _doSearch(self, search_params, show=None, max_age=0, season=None, french=None):
         
         cat = '5030,5040'
-        if show and show.audio_lang != u"en":
+        if (show and show.audio_lang != u"en") or french:
             cat = '5020'
 
         params = {"t": "tvsearch",

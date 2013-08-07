@@ -125,6 +125,7 @@ selected
 <table>
 <b>Flatten files (no folders):</b> <input type="checkbox" name="flatten_folders" #if $show.flatten_folders == 1 and not $sickbeard.NAMING_FORCE_FOLDERS then "checked=\"checked\"" else ""# #if $sickbeard.NAMING_FORCE_FOLDERS then "disabled=\"disabled\"" else ""#/><br /><br />
 <b>Paused:</b> <input type="checkbox" name="paused" #if $show.paused == 1 then "checked=\"checked\"" else ""# /><br /><br />
+<b>French Search (auto) :</b> <input type="checkbox" name="frenchsearch" #if $show.frenchsearch == 1 and $sickbeard.DOWNLOAD_FRENCH then "checked=\"checked\"" else ""##if not $sickbeard.DOWNLOAD_FRENCH then " disabled=\"disabled\"" else ""# /><br /><br />
 <b>Subtitles:</b> <input type="checkbox" name="subtitles"#if $show.subtitles == 1 and $sickbeard.USE_SUBTITLES then " checked=\"checked\"" else ""##if not $sickbeard.USE_SUBTITLES then " disabled=\"disabled\"" else ""#/><br /><br />
 
 <b>Air by date: </b> 

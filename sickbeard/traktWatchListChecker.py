@@ -23,7 +23,7 @@ from sickbeard import encodingKludge as ek
 from sickbeard import logger,db
 from sickbeard import helpers
 from sickbeard import search_queue
-from sickbeard.common import SNATCHED, SNATCHED_PROPER, DOWNLOADED, SKIPPED, UNAIRED, IGNORED, ARCHIVED, WANTED, UNKNOWN
+from sickbeard.common import SNATCHED, SNATCHED_PROPER, SNATCHED_FRENCH, DOWNLOADED, SKIPPED, UNAIRED, IGNORED, ARCHIVED, WANTED, UNKNOWN
 from lib.trakt import *
 
 class TraktChecker():

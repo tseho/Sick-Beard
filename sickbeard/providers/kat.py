@@ -91,7 +91,7 @@ class KATProvider(generic.TorrentProvider):
     
         return [params]
 
-    def _get_episode_search_strings(self, ep_obj):
+    def _get_episode_search_strings(self, ep_obj,french=None):
     
         params = {}
         
@@ -121,7 +121,10 @@ class KATProvider(generic.TorrentProvider):
                 to_return.append(cur_return)
 
         logger.log(u"KAT _get_episode_search_strings for %s is returning %s" % (repr(ep_obj), repr(params)), logger.DEBUG)
-        lang = ep_obj.show.audio_lang
+        if french:
+            lang='fr'
+        else:
+            lang = ep_obj.show.audio_lang
         return to_return
 
     def getURL(self, url, headers=None):
@@ -180,7 +183,7 @@ class KATProvider(generic.TorrentProvider):
             logger.log(u"Unknown exception while loading URL " + url + ": " + traceback.format_exc(), logger.ERROR)
             return None
 
-    def _doSearch(self, search_params, show=None, season=None):
+    def _doSearch(self, search_params, show=None, season=None, french=None):
         # First run a search using the advanced format -- results are probably more reliable, but often not available for several weeks
         # http://kat.ph/usearch/%22james%20may%22%20season:1%20episode:1%20verified:1/?rss=1
         def advancedEpisodeParamBuilder(params):
@@ -191,7 +194,7 @@ class KATProvider(generic.TorrentProvider):
                 episodeParam = episodeParam + 'season:' + str(params.pop('season')) +"%20"
             if 'episode' in params:
                 episodeParam = episodeParam + 'episode:' + str(params.pop('episode')) +"%20"
-            if str(lang)=="fr":
+            if str(lang)=="fr" or french:
                 episodeParam = episodeParam + ' french'
             return episodeParam
         searchURL = self._buildSearchURL(advancedEpisodeParamBuilder, search_params);
@@ -209,7 +212,7 @@ class KATProvider(generic.TorrentProvider):
                 episodeParam = episodeParam + 'S' + str(params.pop('season')).zfill(2)
                 if 'episode' in params:
                     episodeParam += 'E' + str(params.pop('episode')).zfill(2)
-                if str(lang)=="fr":
+                if str(lang)=="fr" or french:
                     episodeParam = episodeParam + ' french'
                 return episodeParam
             searchURL = self._buildSearchURL(fuzzyEpisodeParamBuilder, search_params);

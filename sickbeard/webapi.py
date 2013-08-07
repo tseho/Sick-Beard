@@ -34,7 +34,7 @@ from sickbeard import db, logger, exceptions, history, ui, helpers
 from sickbeard.exceptions import ex
 from sickbeard import encodingKludge as ek
 from sickbeard import search_queue
-from sickbeard.common import SNATCHED, SNATCHED_PROPER, DOWNLOADED, SKIPPED, UNAIRED, IGNORED, ARCHIVED, WANTED, UNKNOWN
+from sickbeard.common import SNATCHED, SNATCHED_PROPER, SNATCHED_FRENCH, DOWNLOADED, SKIPPED, UNAIRED, IGNORED, ARCHIVED, WANTED, UNKNOWN
 from common import Quality, qualityPresetStrings, statusStrings
 from sickbeard import image_cache
 from lib.tvdb_api import tvdb_api, tvdb_exceptions
@@ -2222,7 +2222,7 @@ class CMD_ShowStats(ApiCall):
         episode_status_counts_total = {}
         episode_status_counts_total["total"] = 0
         for status in statusStrings.statusStrings.keys():
-            if status in [UNKNOWN, DOWNLOADED, SNATCHED, SNATCHED_PROPER]:
+            if status in [UNKNOWN, DOWNLOADED, SNATCHED, SNATCHED_PROPER, SNATCHED_FRENCH]:
                 continue
             episode_status_counts_total[status] = 0
 
@@ -2238,7 +2238,7 @@ class CMD_ShowStats(ApiCall):
         # add all snatched qualities
         episode_qualities_counts_snatch = {}
         episode_qualities_counts_snatch["total"] = 0
-        for statusCode in Quality.SNATCHED + Quality.SNATCHED_PROPER:
+        for statusCode in Quality.SNATCHED + Quality.SNATCHED_PROPER + Quality.SNATCHED_FRENCH:
             status, quality = Quality.splitCompositeStatus(statusCode)
             if quality in [Quality.NONE]:
                 continue
@@ -2255,7 +2255,7 @@ class CMD_ShowStats(ApiCall):
             if status in Quality.DOWNLOADED:
                 episode_qualities_counts_download["total"] += 1
                 episode_qualities_counts_download[int(row["status"])] += 1
-            elif status in Quality.SNATCHED + Quality.SNATCHED_PROPER:
+            elif status in Quality.SNATCHED + Quality.SNATCHED_PROPER + Quality.SNATCHED_FRENCH:
                 episode_qualities_counts_snatch["total"] += 1
                 episode_qualities_counts_snatch[int(row["status"])] += 1
             elif status == 0: # we dont count NONE = 0 = N/A
@@ -2396,7 +2396,7 @@ class CMD_ShowsStats(ApiCall):
         stats["shows_total"] = len(sickbeard.showList)
         stats["shows_active"] = len([show for show in sickbeard.showList if show.paused == 0 and show.status != "Ended"])
         stats["ep_downloaded"] = myDB.select("SELECT COUNT(*) FROM tv_episodes WHERE status IN (" + ",".join([str(show) for show in Quality.DOWNLOADED + [ARCHIVED]]) + ") AND season != 0 and episode != 0 AND airdate <= " + today + "")[0][0]
-        stats["ep_total"] = myDB.select("SELECT COUNT(*) FROM tv_episodes WHERE season != 0 and episode != 0 AND (airdate != 1 OR status IN (" + ",".join([str(show) for show in (Quality.DOWNLOADED + Quality.SNATCHED + Quality.SNATCHED_PROPER) + [ARCHIVED]]) + ")) AND airdate <= " + today + " AND status != " + str(IGNORED) + "")[0][0]
+        stats["ep_total"] = myDB.select("SELECT COUNT(*) FROM tv_episodes WHERE season != 0 and episode != 0 AND (airdate != 1 OR status IN (" + ",".join([str(show) for show in (Quality.DOWNLOADED + Quality.SNATCHED + Quality.SNATCHED_PROPER + Quality.SNATCHED_FRENCH) + [ARCHIVED]]) + ")) AND airdate <= " + today + " AND status != " + str(IGNORED) + "")[0][0]
 
         myDB.connection.close()
         return _responds(RESULT_SUCCESS, stats)

@@ -195,8 +195,12 @@
 #end if
 
 	<tr><td class="showLegend">Info Language:</td><td><img src="$sbRoot/images/flags/${show.lang}.png" width="16" height="11" alt="$show.lang" title="$show.lang" /></td></tr>
+    #if int($show.frenchsearch) == 1
+    <tr><td class="showLegend">Audio Language:</td><td><img src="$sbRoot/images/flags/${show.audio_lang}.png" width="16" height="11" alt="$show.audio_lang" title="$show.lang" />  <img src="$sbRoot/images/flags/fr.png" width="16" height="11" alt="fr" title="fr" /></td></tr>
+    #else
     <tr><td class="showLegend">Audio Language:</td><td><img src="$sbRoot/images/flags/${show.audio_lang}.png" width="16" height="11" alt="$show.audio_lang" title="$show.lang" /></td></tr>
-	<tr><td class="showLegend">Custom Names :</td><td>#if $show.exceptions then $exceptions_string else $show.name#</td></tr>
+    #end if
+    <tr><td class="showLegend">Custom Names :</td><td>#if $show.exceptions then $exceptions_string else $show.name#</td></tr>
 	#if $show.imdbid:
 	#if $show.imdb_info['rating'] !='':
 	<tr><td class="showLegend">Rating :</td><td>$show.imdb_info['rating']</td></tr>
@@ -206,7 +210,7 @@
 	#else:
 	<tr><td class="showLegend">No Rating</td><td></td></tr>
 	#end if
-    </td></tr>
+	</td></tr>
     </table>
     <td width="25%">
     <table>

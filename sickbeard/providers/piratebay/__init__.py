@@ -176,7 +176,7 @@ class ThePirateBayProvider(generic.TorrentProvider):
         
         return [search_string]
 
-    def _get_episode_search_strings(self, ep_obj):
+    def _get_episode_search_strings(self, ep_obj,french=None):
        
         search_string = {'Episode': []}
        
@@ -198,7 +198,7 @@ class ThePirateBayProvider(generic.TorrentProvider):
     
         return [search_string]
 
-    def _doSearch(self, search_params, show=None, season=None):
+    def _doSearch(self, search_params, show=None, season=None, french=None):
     
         results = []
         items = {'Season': [], 'Episode': []}
