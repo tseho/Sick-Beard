@@ -47,10 +47,11 @@ class FrenchFinder():
         frenchlist=[]
         #get list of english episodes that we want to search in french
         myDB = db.DBConnection()
+        today = datetime.date.today().toordinal()
         if show:
-            frenchsql=myDB.select("SELECT showid, season, episode from tv_episodes where audio_langs='en' and tv_episodes.showid =?",[show]) 
+            frenchsql=myDB.select("SELECT showid, season, episode from tv_episodes where audio_langs='en' and tv_episodes.showid =? and (? - tv_episodes.airdate) > 120",[show,today]) 
         else:
-            frenchsql=myDB.select("SELECT showid, season, episode from tv_episodes, tv_shows where audio_langs='en' and tv_episodes.showid = tv_shows.tvdb_id and tv_shows.frenchsearch = 1")
+            frenchsql=myDB.select("SELECT showid, season, episode from tv_episodes, tv_shows where audio_langs='en' and tv_episodes.showid = tv_shows.tvdb_id and tv_shows.frenchsearch = 1 and (? - tv_episodes.airdate) > 120",[today])
         #make the episodes objects
         for episode in frenchsql:
             showObj = helpers.findCertainShow(sickbeard.showList, episode[0])
