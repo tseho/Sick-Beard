@@ -63,7 +63,8 @@ class T411Provider(generic.TorrentProvider):
         
     def _get_season_search_strings(self, show, season):
 
-        showNames = show_name_helpers.allPossibleShowNames(show)
+        showNam = show_name_helpers.allPossibleShowNames(show)
+        showNames = list(set(showNam))
         results = []
         for showName in showNames:
             if (int(season) < 31):
@@ -79,7 +80,8 @@ class T411Provider(generic.TorrentProvider):
 
     def _get_episode_search_strings(self, ep_obj, french=None):
 
-        showNames = show_name_helpers.allPossibleShowNames(ep_obj.show)
+        showNam = show_name_helpers.allPossibleShowNames(ep_obj.show)
+        showNames = list(set(showNam))
         results = []
         for showName in showNames:
             results.append( self.getSearchParams( "%s S%02dE%02d" % ( showName, ep_obj.season, ep_obj.episode), ep_obj.show.audio_lang, 433, french ))

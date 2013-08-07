@@ -64,7 +64,8 @@ class GksProvider(generic.TorrentProvider):
 
     def _get_season_search_strings(self, show, season):
 
-        showNames = show_name_helpers.allPossibleShowNames(show)
+        showNam = show_name_helpers.allPossibleShowNames(show)
+        showNames = list(set(showNam))
         results = []
         for showName in showNames:
             for result in self.getSearchParams(showName + "+S%02d" % season, show.audio_lang, season) :
@@ -75,7 +76,8 @@ class GksProvider(generic.TorrentProvider):
 
     def _get_episode_search_strings(self, ep_obj, french=None):
 
-        showNames = show_name_helpers.allPossibleShowNames(ep_obj.show)
+        showNam = show_name_helpers.allPossibleShowNames(ep_obj.show)
+        showNames = list(set(showNam))
         results = []
         for showName in showNames:
             if french:
