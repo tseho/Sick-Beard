@@ -84,7 +84,8 @@ class BinNewzProvider(generic.NZBProvider):
         return sickbeard.BINNEWZ
 
     def _get_season_search_strings(self, show, season, episode=None):
-        showNames = show_name_helpers.allPossibleShowNames(show)
+        showNam = show_name_helpers.allPossibleShowNames(show)
+        showNames = list(set(showNam))
         result = []
         global globepid
         globepid = show.tvdbid
@@ -94,7 +95,8 @@ class BinNewzProvider(generic.NZBProvider):
 
     def _get_episode_search_strings(self, ep_obj, french=None):
         strings = []
-        showNames = show_name_helpers.allPossibleShowNames(ep_obj.show)
+        showNam = show_name_helpers.allPossibleShowNames(ep_obj.show)
+        showNames = list(set(showNam))
         global globepid
         myDB = db.DBConnection()
         epidr = myDB.select("SELECT episode_id from tv_episodes where tvdbid=?", [ep_obj.tvdbid])
