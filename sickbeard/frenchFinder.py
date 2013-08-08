@@ -70,14 +70,26 @@ class FrenchFinder():
                     continue
 
                 logger.log(u"Searching for french episodes on "+curProvider.name +" for " +frepisode.show.name +" season "+str(frepisode.season)+" episode "+str(frepisode.episode))
-                curfrench = curProvider.findFrench(frepisode, manualSearch=True)
+                try:
+                    curfrench = curProvider.findFrench(frepisode, manualSearch=True)
+                except:
+                    logger.log(u"Exception", logger.DEBUG)
+                    continue
                 for x in curfrench:
                     result.append(x)
-            best = search.pickBestResult(result, episode = epObj.episode, season = epObj.season)
+            try:
+                best = search.pickBestResult(result, episode = epObj.episode, season = epObj.season)
+            except:
+                logger.log(u"Exception", logger.DEBUG)
+                continue
             if best:
                 best.name=best.name + ' snatchedfr'
                 logger.log(u"Found french episode for " +frepisode.show.name +" season "+str(frepisode.season)+" episode "+str(frepisode.episode))
-                search.snatchEpisode(best, SNATCHED_FRENCH)
+                try:
+                    search.snatchEpisode(best, SNATCHED_FRENCH)
+                except:
+                    logger.log(u"Exception", logger.DEBUG)
+                    continue
             else:
                 delay.append(frepisode.show.tvdbid)
                 logger.log(u"No french episodes found for " +frepisode.show.name +" season "+str(frepisode.season)+" episode "+str(frepisode.episode))
