@@ -47,11 +47,10 @@ class FrenchFinder():
         frenchlist=[]
         #get list of english episodes that we want to search in french
         myDB = db.DBConnection()
-        today = datetime.date.today().toordinal()
         if show:
-            frenchsql=myDB.select("SELECT showid, season, episode from tv_episodes where audio_langs='en' and tv_episodes.showid =? and (? - tv_episodes.airdate) > 120",[show,today]) 
+            frenchsql=myDB.select("SELECT showid, season, episode from tv_episodes where audio_langs='en' and tv_episodes.showid =? order by showid, airdate asc",[show]) 
         else:
-            frenchsql=myDB.select("SELECT showid, season, episode from tv_episodes, tv_shows where audio_langs='en' and tv_episodes.showid = tv_shows.tvdb_id and tv_shows.frenchsearch = 1 and (? - tv_episodes.airdate) > 120",[today])
+            frenchsql=myDB.select("SELECT showid, season, episode from tv_episodes, tv_shows where audio_langs='en' and tv_episodes.showid = tv_shows.tvdb_id and tv_shows.frenchsearch = 1 order by showid, airdate asc")
         #make the episodes objects
         for episode in frenchsql:
             showObj = helpers.findCertainShow(sickbeard.showList, episode[0])
@@ -59,7 +58,11 @@ class FrenchFinder():
             frenchlist.append(epObj)
         
         #for each episode in frenchlist fire a search in french
+        delay=[]
         for frepisode in frenchlist:
+            if frepisode.show.tvdbid in delay:
+                logger.log(u"Previous episode for show "+str(frepisode.show.tvdbid)+" not found in french so skipping this search", logger.DEBUG)
+                continue
             result=[]
             for curProvider in providers.sortedProviderList():
 
@@ -76,5 +79,6 @@ class FrenchFinder():
                 logger.log(u"Found french episode for " +frepisode.show.name +" season "+str(frepisode.season)+" episode "+str(frepisode.episode))
                 search.snatchEpisode(best, SNATCHED_FRENCH)
             else:
+                delay.append(frepisode.show.tvdbid)
                 logger.log(u"No french episodes found for " +frepisode.show.name +" season "+str(frepisode.season)+" episode "+str(frepisode.episode))
         
