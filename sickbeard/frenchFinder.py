@@ -79,9 +79,10 @@ class FrenchFinder():
                     result.append(x)
             best=None
             try:
-                best = search.pickBestResult(result, episode = epObj.episode)
+                epi={}
+                epi[1]=frepisode
+                best = search.pickBestResult(result, episode = epi)
             except:
-                logger.log(u"Exception", logger.DEBUG)
                 pass
             if best:
                 best.name=best.name + ' snatchedfr'
