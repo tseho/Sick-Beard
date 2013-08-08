@@ -78,7 +78,7 @@ class FrenchFinder():
                 for x in curfrench:
                     result.append(x)
             try:
-                best = search.pickBestResult(result, episode = epObj.episode, season = epObj.season)
+                best = search.pickBestResult(result, episode = epObj.episode)
             except:
                 logger.log(u"Exception", logger.DEBUG)
                 pass
