@@ -130,6 +130,17 @@
 </div>
 
 <div class="optionWrapper">
+    <span class="selectTitle">French Search</span>
+    <div class="selectChoices">
+        <select id="edit_french" name="frenched">
+            <option value="keep">&lt; keep &gt;</option>
+            <option value="enable" #if $frenched_value then "selected=\"selected\"" else ""#>enable</option>
+            <option value="disable" #if $frenched_value == False then "selected=\"selected\"" else ""#>disable</option>
+        </select>
+    </div><br />
+</div>
+
+<div class="optionWrapper alt">
 <span class="selectTitle">Subtitles<span class="separator"></span></span>
     <div class="selectChoices">
         <select id="edit_subtitles" name="subtitles">
@@ -148,7 +159,7 @@
     </div><br />
 </div>
 
-<div class="optionWrapper">
+<div class="optionWrapper alt">
 	<span class="selectTitle">Desired Audio Language</span>
     <div class="selectChoices">
         <select name="audioLang" id="showLangSelect">
