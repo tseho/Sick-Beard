@@ -496,6 +496,9 @@ class Manage:
         paused_all_same = True
         last_paused = None
 
+        frenched_all_same = True
+        last_frenched = None
+        
         quality_all_same = True
         last_quality = None
         
@@ -523,6 +526,13 @@ class Manage:
                     paused_all_same = False
                 else:
                     last_paused = curShow.paused
+                    
+            if frenched_all_same:
+                # if we had a value already and this value is different then they're not all the same
+                if last_frenched not in (curShow.frenchsearch, None):
+                    frenched_all_same = False
+                else:
+                    last_frenched = curShow.frenchsearch
 
             if flatten_folders_all_same:
                 if last_flatten_folders not in (None, curShow.flatten_folders):
@@ -556,6 +566,7 @@ class Manage:
 
         t.showList = toEdit
         t.paused_value = last_paused if paused_all_same else None
+        t.frenched_value = last_frenched if frenched_all_same else None
         t.flatten_folders_value = last_flatten_folders if flatten_folders_all_same else None
         t.quality_value = last_quality if quality_all_same else None
         t.subtitles_value = last_subtitles if subtitles_all_same else None
@@ -565,7 +576,7 @@ class Manage:
         return _munge(t)
 
     @cherrypy.expose
-    def massEditSubmit(self, paused=None, flatten_folders=None, quality_preset=False, subtitles=None,
+    def massEditSubmit(self, paused=None, frenched=None, flatten_folders=None, quality_preset=False, subtitles=None,
                        anyQualities=[], bestQualities=[], tvdbLang=None, audioLang = None, toEdit=None, *args, **kwargs):
 
         dir_map = {}
@@ -598,6 +609,12 @@ class Manage:
                 new_paused = True if paused == 'enable' else False
             new_paused = 'on' if new_paused else 'off'
 
+            if frenched == 'keep':
+                new_frenched = showObj.frenchsearch
+            else:
+                new_frenched = True if frenched == 'enable' else False
+            new_frenched = 'on' if new_frenched else 'off'
+            
             if flatten_folders == 'keep':
                 new_flatten_folders = showObj.flatten_folders
             else:
@@ -619,14 +636,14 @@ class Manage:
             else:
                 new_lang = tvdbLang
 
-            if audioLang == 'None':
+            if audioLang == 'keep':
                 new_audio_lang = showObj.audio_lang;
             else:
                 new_audio_lang = audioLang
 
             exceptions_list = []
             
-            curErrors += Home().editShow(curShow, new_show_dir, anyQualities, bestQualities, exceptions_list, new_flatten_folders, new_paused, subtitles=new_subtitles, tvdbLang=new_lang, audio_lang=new_audio_lang, directCall=True)
+            curErrors += Home().editShow(curShow, new_show_dir, anyQualities, bestQualities, exceptions_list, new_flatten_folders, new_paused, new_frenched, subtitles=new_subtitles, tvdbLang=new_lang, audio_lang=new_audio_lang, directCall=True)
 
             if curErrors:
                 logger.log(u"Errors: "+str(curErrors), logger.ERROR)
