@@ -38,6 +38,7 @@ class CpasbienProvider(generic.TorrentProvider):
         
         self.cj = cookielib.CookieJar()
         self.opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(self.cj))
+        self.opener.addheaders=[('User-agent', 'Mozilla/5.0')]
         
         self.url = "http://www.cpasbien.me"
         
@@ -75,13 +76,12 @@ class CpasbienProvider(generic.TorrentProvider):
         results = []
         searchUrl = self.url + '/recherche/'
         
-
         data = urllib.urlencode({'champ_recherche': searchString})
-
+        req = urllib2.Request(searchUrl, data, headers={'User-Agent' : "Mozilla/5.0"})
         try:
-            soup = BeautifulSoup( urllib2.urlopen(searchUrl, data) )
+            soup = BeautifulSoup( urllib2.urlopen(req) )
         except Exception, e:
-            logger.log(u"Error trying to load cpasbien response: "+ex(e), logger.ERROR)
+            logger.log(u"Error trying to load cpasbien response: "+str(e), logger.ERROR)
             return []
 
         rows = soup.findAll(attrs = {'class' : ["color0", "color1"]})
