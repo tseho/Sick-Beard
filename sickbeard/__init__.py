@@ -161,6 +161,7 @@ DOWNLOAD_FRENCH = None
 PREFERED_METHOD = None
 SEARCH_FREQUENCY = None
 BACKLOG_SEARCH_FREQUENCY = 1
+FRENCH_DELAY = None
 
 MIN_SEARCH_FREQUENCY = 10
 
@@ -445,7 +446,7 @@ def initialize(consoleLogging=True):
                 THEPIRATEBAY, THEPIRATEBAY_PROXY, THEPIRATEBAY_PROXY_URL, THEPIRATEBAY_TRUSTED, \
                 Cpasbien, \
                 kat, \
-                SEARCH_FREQUENCY, DEFAULT_SEARCH_FREQUENCY, BACKLOG_SEARCH_FREQUENCY, \
+                SEARCH_FREQUENCY, DEFAULT_SEARCH_FREQUENCY, BACKLOG_SEARCH_FREQUENCY, FRENCH_DELAY,\
                 QUALITY_DEFAULT, FLATTEN_FOLDERS_DEFAULT, SUBTITLES_DEFAULT, STATUS_DEFAULT, AUDIO_SHOW_DEFAULT, \
                 GROWL_NOTIFY_ONSNATCH, GROWL_NOTIFY_ONDOWNLOAD, GROWL_NOTIFY_ONSUBTITLEDOWNLOAD, TWITTER_NOTIFY_ONSNATCH, TWITTER_NOTIFY_ONDOWNLOAD, TWITTER_NOTIFY_ONSUBTITLEDOWNLOAD, \
                 USE_GROWL, GROWL_HOST, GROWL_PASSWORD, USE_PROWL, PROWL_NOTIFY_ONSNATCH, PROWL_NOTIFY_ONDOWNLOAD, PROWL_NOTIFY_ONSUBTITLEDOWNLOAD, PROWL_API, PROWL_PRIORITY, PROG_DIR, NZBMATRIX, NZBMATRIX_USERNAME, \
@@ -582,7 +583,7 @@ def initialize(consoleLogging=True):
         SEARCH_FREQUENCY = check_setting_int(CFG, 'General', 'search_frequency', DEFAULT_SEARCH_FREQUENCY)
         if SEARCH_FREQUENCY < MIN_SEARCH_FREQUENCY:
             SEARCH_FREQUENCY = MIN_SEARCH_FREQUENCY
-
+        FRENCH_DELAY = check_setting_int(CFG, 'General', 'french_delay', 120)
         TORRENT_DIR = check_setting_str(CFG, 'Blackhole', 'torrent_dir', '')
 
         TV_DOWNLOAD_DIR = check_setting_str(CFG, 'General', 'tv_download_dir', '')
@@ -1339,6 +1340,7 @@ def save_config():
     new_config['General']['prefered_method'] = PREFERED_METHOD    
     new_config['General']['usenet_retention'] = int(USENET_RETENTION)
     new_config['General']['search_frequency'] = int(SEARCH_FREQUENCY)
+    new_config['General']['french_delay'] = int(FRENCH_DELAY)
     new_config['General']['download_propers'] = int(DOWNLOAD_PROPERS)
     new_config['General']['download_french'] = int(DOWNLOAD_FRENCH)
     new_config['General']['quality_default'] = int(QUALITY_DEFAULT)

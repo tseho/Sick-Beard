@@ -42,16 +42,20 @@ class FrenchFinder():
         #    return
         if sickbeard.showList==None:
             return
-        logger.log(u"Beginning the search for french episodes")
+        logger.log(u"Beginning the search for french episodes older than "+ str(sickbeard.FRENCH_DELAY) +" days")
        
         frenchlist=[]
         #get list of english episodes that we want to search in french
         myDB = db.DBConnection()
+        today = datetime.date.today().toordinal()
         if show:
-            frenchsql=myDB.select("SELECT showid, season, episode from tv_episodes where audio_langs='en' and tv_episodes.showid =? order by showid, airdate asc",[show]) 
+            frenchsql=myDB.select("SELECT showid, season, episode from tv_episodes where audio_langs='en' and tv_episodes.showid =? and (? - tv_episodes.airdate) > ? order by showid, airdate asc",[show,today,sickbeard.FRENCH_DELAY]) 
+            count=myDB.select("SELECT count(*) from tv_episodes where audio_langs='en' and tv_episodes.showid =? and (? - tv_episodes.airdate) > ?",[show,today,sickbeard.FRENCH_DELAY]) 
         else:
-            frenchsql=myDB.select("SELECT showid, season, episode from tv_episodes, tv_shows where audio_langs='en' and tv_episodes.showid = tv_shows.tvdb_id and tv_shows.frenchsearch = 1 order by showid, airdate asc")
+            frenchsql=myDB.select("SELECT showid, season, episode from tv_episodes, tv_shows where audio_langs='en' and tv_episodes.showid = tv_shows.tvdb_id and tv_shows.frenchsearch = 1 and (? - tv_episodes.airdate) > ? order by showid, airdate asc",[today,sickbeard.FRENCH_DELAY])
+            count=myDB.select("SELECT count(*) from tv_episodes, tv_shows where audio_langs='en' and tv_episodes.showid = tv_shows.tvdb_id and tv_shows.frenchsearch = 1 and (? - tv_episodes.airdate) > ?",[today,sickbeard.FRENCH_DELAY])
         #make the episodes objects
+        logger.log(u"Searching for "+str(count[0][0]) +" episodes in french")
         for episode in frenchsql:
             showObj = helpers.findCertainShow(sickbeard.showList, episode[0])
             epObj = showObj.getEpisode(episode[1], episode[2])

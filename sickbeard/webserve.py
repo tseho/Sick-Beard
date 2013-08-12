@@ -1013,7 +1013,7 @@ class ConfigSearch:
     @cherrypy.expose
     def saveSearch(self, use_nzbs=None, use_torrents=None, nzb_dir=None, sab_username=None, sab_password=None,
                        sab_apikey=None, sab_category=None, sab_host=None, nzbget_password=None, nzbget_category=None, nzbget_host=None,
-                       torrent_dir=None,torrent_method=None, nzb_method=None, usenet_retention=None, search_frequency=None, download_propers=None, download_french=None, torrent_username=None, torrent_password=None, torrent_host=None, torrent_label=None, torrent_path=None, 
+                       torrent_dir=None,torrent_method=None, nzb_method=None, usenet_retention=None, search_frequency=None, french_delay=None, download_propers=None, download_french=None, torrent_username=None, torrent_password=None, torrent_host=None, torrent_label=None, torrent_path=None, 
                        torrent_ratio=None, torrent_paused=None, ignore_words=None, prefered_method=None, torrent_use_ftp = None, ftp_host=None, ftp_port=None, ftp_timeout=None, ftp_passive = None, ftp_login=None, ftp_password=None, ftp_remotedir=None):
 
         results = []
@@ -1047,6 +1047,9 @@ class ConfigSearch:
 
         if usenet_retention == None:
             usenet_retention = 200
+        
+        if french_delay == None:
+            french_delay = 120
 
         if ignore_words == None:
             ignore_words = ""
@@ -1064,6 +1067,7 @@ class ConfigSearch:
         sickbeard.PREFERED_METHOD = prefered_method
         sickbeard.TORRENT_METHOD = torrent_method
         sickbeard.USENET_RETENTION = int(usenet_retention)
+        sickbeard.FRENCH_DELAY = int(french_delay)
         
         sickbeard.IGNORE_WORDS = ignore_words
         
