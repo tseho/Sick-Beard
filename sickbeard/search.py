@@ -468,8 +468,9 @@ def findSeason(show, season):
         for EpNum in reallywanted:
             showObj = sickbeard.helpers.findCertainShow(sickbeard.showList, show.tvdbid)
             episode = showObj.getEpisode(season, EpNum)
-            finalResults.append(findEpisode(episode, manualSearch=True))
-        return finalResults
+            res=findEpisode(episode, manualSearch=True)
+            snatchEpisode(res)
+        return
     else:
         logger.log(u"Searching for stuff we need from "+show.name+" season "+str(season))
     
@@ -515,6 +516,14 @@ def findSeason(show, season):
     
         # pick the best season NZB
         bestSeasonNZB = None
+        if len(foundResults)==0:
+            logger.log(u"No multi eps found trying a single ep search", logger.DEBUG)
+            for EpNum in reallywanted:
+                showObj = sickbeard.helpers.findCertainShow(sickbeard.showList, show.tvdbid)
+                episode = showObj.getEpisode(season, EpNum)
+                res=findEpisode(episode, manualSearch=True)
+                snatchEpisode(res)
+            return
         if SEASON_RESULT in foundResults:
             bestSeasonNZB = pickBestResult(foundResults[SEASON_RESULT], anyQualities+bestQualities,show.tvdbid,season)
     

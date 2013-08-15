@@ -139,7 +139,7 @@ class BinNewzProvider(generic.NZBProvider):
     def _doSearch(self, searchString=None, show=None, season=None, french=None):
         if searchString is None:
             return []
-        logger.log("BinNewz : Searching for " + searchString)
+        logger.log("BinNewz : Searching for " + searchString, logger.DEBUG)
         data = self.buildUrl(searchString, show.quality)
         try:
             soup = BeautifulSoup(urllib2.urlopen("http://www.binnews.in/_bin/search2.php",
@@ -151,7 +151,8 @@ class BinNewzProvider(generic.NZBProvider):
         results = []
         tables = soup.findAll("table", id="tabliste")
         for table in tables:
-
+            if len(results)>5:
+                break
             rows = table.findAll("tr")
             for row in rows:
 
