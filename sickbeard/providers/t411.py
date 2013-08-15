@@ -45,7 +45,7 @@ class T411Provider(generic.TorrentProvider):
     def isEnabled(self):
         return sickbeard.T411
     
-    def getSearchParams(self, searchString, audio_lang, subcat, french):
+    def getSearchParams(self, searchString, audio_lang, subcat, french=None):
         if audio_lang == "en" and french==None:
             return urllib.urlencode( {'search': searchString, 'cat' : 210, 'submit' : 'Recherche', 'subcat': subcat } ) + "&term%5B17%5D%5B%5D=540&term%5B17%5D%5B%5D=721"
         elif audio_lang == "fr" or french:
