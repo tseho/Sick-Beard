@@ -1005,7 +1005,7 @@ def initialize(consoleLogging=True):
                                                      runImmediately=False)
         
         frenchFinderScheduler = scheduler.Scheduler(frenchFinder.FrenchFinder(),
-                                                     cycleTime=datetime.timedelta(minutes=7200),
+                                                     cycleTime=datetime.timedelta(minutes=4000),
                                                      threadName="FINDFRENCH",
                                                      runImmediately=True)
 
