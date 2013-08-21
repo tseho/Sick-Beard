@@ -1,21 +1,80 @@
+![preview thumb](http://i.imgur.com/OeXSAkU.png)
+
 SickBeard VO/VF by sarakha63
 =====
 
-This version is base on Midgetspy's work.
+This version is based on Midgetspy's and mr-oranges work:
 
 IT includes :
 
 French and english audio language
-Nzb Scraper added : binnews (with nzbindex, binsearch and nzbclub)
-Torrent scraper added : t411, cpasbien, piratebay, gks, kat
-Torrent gestion with transmission, utorrent deluge gestion
+
 Interfaces change
+
+![preview thumb](http://i.imgur.com/C6TPDCT.png)
+![preview thumb](http://i.imgur.com/2nFcEbZ.png)
+![preview thumb](http://i.imgur.com/YvAepaA.png)
+
+Nzb Scraper added : binnews (with nzbindex, binsearch and nzbclub)
+
+Torrent scraper added : t411, cpasbien, piratebay, gks, kat
+
+![preview thumb](http://i.imgur.com/swc1lvx.png)
+
+Torrent gestion with transmission, utorrent deluge gestion, download station
+
+![preview thumb](http://i.imgur.com/K2DoPND.png)
+
 subliminal integration
-next possiblble release download
+
+![preview thumb](http://i.imgur.com/plSD7lP.png)
+![preview thumb](http://i.imgur.com/P2yTfpx.png)
+
+subtitle cleaning
+
+![preview thumb](http://i.imgur.com/5kG6d10.png)
+
 torrent/nzb preferred choice
+
+![preview thumb](http://i.imgur.com/1s7n4Lu.png)
+
+torrent gestion with seeding possibility
+
+![preview thumb](http://i.imgur.com/NDKNgLT.png)
+
+Multiple notification system and trakt watchlist import
+
+![preview thumb](http://i.imgur.com/xq3G3UI.png)
+![preview thumb](http://i.imgur.com/MMtLuzm.png)
+![preview thumb](http://i.imgur.com/N24lVgk.png)
+![preview thumb](http://i.imgur.com/zEWzsJJ.png)
+![preview thumb](http://i.imgur.com/u6GGX5P.png)
+![preview thumb](http://i.imgur.com/uz5Ru1a.png)
+
+multicolor progress bar with informative tooltip
+
+![preview thumb](http://i.imgur.com/IfrAr7b.jpg)
+
+local zone time for coming episodes
+
+![preview thumb](http://i.imgur.com/gbQepiV.jpg)
+
+ignore words and proper/auto french:
+
+![preview thumb](http://i.imgur.com/bnkTqbY.png)
+
+custom search name and more
+
+![preview thumb](http://i.imgur.com/tSAvGcJ.png)
+![preview thumb](http://i.imgur.com/5X3Vm5Y.png)
+![preview thumb](http://i.imgur.com/axshXXM.png)
+![preview thumb](http://i.imgur.com/ukrXA4C.png)
+![preview thumb](http://i.imgur.com/ZTOCiRi.png)
+
+and much more such as:
+
+auto next available release download when failed
 and much more
-
-
 
 *Sick Beard is currently an alpha release. There may be severe bugs in it and at any given time it may not work at all.*
 
