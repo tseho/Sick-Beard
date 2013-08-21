@@ -163,9 +163,9 @@ class GenericMetadata():
 
         # Our specials thumbnail is, well, special
         if season == 0:
-            season_thumb_file_path = 'season-specials'
+            season_thumb_file_path = 'saison-specials'
         else:
-            season_thumb_file_path = 'season' + str(season).zfill(2)
+            season_thumb_file_path = 'saison' + str(season).zfill(2)
         
         return ek.ek(os.path.join, show_obj.location, season_thumb_file_path+'.tbn')
     
