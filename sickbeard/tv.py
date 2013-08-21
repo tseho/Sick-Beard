@@ -1867,6 +1867,8 @@ class TVEpisode(object):
 
             result_name = result_name.replace('%RG', '')
             result_name = result_name.replace('%rg', '')
+            if result_name[-1] in ['.','-','_',' ']:
+                result_name = result_name[:-1]
             logger.log(u"Episode has no release name, replacing it with a generic one: "+result_name, logger.DEBUG)
         
         # split off ep name part only
