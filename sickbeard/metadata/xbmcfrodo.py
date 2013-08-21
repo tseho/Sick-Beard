@@ -57,11 +57,11 @@ class XBMCFrodoMetadata(xbmc.XBMCMetadata):
         self.fanart_name = "fanart.jpg"
 
         self.eg_show_metadata = "tvshow.nfo"
-        self.eg_episode_metadata = "Season##\\<i>filename</i>.nfo"
+        self.eg_episode_metadata = "Saison##\\<i>filename</i>.nfo"
         self.eg_fanart = "fanart.jpg"
         self.eg_poster = "poster.jpg & banner.jpg"
-        self.eg_episode_thumbnails = "Season##\\<i>filename</i>-thumb.jpg"
-        self.eg_season_thumbnails = "season##-poster.jpg"
+        self.eg_episode_thumbnails = "Saison##\\<i>filename</i>-thumb.jpg"
+        self.eg_season_thumbnails = "saison##-poster.jpg"
         self.banner_name = "banner.jpg"
         
     def get_banner_path(self, show_obj):
@@ -123,9 +123,9 @@ class XBMCFrodoMetadata(xbmc.XBMCMetadata):
 
         # Our specials thumbnail is, well, special
         if season == 0:
-            season_thumb_file_path = 'season-specials'
+            season_thumb_file_path = 'saison-specials'
         else:
-            season_thumb_file_path = 'season' + str(season).zfill(2)
+            season_thumb_file_path = 'saison' + str(season).zfill(2)
         
         return ek.ek(os.path.join, show_obj.location, season_thumb_file_path + '-poster.jpg')
 

@@ -32,7 +32,7 @@ name_presets = ('%SN - %Sx%0E - %EN',
                 '%S.N.S%0SE%0E.%E.N',
                 '%Sx%0E - %EN',
                 'S%0SE%0E - %EN',
-                'Season %0S/%S.N.S%0SE%0E.%Q.N-%RG'
+                'Saison %0S/%S.N.S%0SE%0E.%Q.N-%RG'
                 )
 
 name_abd_presets = ('%SN - %A-D - %EN',
