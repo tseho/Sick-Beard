@@ -514,7 +514,10 @@ def del_empty_dirs(s_dir):
 
     if b_empty:
         if s_dir!=sickbeard.TORRENT_DOWNLOAD_DIR and s_dir!=sickbeard.TV_DOWNLOAD_DIR:
-            logger.log(u"Deleting " + s_dir.decode('utf-8')+ ' because it is empty')
+            try:
+                logger.log(u"Deleting " + s_dir.decode('utf-8')+ ' because it is empty')
+            except:
+                logger.log(u"Deleting one folder because it is empty")
             os.rmdir(s_dir)
 
 def make_dirs(path):
